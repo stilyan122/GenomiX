@@ -1,0 +1,47 @@
+﻿[
+  {
+    "Id": "ea821ce2-2a3d-43ef-8978-5f34ee07d080",
+    "UserName": "stilyan",
+    "NormalizedUserName": "STILYAN",
+    "Email": "stilyan@example.com",
+    "NormalizedEmail": "STILYAN@EXAMPLE.COM",
+    "EmailConfirmed": true,
+    "PhoneNumberConfirmed": false,
+    "TwoFactorEnabled": false,
+    "LockoutEnabled": false,
+    "AccessFailedCount": 0,
+    "FirstName": "Stilyan",
+    "LastName": "Chanev",
+    "CreatedAt": "2024-06-01T12:00:00Z"
+  },
+  {
+    "Id": "9d5e0ac1-4f1b-422b-b7f0-0f7d5d2dbbb1",
+    "UserName": "alice",
+    "NormalizedUserName": "ALICE",
+    "Email": "alice@example.com",
+    "NormalizedEmail": "ALICE@EXAMPLE.COM",
+    "EmailConfirmed": true,
+    "PhoneNumberConfirmed": false,
+    "TwoFactorEnabled": false,
+    "LockoutEnabled": false,
+    "AccessFailedCount": 0,
+    "FirstName": "Alice",
+    "LastName": "Johnson",
+    "CreatedAt": "2024-07-15T10:30:00Z"
+  },
+  {
+    "Id": "58a7c2b5-1347-4f0a-b3ad-912d4f098aaa",
+    "UserName": "ivan",
+    "NormalizedUserName": "IVAN",
+    "Email": "ivan@example.com",
+    "NormalizedEmail": "IVAN@EXAMPLE.COM",
+    "EmailConfirmed": false,
+    "PhoneNumberConfirmed": false,
+    "TwoFactorEnabled": false,
+    "LockoutEnabled": false,
+    "AccessFailedCount": 0,
+    "FirstName": "Ivan",
+    "LastName": "Petrov",
+    "CreatedAt": "2024-08-20T08:45:00Z"
+  }
+]

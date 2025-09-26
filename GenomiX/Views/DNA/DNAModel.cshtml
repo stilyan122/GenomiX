@@ -1,0 +1,245 @@
+﻿@model Guid
+@{
+    ViewData["Title"] = "GenomiX - 3D DNA Editor";
+}
+
+<style>
+    body { margin: 0; }
+    .toolbar {
+      position: fixed; inset: 12px auto auto 12px; z-index: 10; display: flex; gap: 8px; align-items: center;
+      background: rgba(12,15,40,.75); padding: 10px 12px; border-radius: 12px; color: #e8eeff; border: 1px solid #26336b;
+      font-family: Inter, system-ui, Segoe UI, Roboto, Arial, sans-serif;
+      backdrop-filter: blur(6px);
+    }
+    .btn { cursor: pointer; border: 1px solid #2a3773; background: #0f1534; color:#e8eeff; border-radius: 10px; padding: 8px 12px; font-weight: 700; }
+    .btn.primary { background: linear-gradient(145deg,#79a0ff,#5d7ff4); color:#0b1020; border-color: transparent; }
+    .btn:disabled { opacity: .55; cursor: not-allowed; }
+    .panel { position: fixed; inset: auto 12px 12px auto; z-index: 10; background: rgba(12,15,40,.75); padding: 10px 12px; border-radius: 12px; color: #a8b4d9; border: 1px solid #26336b; font-size: 14px; backdrop-filter: blur(6px);}
+    .panel input { width: 74px; padding: 6px 8px; border-radius: 8px; border:1px solid #2a3773; background:#0f1534; color:#e8eeff; }
+</style>
+
+<div class="toolbar">
+    <button id="modeBasic" class="btn">Basic</button>
+    <button id="modeScientific" class="btn">Scientific</button>
+    <span style="opacity:.7;margin:0 6px;">|</span>
+    <button id="undo" class="btn">Undo</button>
+    <button id="redo" class="btn">Redo</button>
+</div>
+
+<div class="panel">
+    <form id="mutateForm" style="display:flex; gap:8px; align-items:center;">
+        <label>Pos <input id="pos" type="number" min="1" value="1" /></label>
+        <label>Base <input id="base" type="text" maxlength="1" value="A" /></label>
+        <button class="btn primary" type="submit">Mutate</button>
+    </form>
+</div>
+
+<canvas id="scene"></canvas>
+<div id="data" data-model="@Model" style="display:none;"></div>
+
+<!-- three.js from CDN -->
+<script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
+<script src="https://unpkg.com/three@0.160.0/examples/js/controls/OrbitControls.js"></script>
+
+<script>
+    (async () => {
+      // ---- Config ----
+      const modelId = document.getElementById('data').dataset.model;
+      const canvas = document.getElementById('scene');
+
+      // Geometry params (B-DNA-ish)
+      const bpPerTurn = 10;            // ~10 bp per turn
+      const twist = (2*Math.PI)/bpPerTurn; // radians per bp
+      const pitch = 0.34;              // nm per base step (scaled)
+      const radius = 1.2;              // helix radius (arbitrary units)
+      const scale = 25;                // visual scale factor
+
+      // Colors per base
+      const colors = { A:0xff6b6b, T:0xffc15e, C:0x6bd3ff, G:0x8aff8a, bond:0xbad4ff, backbone:0x7b8cff };
+
+      // State
+      let mode = 'basic'; // 'basic' | 'scientific'
+      let state = null;   // { modelId, index, strand1, strand2 }
+
+      // ---- Three.js bootstrap ----
+      const renderer = new THREE.WebGLRenderer({ canvas, antialias:true });
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x0b1020);
+      const camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 0.1, 2000);
+      camera.position.set(0, 40, 85);
+      const controls = new THREE.OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+
+      const light = new THREE.DirectionalLight(0xffffff, 1.0);
+      light.position.set(30, 60, 40);
+      scene.add(light, new THREE.AmbientLight(0x8899ff, 0.5));
+
+      function onResize(){
+        const w = window.innerWidth, h = window.innerHeight;
+        renderer.setSize(w, h);
+        camera.aspect = w/h; camera.updateProjectionMatrix();
+      }
+      window.addEventListener('resize', onResize); onResize();
+
+      // Containers we rebuild each render
+      let helixGroup = null;
+
+      // ---- API helpers ----
+      async function apiGet() {
+        const res = await fetch(`/api/dna/${modelId}`);
+        if (!res.ok) throw new Error('Failed to load DNA');
+        return res.json();
+      }
+      async function apiPost(url, body) {
+        const res = await fetch(url, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
+        if (!res.ok) throw new Error('Request failed');
+        return res.json();
+      }
+
+      // ---- Geometry helpers ----
+      function baseColor(b) { return colors[b] ?? 0xffffff; }
+
+      function helixPoint(isStrand1, i) {
+        // t parameter along helix; second strand is phase shifted by PI
+        const t = i * twist + (isStrand1 ? 0 : Math.PI);
+        const x = radius * Math.cos(t);
+        const y = radius * Math.sin(t);
+        const z = i * pitch;
+        return new THREE.Vector3(x*scale, y*scale, z*scale);
+      }
+
+      function cylinderBetween(a, b, radius, color) {
+        const dir = new THREE.Vector3().subVectors(b, a);
+        const len = dir.length();
+        const geom = new THREE.CylinderGeometry(radius, radius, len, 12);
+        // orient cylinder along axis
+        const m = new THREE.Matrix4();
+        const quat = new THREE.Quaternion();
+        const up = new THREE.Vector3(0,1,0);
+        quat.setFromUnitVectors(up, dir.clone().normalize());
+        m.makeRotationFromQuaternion(quat);
+        const mesh = new THREE.Mesh(geom, new THREE.MeshStandardMaterial({ color }));
+        // move to midpoint
+        mesh.position.copy(a.clone().add(dir.multiplyScalar(0.5)));
+        mesh.applyMatrix4(m);
+        return mesh;
+      }
+
+      function sphereAt(p, r, color) {
+        const geom = new THREE.SphereGeometry(r, 18, 18);
+        const mat = new THREE.MeshStandardMaterial({ color });
+        const m = new THREE.Mesh(geom, mat);
+        m.position.copy(p);
+        return m;
+      }
+
+      function cubeAt(p, s, color) {
+        const geom = new THREE.BoxGeometry(s, s, s);
+        const mat = new THREE.MeshStandardMaterial({ color });
+        const m = new THREE.Mesh(geom, mat);
+        m.position.copy(p);
+        return m;
+      }
+
+      function backbone(strandPoints, color, thickness) {
+        const group = new THREE.Group();
+        for (let i=0; i<strandPoints.length-1; i++) {
+          group.add(cylinderBetween(strandPoints[i], strandPoints[i+1], thickness, color));
+        }
+        return group;
+      }
+
+      // ---- Build scene for current state ----
+      function buildHelix() {
+        if (helixGroup) { scene.remove(helixGroup); helixGroup.traverse(obj => { if (obj.geometry) obj.geometry.dispose(); if (obj.material) obj.material.dispose?.(); }); }
+        helixGroup = new THREE.Group();
+
+        const s1 = state.strand1;
+        const s2 = state.strand2;
+        const n = Math.min(s1.length, s2.length);
+
+        const points1 = [], points2 = [];
+        for (let i=0; i<n; i++) {
+          points1.push(helixPoint(true, i));
+          points2.push(helixPoint(false, i));
+        }
+
+        // Backbones
+        helixGroup.add(backbone(points1, colors.backbone, mode === 'basic' ? 0.6 : 0.35));
+        helixGroup.add(backbone(points2, colors.backbone, mode === 'basic' ? 0.6 : 0.35));
+
+        // Nucleotides + hydrogen bonds
+        for (let i=0; i<n; i++) {
+          const p1 = points1[i], p2 = points2[i];
+          const b1 = s1[i], b2 = s2[i];
+
+          if (mode === 'basic') {
+            // cubes for bases, one small bond rod
+            helixGroup.add(cubeAt(p1, 2.2, baseColor(b1)));
+            helixGroup.add(cubeAt(p2, 2.2, baseColor(b2)));
+            helixGroup.add(cylinderBetween(p1, p2, 0.25, colors.bond));
+          } else {
+            // scientific: ball-and-stick feel (a few spheres per base + multiple H-bonds)
+            helixGroup.add(sphereAt(p1, 1.1, baseColor(b1)));
+            helixGroup.add(sphereAt(p2, 1.1, baseColor(b2)));
+
+            // minor/major groove hint: offset small satellites
+            const n1 = p1.clone().normalize();
+            const n2 = p2.clone().normalize();
+            helixGroup.add(sphereAt(p1.clone().addScaledVector(n1, 1.6), 0.5, 0xffffff));
+            helixGroup.add(sphereAt(p2.clone().addScaledVector(n2, 1.6), 0.5, 0xffffff));
+
+            // H-bonds: A–T (2), C–G (3)
+            const hbonds = ( (b1==='A'&&b2==='T') || (b1==='T'&&b2==='A') ) ? 2 : 3;
+            for (let k=0; k<hbonds; k++){
+              const frac = (k+1)/(hbonds+1);
+              const a = p1.clone().lerp(p2, frac).add(new THREE.Vector3(0,0,0.2*(k-1)));
+              const b = p1.clone().lerp(p2, frac+0.001);
+              helixGroup.add(cylinderBetween(a,b,0.15,colors.bond));
+            }
+          }
+        }
+
+        // Center & add
+        const centerZ = (n * pitch * scale) / 2;
+        helixGroup.position.set(0, 0, -centerZ);
+        scene.add(helixGroup);
+      }
+
+      // ---- Render loop ----
+      function animate() {
+        requestAnimationFrame(animate);
+        controls.update();
+        renderer.render(scene, camera);
+      }
+      animate();
+
+      // ---- UI wiring ----
+      async function refresh(){
+        state = await apiGet();
+        buildHelix();
+        // Enable/disable undo/redo buttons
+        const maxIndex = await (await fetch(`/api/dna/${modelId}`)).json().then(d => d.index); // we re-use state.index
+        document.getElementById('undo').disabled = state.index <= 0;
+        // For redo, we query max PairIndex; quick check by calling a lightweight endpoint would be better.
+      }
+
+      document.getElementById('modeBasic').onclick = () => { mode = 'basic'; buildHelix(); };
+      document.getElementById('modeScientific').onclick = () => { mode = 'scientific'; buildHelix(); };
+
+      document.getElementById('undo').onclick = async () => { state = await apiPost('/api/dna/undo', modelId); buildHelix(); };
+      document.getElementById('redo').onclick = async () => { state = await apiPost('/api/dna/redo', modelId); buildHelix(); };
+
+      document.getElementById('mutateForm').onsubmit = async (e) => {
+        e.preventDefault();
+        const pos = parseInt(document.getElementById('pos').value, 10);
+        const nb = document.getElementById('base').value.trim().toUpperCase();
+        if (!'ACGT'.includes(nb)) { alert('Base must be A/C/G/T'); return; }
+        state = await apiPost('/api/dna/mutate', { modelId, pos, newBase: nb });
+        buildHelix();
+      };
+
+      // boot
+      await refresh();
+    })();
+</script>

@@ -1,0 +1,79 @@
+﻿@{
+    ViewData["Title"] = "GenomiX - Welcome";
+}
+
+<main class="wrap">
+    <section class="hero" aria-labelledby="hero-title">
+        <div>
+            <h1 id="hero-title" class="title">Edit DNA in 3D. Watch mutations ripple across life.</h1>
+            <p class="subtitle">Two-strand editing, instant mutation feedback, population simulations, and adaptive lessons - all in one place.</p>
+            <div style="margin-top:16px; display:flex; gap:10px; flex-wrap:wrap;">
+                <a class="btn primary" href="/dna/@Guid.Empty">Start editing DNA</a>
+                <a class="btn ghost" href="#features">Explore features</a>
+            </div>
+        </div>
+
+        <aside class="helix-card" aria-label="Preview">
+            <div class="row" style="justify-content:space-between; margin-bottom:8px;">
+                <div class="row">
+                    <strong>Double Helix</strong>
+                </div>
+                <span class="badge">Live demo ready</span>
+            </div>
+            <div class="helix-canvas"></div>
+        </aside>
+    </section>
+
+    <section id="features" class="section" aria-labelledby="features-title">
+        <h2 id="features-title" class="h2">Features</h2>
+        <div class="grid">
+            <article class="card">
+                <div class="row">
+                    <h3>Gene Panel</h3>
+                </div>
+                <p>Edit two strands in real time (insert, delete, substitute). Basic &amp; Scientific modes.</p>
+            </article>
+
+            <article class="card">
+                <div class="row">
+                    <h3>DNA Repair</h3>
+                </div>
+                <p>Visual nanobot/enzyme shows mismatch repair steps as you learn the mechanism.</p>
+            </article>
+
+            <article class="card">
+                <div class="row">
+                    <h3>Population Sim</h3>
+                </div>
+                <p>Generate organisms, tweak environment factors, track survival and allele spread.</p>
+            </article>
+        </div>
+    </section>
+
+    <section id="how" class="section" aria-labelledby="how-title">
+        <h2 id="how-title" class="h2">How it works</h2>
+        <div class="grid">
+            <article class="card">
+                <h3>1) Load</h3>
+                <p>Pick a template or paste a sequence. Two complementary strands load into the editor.</p>
+            </article>
+            <article class="card">
+                <h3>2) Mutate</h3>
+                <p>Click a base to change it. GenomiX logs the mutation and updates the complementary strand.</p>
+            </article>
+            <article class="card">
+                <h3>3) Explore</h3>
+                <p>Send your DNA to populations, run repair animations, and test yourself with lessons.</p>
+            </article>
+        </div>
+    </section>
+
+    <section id="cta" class="section" aria-labelledby="cta-title">
+        <h2 id="cta-title" class="h2">Ready to experiment?</h2>
+        <p class="subtitle">Open the demo model and try a substitution. Undo/redo is built in.</p>
+        <div style="margin-top:10px; display:flex; gap:10px; flex-wrap:wrap;">
+            <a class="btn primary" href="/dna/choose">Open DNA demo</a>
+            <a class="btn ghost" href="/Lesson">Browse lessons</a>
+        </div>
+    </section>
+</main>
