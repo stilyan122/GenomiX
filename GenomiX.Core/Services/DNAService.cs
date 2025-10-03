@@ -25,7 +25,9 @@ namespace GenomiX.Core.Services
 
         public async Task<IEnumerable<DNAModel>> GetAllAsync()
         {
-            return await this._repository.GetAllAsync();
+            return this._repository
+                .GetAll()
+                ;
         }
 
         public async Task<DNAModel?> GetByIdAsync(object id)

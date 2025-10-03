@@ -52,7 +52,7 @@ namespace GenomiX.Infrastructure.Models
 
         /// <summary> UTC created timestamp. </summary>
         [Comment("UTC created timestamp.")]
-        public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
+        public DateTimeOffset CreatedAt { get; set; }
 
         /// <summary> DNA Sequence foreign key navigation property. </summary>
         public DNASequence? DNASequence { get; set; }

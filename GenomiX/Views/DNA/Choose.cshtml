@@ -1,4 +1,4 @@
-﻿@model Guid
+﻿@* @model Guid
 @{
     ViewData["Title"] = "GenomiX - 3D DNA Editor";
 }
@@ -243,3 +243,20 @@
       await refresh();
     })();
 </script>
+ *@
+
+
+<div class="container mt-5 text-center">
+    <h1 class="mb-4">DNA Demo</h1>
+    <p class="lead">Choose how you want to start:</p>
+
+    <div class="d-flex justify-content-center gap-4 mt-4">
+        <a class="btn btn-lg btn-outline-primary" href="/dna/predefined">
+            <i class="bi bi-collection"></i> Use Predefined DNA
+        </a>
+
+        <a class="btn btn-lg btn-outline-success" href="/dna/custom">
+            <i class="bi bi-pencil-square"></i> Create Your Own
+        </a>
+    </div>
+</div>

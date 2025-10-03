@@ -30,6 +30,12 @@ namespace GenomiX.Infrastructure.Models
         [MaxLength(QuestionPropertyConstraints.Explanation_MaxLength)]
         public string? Explanation { get; set; }
 
+        /// <summary> Question type: mcq | multi | open. </summary>
+        [Comment("Question type: mcq | multi | open.")]
+        [Required]
+        [MaxLength(QuestionPropertyConstraints.Type_MaxLength)]
+        public string Type { get; set; } = "";
+
         /// <summary> Navigation property to the parent Test. </summary>
         public Test? Test { get; set; } = null!;
 

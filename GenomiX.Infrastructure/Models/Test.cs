@@ -17,17 +17,11 @@ namespace GenomiX.Infrastructure.Models
         [Comment("FK to Lesson.")]
         public Guid LessonId { get; set; }
 
-        /// <summary> Question type: mcq | multi | open. </summary>
-        [Comment("Question type: mcq | multi | open.")]
+        /// <summary> The title text. </summary>
+        [Comment("The title text.")]
         [Required]
-        [MaxLength(TestPropertyConstraints.Type_MaxLength)]
-        public string Type { get; set; } = "";
-
-        /// <summary> The question text/prompt. </summary>
-        [Comment("The question text/prompt.")]
-        [Required]
-        [MaxLength(TestPropertyConstraints.Question_MaxLength)]
-        public string Question { get; set; } = "";
+        [MaxLength(TestPropertyConstraints.Title_MaxLength)]
+        public string Title { get; set; } = "";
 
         /// <summary> Navigation property for questions table. </summary>
         public ICollection<Question> Questions { get; set; } = new List<Question>();

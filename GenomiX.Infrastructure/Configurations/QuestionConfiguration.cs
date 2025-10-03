@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using GenomiX.Infrastructure.Models;
 using GenomiX.Infrastructure.Constants;
+using GenomiX.Common.Extensions;
 
 namespace GenomiX.Infrastructure.Configurations
 {
@@ -12,6 +13,7 @@ namespace GenomiX.Infrastructure.Configurations
     {
         public void Configure(EntityTypeBuilder<Question> builder)
         {
+            builder.SeedEntities("questions.json");
         }
     }
 }

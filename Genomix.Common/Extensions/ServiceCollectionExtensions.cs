@@ -47,7 +47,8 @@ namespace GenomiX.Common.Extensions
             // Register repositories
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>))
                     .AddScoped<IDNAService, DNAService>()
-                    .AddScoped<IOrganismService, OrganismService>();
+                    .AddScoped<IOrganismService, OrganismService>()
+                    .AddScoped<ISequenceService, SequenceService>();
 
             return services;
         }

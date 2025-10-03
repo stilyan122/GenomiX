@@ -1,0 +1,27 @@
+﻿[
+  {
+    "Id": "aaaa1111-aaaa-2222-aaaa-aaaaaaaaaaaa",
+    "LessonId": "aaaa1111-aaaa-1111-aaaa-aaaaaaaaaaaa",
+    "Title": "Quiz: DNA Structure"
+  },
+  {
+    "Id": "bbbb2222-bbbb-3333-bbbb-bbbbbbbbbbbb",
+    "LessonId": "bbbb2222-bbbb-2222-bbbb-bbbbbbbbbbbb",
+    "Title": "Quiz: Mutation Types"
+  },
+  {
+    "Id": "cccc3333-cccc-4444-cccc-cccccccccccc",
+    "LessonId": "cccc3333-cccc-3333-cccc-cccccccccccc",
+    "Title": "Quiz: DNA Repair"
+  },
+  {
+    "Id": "dddd4444-dddd-5555-dddd-dddddddddddd",
+    "LessonId": "dddd4444-dddd-4444-dddd-dddddddddddd",
+    "Title": "Quiz: Probability"
+  },
+  {
+    "Id": "eeee5555-eeee-6666-eeee-eeeeeeeeeeee",
+    "LessonId": "eeee5555-eeee-5555-eeee-eeeeeeeeeeee",
+    "Title": "Quiz: Population Evolution"
+  }
+]

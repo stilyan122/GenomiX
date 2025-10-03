@@ -1,9 +1,26 @@
 ﻿[
   {
-    "Id": "ea821ce2-2a3d-43ef-8978-5f34ee07d080",
+    "Id": "44444444-0000-0000-0000-000000000001",
     "UserId": "ea821ce2-2a3d-43ef-8978-5f34ee07d080",
+    "CurrentIndex": 0,
+    "DisplayMode": 1,
+    "CreatedAt": "2024-06-15T12:00:00Z",
+    "UpdatedAt": "2024-06-15T12:00:00Z"
+  },
+  {
+    "Id": "44444444-0000-0000-0000-000000000002",
+    "UserId": "9d5e0ac1-4f1b-422b-b7f0-0f7d5d2dbbb1",
+    "CurrentIndex": 0,
     "DisplayMode": 0,
-    "CreatedAt": "2024-06-01T12:00:00Z",
-    "UpdatedAt": "2024-06-01T12:00:00Z"
+    "CreatedAt": "2024-07-20T09:30:00Z",
+    "UpdatedAt": "2024-07-20T09:30:00Z"
+  },
+  {
+    "Id": "44444444-0000-0000-0000-000000000003",
+    "UserId": "58a7c2b5-1347-4f0a-b3ad-912d4f098aaa",
+    "CurrentIndex": 0,
+    "DisplayMode": 1,
+    "CreatedAt": "2024-08-25T10:45:00Z",
+    "UpdatedAt": "2024-08-25T10:45:00Z"
   }
 ]

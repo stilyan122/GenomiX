@@ -1,0 +1,27 @@
+﻿[
+  {
+    "Id": "11111111-1111-1111-1111-111111111111",
+    "Name": "Sickle Cell Anemia",
+    "Description": "Genetic disorder caused by a mutation in the HBB gene, leading to abnormal hemoglobin and sickle-shaped red blood cells."
+  },
+  {
+    "Id": "22222222-2222-2222-2222-222222222222",
+    "Name": "Cystic Fibrosis",
+    "Description": "Caused by mutations in the CFTR gene, resulting in thick mucus affecting the lungs and digestive system."
+  },
+  {
+    "Id": "33333333-3333-3333-3333-333333333333",
+    "Name": "Huntington's Disease",
+    "Description": "Neurodegenerative disorder caused by expanded CAG repeats in the HTT gene."
+  },
+  {
+    "Id": "44444444-4444-4444-4444-444444444444",
+    "Name": "Phenylketonuria (PKU)",
+    "Description": "Metabolic disorder due to mutations in the PAH gene, leading to inability to break down phenylalanine."
+  },
+  {
+    "Id": "55555555-5555-5555-5555-555555555555",
+    "Name": "Tay-Sachs Disease",
+    "Description": "Fatal genetic disorder caused by mutations in the HEXA gene, leading to accumulation of GM2 ganglioside in nerve cells."
+  }
+]

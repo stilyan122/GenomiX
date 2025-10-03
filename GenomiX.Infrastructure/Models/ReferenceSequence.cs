@@ -1,7 +1,6 @@
 ﻿using GenomiX.Infrastructure.Validation;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GenomiX.Infrastructure.Models
 {
@@ -49,6 +48,6 @@ namespace GenomiX.Infrastructure.Models
 
         /// <summary> UTC timestamp when this reference sequence was created. </summary>
         [Comment("UTC timestamp when the reference sequence was created.")]
-        public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
+        public DateTimeOffset CreatedAt { get; set; }
     }
 }

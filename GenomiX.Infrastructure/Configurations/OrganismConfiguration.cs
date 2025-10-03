@@ -1,4 +1,5 @@
-﻿using GenomiX.Infrastructure.Models;
+﻿using GenomiX.Common.Extensions;
+using GenomiX.Infrastructure.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -14,7 +15,7 @@ namespace GenomiX.Infrastructure.Configurations
     {
         public void Configure(EntityTypeBuilder<Organism> builder)
         {
-           
+           builder.SeedEntities("organisms.json");
         }
     }
 }

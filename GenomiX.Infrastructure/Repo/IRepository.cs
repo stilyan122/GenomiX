@@ -9,8 +9,8 @@
         /// <summary>
         /// Retrieves all entities of type <typeparamref name="T"/>.
         /// </summary>
-        /// <returns>A task that represents the asynchronous operation. The task result contains an enumerable of entities.</returns>
-        Task<IEnumerable<T>> GetAllAsync();
+        /// <returns>The result contains a queryable of entities.</returns>
+        IQueryable<T> GetAll();
 
         /// <summary>
         /// Retrieves an entity by its identifier.

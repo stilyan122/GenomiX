@@ -12,7 +12,7 @@ namespace GenomiX.Infrastructure.Configurations
     {
         public void Configure(EntityTypeBuilder<DNASequence> builder)
         {
-            //builder.SeedEntities("sequences.json");
+            builder.SeedEntities("sequences.json");
         }
     }
 }

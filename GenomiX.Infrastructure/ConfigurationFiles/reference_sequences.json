@@ -1,0 +1,56 @@
+﻿[
+  {
+    "Id": "11111111-0000-0000-0000-000000000001",
+    "Species": "Homo sapiens",
+    "Name": "BRCA1 fragment",
+    "Sequence": "ATGGAAGAGCTGTCAGGAGAGCTGCCAGCTGGTGAGGAAGCAGTGAGCCTGAGCAAGAGCTGAG",
+    "Strand": 1,
+    "PairIndex": 0,
+    "CreatedAt": "2024-01-01T00:00:00Z"
+  },
+  {
+    "Id": "11111111-0000-0000-0000-000000000002",
+    "Species": "Homo sapiens",
+    "Name": "BRCA1 fragment (complement)",
+    "Sequence": "CTCAGCTCTTGCTCAGGCTCACTGCTTCCTCACCAGCTGGCAGCTCTCCTGACAGCTCTTCCAT",
+    "Strand": 2,
+    "PairIndex": 0,
+    "CreatedAt": "2024-01-01T00:00:00Z"
+  },
+  {
+    "Id": "22222222-0000-0000-0000-000000000001",
+    "Species": "Mus musculus",
+    "Name": "TP53 fragment",
+    "Sequence": "ATGGTCAGGACCTGGAGAAGGAGCTGAGGCTGGATGAAGTCAAGAGTGTCAAGCGAGCTGAGG",
+    "Strand": 1,
+    "PairIndex": 1,
+    "CreatedAt": "2024-01-01T00:00:00Z"
+  },
+  {
+    "Id": "22222222-0000-0000-0000-000000000002",
+    "Species": "Mus musculus",
+    "Name": "TP53 fragment (complement)",
+    "Sequence": "CCTCAGCTCGCTTGACACTCTTGACTTCATCCAGCCTCAGCTCCTTCTCCAGGTCCTGACCAG",
+    "Strand": 2,
+    "PairIndex": 1,
+    "CreatedAt": "2024-01-01T00:00:00Z"
+  },
+  {
+    "Id": "33333333-0000-0000-0000-000000000001",
+    "Species": "Canis lupus familiaris",
+    "Name": "COX1 mitochondrial fragment",
+    "Sequence": "ATGGAAGAGGAGCTGCTGAGGAGCTGGTGAGGAAGCAGTGAGCCTGAGCAAGAGCTGAGCTA",
+    "Strand": 1,
+    "PairIndex": 2,
+    "CreatedAt": "2024-01-01T00:00:00Z"
+  },
+  {
+    "Id": "33333333-0000-0000-0000-000000000002",
+    "Species": "Canis lupus familiaris",
+    "Name": "COX1 mitochondrial fragment (complement)",
+    "Sequence": "TAGCTCAGCTCTTGCTCAGGCTCACTGCTTCCTCACCAGCTCCTCAGCAGCTCCTCTTCCAT",
+    "Strand": 2,
+    "PairIndex": 2,
+    "CreatedAt": "2024-01-01T00:00:00Z"
+  }
+]

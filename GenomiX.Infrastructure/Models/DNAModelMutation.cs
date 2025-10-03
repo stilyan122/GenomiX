@@ -49,7 +49,7 @@ namespace GenomiX.Infrastructure.Models
 
         /// <summary> UTC timestamp of the mutation record. </summary>
         [Comment("UTC timestamp of the mutation record.")]
-        public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
+        public DateTimeOffset CreatedAt { get; set; }
 
         /// <summary> Navigation property to the associated DNAModel. </summary>
         public DNAModel? Model { get; set; }

@@ -1,0 +1,32 @@
+﻿[
+  {
+    "Id": "aaaaaaaa-1111-1111-1111-aaaaaaaaaaaa",
+    "ModelId": "44444444-0000-0000-0000-000000000001",
+    "Type": "substitution",
+    "PosStart": 6,
+    "PosEnd": 6,
+    "Ref": "A",
+    "Alt": "T",
+    "CreatedAt": "2024-09-01T10:00:00Z"
+  },
+  {
+    "Id": "bbbbbbbb-2222-2222-2222-bbbbbbbbbbbb",
+    "ModelId": "44444444-0000-0000-0000-000000000001",
+    "Type": "insertion",
+    "PosStart": 10,
+    "PosEnd": 10,
+    "Ref": "",
+    "Alt": "G",
+    "CreatedAt": "2024-09-01T10:10:00Z"
+  },
+  {
+    "Id": "cccccccc-3333-3333-3333-cccccccccccc",
+    "ModelId": "44444444-0000-0000-0000-000000000002",
+    "Type": "deletion",
+    "PosStart": 15,
+    "PosEnd": 16,
+    "Ref": "CT",
+    "Alt": "",
+    "CreatedAt": "2024-09-01T10:20:00Z"
+  }
+]

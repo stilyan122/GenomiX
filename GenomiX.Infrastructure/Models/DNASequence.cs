@@ -28,7 +28,7 @@ namespace GenomiX.Infrastructure.Models
 
         /// <summary> UTC timestamp when this snapshot was created. </summary>
         [Comment("UTC timestamp when the snapshot was created.")]
-        public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
+        public DateTimeOffset CreatedAt { get; set; }
 
         /// <summary> Navigation Property for Model. </summary>
         public DNAModel Model { get; set; } = null!;

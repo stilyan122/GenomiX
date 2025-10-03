@@ -6,13 +6,12 @@
     "Email": "stilyan@example.com",
     "NormalizedEmail": "STILYAN@EXAMPLE.COM",
     "EmailConfirmed": true,
-    "PhoneNumberConfirmed": false,
-    "TwoFactorEnabled": false,
-    "LockoutEnabled": false,
-    "AccessFailedCount": 0,
     "FirstName": "Stilyan",
     "LastName": "Chanev",
-    "CreatedAt": "2024-06-01T12:00:00Z"
+    "CreatedAt": "2024-06-01T12:00:00Z",
+    "PasswordHash": "AQAAAAIAAYagAAAAEHzs4+DPBZG9xAgWTlZ7ezRrWg2DfpAjDKOrzJizgKN9PduBps+Ke0JrDB5QNi5u/A==",
+    "ConcurrencyStamp": "11111111-1111-1111-1111-111111111111",
+    "SecurityStamp": "aaaaaaa1-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
   },
   {
     "Id": "9d5e0ac1-4f1b-422b-b7f0-0f7d5d2dbbb1",
@@ -21,13 +20,12 @@
     "Email": "alice@example.com",
     "NormalizedEmail": "ALICE@EXAMPLE.COM",
     "EmailConfirmed": true,
-    "PhoneNumberConfirmed": false,
-    "TwoFactorEnabled": false,
-    "LockoutEnabled": false,
-    "AccessFailedCount": 0,
     "FirstName": "Alice",
     "LastName": "Johnson",
-    "CreatedAt": "2024-07-15T10:30:00Z"
+    "CreatedAt": "2024-07-15T10:30:00Z",
+    "PasswordHash": "AQAAAAIAAYagAAAAED7CaPCa5Oa3vAGoXw8QDdC2aURdW1KhO/yY4ZEnWJoKpRjNUNu4dF9YLeIHByOjLg==",
+    "ConcurrencyStamp": "22222222-2222-2222-2222-222222222222",
+    "SecurityStamp": "bbbbbbb2-bbbb-bbbb-bbbb-bbbbbbbbbbbb"
   },
   {
     "Id": "58a7c2b5-1347-4f0a-b3ad-912d4f098aaa",
@@ -36,12 +34,11 @@
     "Email": "ivan@example.com",
     "NormalizedEmail": "IVAN@EXAMPLE.COM",
     "EmailConfirmed": false,
-    "PhoneNumberConfirmed": false,
-    "TwoFactorEnabled": false,
-    "LockoutEnabled": false,
-    "AccessFailedCount": 0,
     "FirstName": "Ivan",
     "LastName": "Petrov",
-    "CreatedAt": "2024-08-20T08:45:00Z"
+    "CreatedAt": "2024-08-20T08:45:00Z",
+    "PasswordHash": "AQAAAAIAAYagAAAAEIkC1sWbH1iX8tcz2c1oRzFYI0J0mxPOhUkYqGp16wHQi0NmbTQd1+TquU5EtdISew==",
+    "ConcurrencyStamp": "33333333-3333-3333-3333-333333333333",
+    "SecurityStamp": "ccccccc3-cccc-cccc-cccc-cccccccccccc"
   }
 ]

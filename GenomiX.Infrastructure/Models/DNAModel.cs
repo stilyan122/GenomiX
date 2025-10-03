@@ -33,11 +33,11 @@ namespace GenomiX.Infrastructure.Models
 
         /// <summary> UTC created timestamp. </summary>
         [Comment("UTC created timestamp.")]
-        public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
+        public DateTimeOffset CreatedAt { get; set; }
 
         /// <summary> UTC updated timestamp. </summary>
         [Comment("UTC updated timestamp.")]
-        public DateTimeOffset UpdatedAt { get; set; } = DateTimeOffset.UtcNow;
+        public DateTimeOffset UpdatedAt { get; set; } 
 
         /// <summary> Navigation properties. </summary>
         public ICollection<DNAModelMutation> Mutations { get; set; } = new List<DNAModelMutation>();

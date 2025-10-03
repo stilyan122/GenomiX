@@ -16,7 +16,7 @@ namespace GenomiX.Infrastructure.Configurations
     {
         public void Configure(EntityTypeBuilder<DNAModel> builder)
         {
-            //builder.SeedEntities("models.json");
+            builder.SeedEntities("models.json");
         }
     }
 }

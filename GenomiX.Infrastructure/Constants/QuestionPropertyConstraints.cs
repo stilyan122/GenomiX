@@ -14,5 +14,10 @@ namespace GenomiX.Infrastructure.Constants
         /// The maximum length allowed for the Explanation property.
         /// </summary>
         public const int Explanation_MaxLength = 1024;
+
+        /// <summary>
+        /// The maximum length allowed for the Type property (e.g., "mcq", "multi", "open").
+        /// </summary>
+        public const int Type_MaxLength = 32;
     }
 }

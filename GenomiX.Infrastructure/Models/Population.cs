@@ -37,7 +37,7 @@ namespace GenomiX.Infrastructure.Models
 
         /// <summary> UTC created timestamp. </summary>
         [Comment("UTC created timestamp.")]
-        public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
+        public DateTimeOffset CreatedAt { get; set; } 
 
         /// <summary> Navigation property for organism table. </summary>
         public ICollection<Organism> Organisms { get; set; } = new List<Organism>();

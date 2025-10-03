@@ -24,9 +24,9 @@ namespace GenomiX.Infrastructure.Repo
         }
 
         /// <inheritdoc/>
-        public async Task<IEnumerable<T>> GetAllAsync()
+        public IQueryable<T> GetAll()
         {
-            return await _dbSet.ToListAsync();
+            return _dbSet;
         }
 
         /// <inheritdoc/>
