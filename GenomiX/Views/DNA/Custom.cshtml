@@ -85,12 +85,31 @@
             return strand.split("").map(base => complement[base] || "").join("");
         }
 
-        function parseDNAJson(content) {
+               function parseDNAJson(content) {
             let parsed;
+            let isJson = true;
+
             try {
                 parsed = JSON.parse(content);
             } catch {
-                return { strands: [content.trim().toUpperCase()] }; 
+                isJson = false;
+            }
+
+            if (!isJson) {
+                const lines = content
+                    .trim()
+                    .toUpperCase()
+                    .split(/\r?\n/)
+                    .filter(l => /^[ATCG]+$/.test(l));
+
+                if (lines.length === 1) {
+                    return { strands: [lines[0], generateComplement(lines[0])] };
+                }
+                if (lines.length >= 2) {
+                    return { strands: [lines[0], lines[1]] };
+                }
+
+                return { strands: [] };
             }
 
             if (typeof parsed !== "object" || parsed === null) {
@@ -99,7 +118,7 @@
 
             const keys = Object.keys(parsed);
             const dnaKeys = keys.filter(k =>
-                /dna|sequence|seq|strand1?|strand2?|forward|reverse/i.test(k)
+                /^(dna|sequence|seq|strand[12]?|forward|reverse)$/i.test(k.trim())
             );
 
             if (dnaKeys.length === 1) {
@@ -131,6 +150,7 @@
                 const reader = new FileReader();
                 reader.onload = event => {
                     const result = parseDNAJson(event.target.result);
+                    console.log(result)
                     if (result.strands.length > 0) {
                         dnaSequenceInput.value = result.strands.join("\n");
                     } else {
@@ -143,20 +163,59 @@
             input.click();
         });
 
-        // --- Visualize DNA ---
         visualizeBtn.addEventListener("click", () => {
-            const sequence = dnaSequenceInput.value.trim().toUpperCase();
-            if (!sequence || !/^[ATCG\n]+$/.test(sequence)) {
+            let sequenceText = dnaSequenceInput.value.trim().toUpperCase();
+            
+            if (!sequenceText) {
+                alert("Please enter a DNA sequence.");
+                return;
+            }
+
+            const lines = sequenceText
+                .split(/\r?\n/)
+                .map(l => l.trim())
+                .filter(l => /^[ATCG]+$/.test(l));
+
+            if (lines.length === 0) {
                 alert("Please enter a valid DNA sequence (A/T/C/G only).");
                 return;
             }
 
+            let strands = [];
+
+            if (lines.length === 1) {
+                // Only one strand — auto-generate complement
+                strands = [lines[0], generateComplement(lines[0])];
+            }
+            else if (lines.length >= 2) {
+                const s1 = lines[0];
+                const s2 = lines[1];
+
+                // Check length
+                if (s1.length !== s2.length) {
+                    alert("Both DNA strands must have the same length!");
+                    return;
+                }
+
+                // Check complementarity
+                const expectedComplement = generateComplement(s1);
+                if (s2 !== expectedComplement) {
+                    alert("The second strand is not the correct complement of the first strand!");
+                    return;
+                }
+
+                strands = [s1, s2];
+            }
+
+            // Hide input
             dnaSequenceInput.closest(".row").style.display = "none";
 
+            // Visualize
             visualizer.innerHTML = `
                 <div class="p-3 text-white">
                     <h5>🧬 DNA Strands</h5>
-                    <pre>${sequence}</pre>
+                    <pre><b>Strand 1:</b> ${strands[0]}</pre>
+                    <pre><b>Strand 2:</b> ${strands[1]}</pre>
                 </div>`;
         });
     </script>
