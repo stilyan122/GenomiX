@@ -214,3 +214,132 @@ a {
         grid-template-columns: 1fr
     }
 }
+
+/* DNA - Custom.cshtml */
+
+#dna-visual {
+    position: relative;
+    background: #101820;
+    overflow: hidden;
+    border-radius: 12px;
+}
+
+.dna-ladder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.6s ease;
+    height: 100%;
+    padding: 40px;
+    gap: 20px;
+    will-change: transform;
+}
+
+.base-pair {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    transform: rotateZ(12deg);
+    transition: transform 0.25s ease, scale 0.25s ease;
+}
+
+.base {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    text-align: center;
+    line-height: 32px;
+    font-family: monospace;
+    font-weight: bold;
+    color: white;
+    box-shadow: 0 0 6px rgba(255, 255, 255, 0.2);
+}
+
+.A {
+    background-color: #ff4d4d;
+}
+
+.T {
+    background-color: #ff9999;
+}
+
+.C {
+    background-color: #4d79ff;
+}
+
+.G {
+    background-color: #80b3ff;
+}
+
+.base-pair.active {
+    transform: scale(1.6) rotateZ(0deg);
+    z-index: 2;
+}
+
+.base.active {
+    box-shadow: 0 0 14px 6px rgba(255, 255, 255, 0.6);
+}
+
+.tooltip {
+    position: absolute;
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-family: monospace;
+    pointer-events: none;
+}
+
+.dna-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.15);
+    border: none;
+    color: white;
+    font-size: 2rem;
+    padding: 10px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s;
+    z-index: 10;
+}
+
+    .dna-nav:hover {
+        background: rgba(255, 255, 255, 0.3);
+    }
+
+#prev-base {
+    left: 10px;
+}
+
+#next-base {
+    right: 10px;
+}
+
+/* Progress bar */
+.progress-container {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 10px;
+    background: rgba(255, 255, 255, 0.15);
+    cursor: pointer;
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #00ffcc, #0077ff);
+    width: 0%;
+    transition: width 0.3s ease;
+}

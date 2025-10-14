@@ -85,7 +85,8 @@
             return strand.split("").map(base => complement[base] || "").join("");
         }
 
-               function parseDNAJson(content) {
+        // --- Parse DNA or JSON files ---
+        function parseDNAJson(content) {
             let parsed;
             let isJson = true;
 
@@ -139,7 +140,8 @@
 
             return { strands: [] };
         }
--
+
+        // --- Import file handler ---
         importBtn.addEventListener("click", () => {
             const input = document.createElement("input");
             input.type = "file";
@@ -150,7 +152,6 @@
                 const reader = new FileReader();
                 reader.onload = event => {
                     const result = parseDNAJson(event.target.result);
-                    console.log(result)
                     if (result.strands.length > 0) {
                         dnaSequenceInput.value = result.strands.join("\n");
                     } else {
@@ -163,60 +164,132 @@
             input.click();
         });
 
+        // --- Visualization handler ---
         visualizeBtn.addEventListener("click", () => {
-            let sequenceText = dnaSequenceInput.value.trim().toUpperCase();
-            
+            const sequenceText = dnaSequenceInput.value.trim();
             if (!sequenceText) {
-                alert("Please enter a DNA sequence.");
+                alert("Please enter or import a DNA sequence first!");
                 return;
             }
+            visualizeDNA(sequenceText);
+        });
 
-            const lines = sequenceText
-                .split(/\r?\n/)
-                .map(l => l.trim())
-                .filter(l => /^[ATCG]+$/.test(l));
+        // --- Visualization logic ---
+        function visualizeDNA(sequenceText) {
+            v   isualizer.innerHTML = "";
 
-            if (lines.length === 0) {
-                alert("Please enter a valid DNA sequence (A/T/C/G only).");
-                return;
-            }
-
-            let strands = [];
+            const lines = sequenceText.split(/\r?\n/).filter(l => l.trim());
+            let strand1, strand2;
 
             if (lines.length === 1) {
-                // Only one strand — auto-generate complement
-                strands = [lines[0], generateComplement(lines[0])];
-            }
-            else if (lines.length >= 2) {
-                const s1 = lines[0];
-                const s2 = lines[1];
-
-                // Check length
-                if (s1.length !== s2.length) {
-                    alert("Both DNA strands must have the same length!");
-                    return;
-                }
-
-                // Check complementarity
-                const expectedComplement = generateComplement(s1);
-                if (s2 !== expectedComplement) {
-                    alert("The second strand is not the correct complement of the first strand!");
-                    return;
-                }
-
-                strands = [s1, s2];
+                strand1 = lines[0].trim().toUpperCase();
+                strand2 = generateComplement(strand1);
+            } else {
+                strand1 = lines[0].trim().toUpperCase();
+                strand2 = lines[1].trim().toUpperCase();
             }
 
-            // Hide input
-            dnaSequenceInput.closest(".row").style.display = "none";
+            if (strand1.length !== strand2.length) {
+                alert("Both DNA strands must be of equal length!");
+                return;
+            }
 
-            // Visualize
-            visualizer.innerHTML = `
-                <div class="p-3 text-white">
-                    <h5>🧬 DNA Strands</h5>
-                    <pre><b>Strand 1:</b> ${strands[0]}</pre>
-                    <pre><b>Strand 2:</b> ${strands[1]}</pre>
-                </div>`;
-        });
+            const ladder = document.createElement("div");
+            ladder.classList.add("dna-ladder");
+            visualizer.appendChild(ladder);
+
+            const tooltip = document.createElement("div");
+            tooltip.classList.add("tooltip");
+            tooltip.textContent = "Ready.";
+            visualizer.appendChild(tooltip);
+
+            const progressContainer = document.createElement("div");
+            progressContainer.classList.add("progress-container");
+            const progressBar = document.createElement("div");
+            progressBar.classList.add("progress-bar");
+            progressContainer.appendChild(progressBar);
+            visualizer.appendChild(progressContainer);
+
+            const prevBtn = document.createElement("button");
+            const nextBtn = document.createElement("button");
+            prevBtn.classList.add("dna-nav");
+            nextBtn.classList.add("dna-nav");
+            prevBtn.id = "prev-base";
+            nextBtn.id = "next-base";
+            prevBtn.textContent = "⟨";
+            nextBtn.textContent = "⟩";
+            visualizer.appendChild(prevBtn);
+            visualizer.appendChild(nextBtn);
+
+            const pairs = [];
+            for (let i = 0; i < strand1.length; i++) {
+                const base1 = strand1[i];
+                const base2 = strand2[i];
+
+                const pair = document.createElement("div");
+                pair.classList.add("base-pair");
+
+                const top = document.createElement("div");
+                top.classList.add("base", base1);
+                top.textContent = base1;
+
+                const bottom = document.createElement("div");
+                bottom.classList.add("base", base2);
+                bottom.textContent = base2;
+
+                pair.appendChild(top);
+                pair.appendChild(bottom);
+                ladder.appendChild(pair);
+                pairs.push(pair);
+            }
+
+            let current = Math.floor(strand1.length / 2); // start centered
+            const totalPairs = strand1.length;
+
+            function updateView() {
+                const pairWidth = 52; // width + gap
+                const centerOffset = (visualizer.clientWidth / 2) - (pairWidth / 2);
+                const translateX = -(current * pairWidth) + centerOffset;
+
+                ladder.style.transform = `translateX(${translateX}px)`;
+
+                pairs.forEach(p => p.classList.remove("active"));
+                const activePair = pairs[current];
+                if (activePair) {
+                    activePair.classList.add("active");
+                    tooltip.textContent = getPairInfo(strand1[current], strand2[current]);
+                }
+
+                progressBar.style.width = `${((current + 1) / totalPairs) * 100}%`;
+            }
+
+            function getPairInfo(b1, b2) {
+                if ((b1 === "A" && b2 === "T") || (b1 === "T" && b2 === "A"))
+                    return `Base ${current + 1}: A–T (2 H bonds)`;
+                if ((b1 === "C" && b2 === "G") || (b1 === "G" && b2 === "C"))
+                    return `Base ${current + 1}: C–G (3 H bonds)`;
+                return `Base ${current + 1}: ${b1}–${b2}`;
+            }
+
+            // Button navigation
+            nextBtn.addEventListener("click", () => {
+                if (current < totalPairs - 1) current++;
+                updateView();
+            });
+            prevBtn.addEventListener("click", () => {
+                if (current > 0) current--;
+                updateView();
+            });
+
+            // Jump to position via progress bar click
+            progressContainer.addEventListener("click", e => {
+                const rect = progressContainer.getBoundingClientRect();
+                const percent = (e.clientX - rect.left) / rect.width;
+                current = Math.round(percent * (totalPairs - 1));
+                updateView();
+            });
+
+            updateView();
+        }
     </script>
 }
