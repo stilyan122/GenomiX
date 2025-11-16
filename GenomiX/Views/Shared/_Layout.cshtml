@@ -4,10 +4,15 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - GenomiX</title>
-    <script type="importmap"></script>
+
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/GenomiX.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/vars.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/base.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/components.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/layout.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/home.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/dna.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/dna-science.css" asp-append-version="true" />
 </head>
 <body>
     <header class="wrap">
@@ -25,10 +30,11 @@
                 <a href="#features">Features</a>
                 <a href="#how">How it works</a>
                 <a href="#cta">Get started</a>
-                <a class="btn ghost" href="/dna/@Guid.Empty">Open demo</a>
+                <a class="btn ghost" href="/dna/choose">Open demo</a>
             </div>
         </nav>
     </header>
+
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
@@ -36,12 +42,13 @@
     </div>
 
     <footer class="footer">
-        <div>© @DateTime.UtcNow.Year GenomiX • Built for learning genetics.</div>
+        <div>© @DateTime.UtcNow.Year GenomiX. Built for learning genetics.</div>
     </footer>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.156.1/build/three.min.js"></script>   
+    <script type="module" src="~/js/dna-builder.js" asp-append-version="true"></script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

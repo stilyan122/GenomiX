@@ -2,255 +2,42 @@
     ViewData["Title"] = "Custom DNA Builder";
 }
 
-<div class="container py-5">
-
-    <div class="text-center mb-5">
-        <h1 class="fw-bold display-5">🧬 Build Your Own DNA</h1>
-        <p class="lead text-white">
+<div class="gx-container gx-dna">
+    <header class="gx-dna__header">
+        <h1 class="title">🧬 Build Your Own DNA</h1>
+        <p class="subtitle">
             Create your sequence in real time, switch between <strong>Basic</strong> and <strong>Scientific</strong> view,
             and watch the double helix come alive.
         </p>
+    </header>
+
+    <div class="gx-dna__modes" role="group" aria-label="Mode switch">
+        <label class="gx-toggle">
+            <input type="radio" name="mode" id="basicMode" checked />
+            <span>Basic Mode</span>
+        </label>
+        <label class="gx-toggle">
+            <input type="radio" name="mode" id="scientificMode" />
+            <span>Scientific Mode</span>
+        </label>
     </div>
 
-    <div class="d-flex justify-content-center mb-4">
-        <div class="btn-group" role="group" aria-label="Mode switch">
-            <input type="radio" class="btn-check" name="mode" id="basicMode" checked>
-            <label class="btn btn-outline-primary" for="basicMode">Basic Mode</label>
+    <section id="dna-input-section" class="gx-dna__input">
+        <label for="sequence" class="gx-label">Enter DNA Strand(s) (A, C, G, T only)</label>
+        <textarea id="sequence" name="sequence" class="gx-textarea" rows="4" placeholder="ATGCGTACG..." spellcheck="false"></textarea>
+        <p class="gx-help">
+            Tip: If you enter one strand, the complementary strand is generated automatically.
+            If you prefer, enter two strands on separate lines.
+        </p>
 
-            <input type="radio" class="btn-check" name="mode" id="scientificMode">
-            <label class="btn btn-outline-success" for="scientificMode">Scientific Mode</label>
+        <div class="gx-actions">
+            <button id="import-btn" class="btn ghost">📂 Import (.txt / .json)</button>
+            <button id="visualize-btn" class="btn primary">🔬 Visualize DNA</button>
         </div>
-    </div>
+    </section>
 
-    <!-- DNA Input Section -->
-    <div id="dna-input-section" class="row mb-4">
-        <div class="col-md-8 mx-auto">
-            <label for="sequence" class="form-label fw-semibold">Enter DNA Strand(s) (A, C, G, T bases only)</label>
-            <textarea id="sequence" name="sequence" class="form-control text-monospace"
-                      rows="4" placeholder="ATGCGTACG..." spellcheck="false"></textarea>
-            <div class="form-text text-white">
-                Tip: If you enter one strand, the complementary strand will be generated automatically.
-                If you prefer, you can enter 2 strands on 2 different rows.
-            </div>
-
-            <div class="d-flex justify-content-between mt-3">
-                <button id="import-btn" class="btn btn-outline-secondary">
-                    📂 Import Sequence File (.txt or .json)
-                </button>
-                <button id="visualize-btn" class="btn btn-primary">
-                    🔬 Visualize DNA
-                </button>
-            </div>
+    <section id="dna-visualizer-section" class="gx-dna__viewer" style="display:none;">
+        <div id="dna-visual" class="gx-dna__canvas">
         </div>
-    </div>
-
-    <!-- DNA Visualizer -->
-    <div id="dna-visualizer-section" class="row mb-5" style="display:none;">
-        <div class="col-md-10 mx-auto text-center position-relative">
-            <div id="dna-visual" class="border rounded shadow-sm bg-dark"
-                 style="height: 400px; border-radius: 12px; overflow: hidden;">
-                <p class="text-white-50 mt-5">[ DNA Visualization will appear here 🧬 ]</p>
-            </div>
-        </div>
-    </div>
-
+    </section>
 </div>
-
-@section Scripts {
-    <script>
-        const dnaSequenceInput = document.getElementById("sequence");
-        const importBtn = document.getElementById("import-btn");
-        const visualizeBtn = document.getElementById("visualize-btn");
-        const visualizer = document.getElementById("dna-visual");
-        const dnaInputSection = document.getElementById("dna-input-section");
-        const dnaVisualizerSection = document.getElementById("dna-visualizer-section");
-
-        const complement = { A: "T", T: "A", C: "G", G: "C" };
-
-        function generateComplement(strand) {
-            return strand.split("").map(base => complement[base] || "").join("");
-        }
-
-        // --- Parse DNA or JSON ---
-        function parseDNAJson(content) {
-            let parsed;
-            try { parsed = JSON.parse(content); } catch { parsed = null; }
-            if (!parsed) {
-                const lines = content.trim().toUpperCase().split(/\r?\n/).filter(l => /^[ATCG]+$/.test(l));
-                if (lines.length === 1) return { strands: [lines[0], generateComplement(lines[0])] };
-                if (lines.length >= 2) return { strands: [lines[0], lines[1]] };
-                return { strands: [] };
-            }
-            const keys = Object.keys(parsed);
-            const dnaKeys = keys.filter(k => /^(dna|sequence|seq|strand[12]?|forward|reverse)$/i.test(k.trim()));
-            if (dnaKeys.length === 1) {
-                const s1 = (parsed[dnaKeys[0]] || "").trim().toUpperCase();
-                return { strands: [s1, generateComplement(s1)] };
-            }
-            if (dnaKeys.length === 2) {
-                const s1 = (parsed[dnaKeys[0]] || "").trim().toUpperCase();
-                const s2 = (parsed[dnaKeys[1]] || "").trim().toUpperCase();
-                return { strands: [s1, s2] };
-            }
-            if (keys.length === 1) {
-                const s1 = (parsed[keys[0]] || "").trim().toUpperCase();
-                return { strands: [s1, generateComplement(s1)] };
-            }
-            return { strands: [] };
-        }
-
-        // --- Import handler ---
-        importBtn.addEventListener("click", () => {
-            const input = document.createElement("input");
-            input.type = "file";
-            input.accept = ".txt,.json";
-            input.onchange = e => {
-                const file = e.target.files[0];
-                const reader = new FileReader();
-                reader.onload = event => {
-                    const result = parseDNAJson(event.target.result);
-                    if (result.strands.length > 0) dnaSequenceInput.value = result.strands.join("\n");
-                    else alert("Could not parse a DNA sequence from file.");
-                };
-                reader.readAsText(file);
-            };
-            input.click();
-        });
-
-        // --- Visualize handler ---
-        visualizeBtn.addEventListener("click", () => {
-            const seq = dnaSequenceInput.value.trim();
-            if (!seq) return alert("Please enter or import a DNA sequence first!");
-            dnaInputSection.style.display = "none";
-            dnaVisualizerSection.style.display = "block";
-            visualizeDNA(seq);
-        });
-
-        // --- DNA Visualization ---
-        function visualizeDNA(sequenceText) {
-            visualizer.innerHTML = "";
-
-            const lines = sequenceText.split(/\r?\n/).filter(l => l.trim());
-            const strand1 = lines[0].trim().toUpperCase();
-            const strand2 = lines.length > 1 ? lines[1].trim().toUpperCase() : generateComplement(strand1);
-
-            if (strand1.length !== strand2.length)
-                return alert("Both DNA strands must be of equal length!");
-
-            const ladder = document.createElement("div");
-            ladder.classList.add("dna-ladder");
-            visualizer.appendChild(ladder);
-
-            const tooltip = document.createElement("div");
-            tooltip.classList.add("tooltip");
-            tooltip.textContent = "Ready.";
-            visualizer.appendChild(tooltip);
-
-            const progressContainer = document.createElement("div");
-            progressContainer.classList.add("progress-container");
-            const progressBar = document.createElement("div");
-            progressBar.classList.add("progress-bar");
-            progressContainer.appendChild(progressBar);
-            visualizer.appendChild(progressContainer);
-
-            const prevBtn = document.createElement("button");
-            const nextBtn = document.createElement("button");
-            prevBtn.classList.add("dna-nav");
-            nextBtn.classList.add("dna-nav");
-            prevBtn.id = "prev-base";
-            nextBtn.id = "next-base";   
-            prevBtn.textContent = "⟨";
-            nextBtn.textContent = "⟩";
-            visualizer.appendChild(prevBtn);
-            visualizer.appendChild(nextBtn);
-
-            const pairs = [];
-            for (let i = 0; i < strand1.length; i++) {
-                const base1 = strand1[i];
-                const base2 = strand2[i];
-                const pair = document.createElement("div");
-                pair.classList.add("base-pair");
-
-                const top = document.createElement("div");
-                top.classList.add("base", base1);
-                top.textContent = base1;
-                const bottom = document.createElement("div");
-                bottom.classList.add("base", base2);
-                bottom.textContent = base2;
-
-                pair.appendChild(top);
-                pair.appendChild(bottom);
-                ladder.appendChild(pair);
-                pairs.push(pair);
-            }
-
-            let current = Math.floor(strand1.length / 2);
-            const totalPairs = strand1.length;
-            const pairWidth = 52;
-
-            function updateView() 
-            {
-                const totalPairs = pairs.length;
-                const totalWidth = totalPairs * pairWidth;
-                const viewWidth = visualizer.clientWidth;
-
-                // Calculate the intended center position of the active base
-                const targetCenter = (current + 0.5) * pairWidth;
-                let translateX = viewWidth / 2 - targetCenter;
-
-                // Clamp edges (slightly expanded bounds)
-                const edgeOffset = Math.min(viewWidth * 0.3, totalWidth * 0.1);
-        
-                const maxTranslate = edgeOffset;  // small left buffer
-                const minTranslate = viewWidth - totalWidth - edgeOffset;
-
-                if (totalWidth <= viewWidth) {
-                    translateX = (viewWidth - totalWidth) / 2;
-                } else {
-                    if (translateX > maxTranslate) translateX = maxTranslate;
-                    if (translateX < minTranslate) translateX = minTranslate;
-                }
-
-                ladder.style.transform = `translateX(${translateX}px)`;
-
-                // Highlight active base pair
-                pairs.forEach(p => p.classList.remove("active"));
-                const activePair = pairs[current];
-                if (activePair) {
-                    activePair.classList.add("active");
-                    tooltip.textContent = getPairInfo(strand1[current], strand2[current]);
-                }
-
-                // Update progress bar
-                progressBar.style.width = `${((current + 1) / totalPairs) * 100}%`;
-            }
-
-            function getPairInfo(b1, b2) {
-                if ((b1 === "A" && b2 === "T") || (b1 === "T" && b2 === "A"))
-                    return `Base ${current + 1}: A–T (2 H bonds)`;
-                if ((b1 === "C" && b2 === "G") || (b1 === "G" && b2 === "C"))
-                    return `Base ${current + 1}: C–G (3 H bonds)`;
-                return `Base ${current + 1}: ${b1}–${b2}`;
-            }
-
-            nextBtn.addEventListener("click", () => {
-                if (current < totalPairs - 1) current++;
-                updateView();
-            });
-
-            prevBtn.addEventListener("click", () => {
-                if (current > 0) current--;
-                updateView();
-            });
-
-            progressContainer.addEventListener("click", e => {
-                const rect = progressContainer.getBoundingClientRect();
-                const percent = (e.clientX - rect.left) / rect.width;
-                current = Math.round(percent * (totalPairs - 1));
-                updateView();
-            });
-
-            updateView();
-        }
-    </script>
-}
