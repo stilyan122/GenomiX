@@ -1,26 +1,25 @@
-﻿@using Microsoft.AspNetCore.Identity
-@inject SignInManager<IdentityUser> SignInManager
-@inject UserManager<IdentityUser> UserManager
+﻿@using GenomiX.Infrastructure.Models
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<GenUser> SignInManager
+@inject UserManager<GenUser> UserManager
 
-<ul class="navbar-nav">
-@if (SignInManager.IsSignedIn(User))
-{
-    <li class="nav-item">
-        <a  class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @User.Identity?.Name!</a>
-    </li>
-    <li class="nav-item">
-        <form  class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-            <button  type="submit" class="nav-link btn btn-link text-dark">Logout</button>
-        </form>
-    </li>
-}
-else
-{
-    <li class="nav-item">
-        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">Register</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login">Login</a>
-    </li>
-}
+<ul class="navbar-nav" style="display:flex; gap:.75rem; align-items:center; list-style:none; margin:0; padding:0;">
+    @if (SignInManager.IsSignedIn(User))
+    {
+        <li>
+            <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">
+                Hello, @UserManager.GetUserName(User)!
+            </a>
+        </li>
+        <li>
+            <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="~/" method="post">
+                <button type="submit" class="btn btn-sm btn-outline-secondary">Log out</button>
+            </form>
+        </li>
+    }
+    else
+    {
+        <li><a class="btn btn-sm btn-outline-secondary" asp-area="Identity" asp-page="/Account/Login">Log in</a></li>
+        <li><a class="btn btn-sm btn-primary" asp-area="Identity" asp-page="/Account/Register">Sign up</a></li>
+    }
 </ul>

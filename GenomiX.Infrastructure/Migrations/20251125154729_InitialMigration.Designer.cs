@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GenomiX.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250930072112_Initial_Migration")]
-    partial class Initial_Migration
+    [Migration("20251125154729_InitialMigration")]
+    partial class InitialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -191,6 +191,24 @@ namespace GenomiX.Infrastructure.Migrations
                             DisplayMode = (byte)1,
                             UpdatedAt = new DateTimeOffset(new DateTime(2024, 8, 25, 10, 45, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             UserId = new Guid("58a7c2b5-1347-4f0a-b3ad-912d4f098aaa")
+                        },
+                        new
+                        {
+                            Id = new Guid("44444444-0000-0000-0000-000000000004"),
+                            CreatedAt = new DateTimeOffset(new DateTime(2024, 7, 20, 9, 5, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            CurrentIndex = 0,
+                            DisplayMode = (byte)1,
+                            UpdatedAt = new DateTimeOffset(new DateTime(2024, 7, 20, 9, 5, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            UserId = new Guid("a7f9a7d5-56f5-4f3f-8a9f-8c2f0d3d7001")
+                        },
+                        new
+                        {
+                            Id = new Guid("44444444-0000-0000-0000-000000000005"),
+                            CreatedAt = new DateTimeOffset(new DateTime(2024, 9, 10, 11, 20, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            CurrentIndex = 0,
+                            DisplayMode = (byte)1,
+                            UpdatedAt = new DateTimeOffset(new DateTime(2024, 9, 10, 11, 20, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            UserId = new Guid("c2b3d8ae-2b6d-4c41-9b8e-b1c2a3d4e005")
                         });
                 });
 
@@ -586,6 +604,44 @@ namespace GenomiX.Infrastructure.Migrations
                             SecurityStamp = "ccccccc3-cccc-cccc-cccc-cccccccccccc",
                             TwoFactorEnabled = false,
                             UserName = "ivan"
+                        },
+                        new
+                        {
+                            Id = new Guid("a7f9a7d5-56f5-4f3f-8a9f-8c2f0d3d7001"),
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "44444444-4444-4444-4444-444444444444",
+                            CreatedAt = new DateTime(2024, 7, 20, 9, 0, 0, 0, DateTimeKind.Utc),
+                            Email = "maria.teacher@example.com",
+                            EmailConfirmed = true,
+                            FirstName = "Maria",
+                            LastName = "Dimitrova",
+                            LockoutEnabled = false,
+                            NormalizedEmail = "MARIA.TEACHER@EXAMPLE.COM",
+                            NormalizedUserName = "MARIA.TEACHER",
+                            PasswordHash = "AQAAAAIAAYagAAAAEJ8JpK5Cz9z9qzQ2z5y0r8Zc8n5o3g9p+uZkqB5x0Gz3/7jZK3Tj3f1xY2nG8j0q5g==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "ddddddd4-dddd-dddd-dddd-dddddddddddd",
+                            TwoFactorEnabled = false,
+                            UserName = "maria.teacher"
+                        },
+                        new
+                        {
+                            Id = new Guid("c2b3d8ae-2b6d-4c41-9b8e-b1c2a3d4e005"),
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "55555555-5555-5555-5555-555555555555",
+                            CreatedAt = new DateTime(2024, 9, 10, 11, 15, 0, 0, DateTimeKind.Utc),
+                            Email = "georgi.scientist@example.com",
+                            EmailConfirmed = true,
+                            FirstName = "Georgi",
+                            LastName = "Kolev",
+                            LockoutEnabled = false,
+                            NormalizedEmail = "GEORGI.SCIENTIST@EXAMPLE.COM",
+                            NormalizedUserName = "GEORGI.SCIENTIST",
+                            PasswordHash = "AQAAAAIAAYagAAAAEL6H2uXl7u0qg7c+W6ZQ2gk0q0zv2Qm8q6pA6xvYQ2n2eK1m8s0n1l5r3j0h2p4c6w==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "eeeeeee5-eeee-eeee-eeee-eeeeeeeeeeee",
+                            TwoFactorEnabled = false,
+                            UserName = "georgi.scientist"
                         });
                 });
 
@@ -638,7 +694,8 @@ namespace GenomiX.Infrastructure.Migrations
                             Difficulty = (byte)1,
                             Information = "DNA (Deoxyribonucleic acid) is a double helix composed of nucleotides: adenine (A), cytosine (C), guanine (G), and thymine (T). A pairs with T, and C pairs with G.",
                             Title = "DNA Structure Basics",
-                            Topic = "DNA"
+                            Topic = "DNA",
+                            UserId = new Guid("a7f9a7d5-56f5-4f3f-8a9f-8c2f0d3d7001")
                         },
                         new
                         {
@@ -646,7 +703,8 @@ namespace GenomiX.Infrastructure.Migrations
                             Difficulty = (byte)2,
                             Information = "Mutations are changes in DNA. **Substitution** replaces one base, **insertion** adds bases, and **deletion** removes bases. Mutations can be harmful, neutral, or beneficial.",
                             Title = "Types of Mutations",
-                            Topic = "Mutations"
+                            Topic = "Mutations",
+                            UserId = new Guid("a7f9a7d5-56f5-4f3f-8a9f-8c2f0d3d7001")
                         },
                         new
                         {
@@ -654,15 +712,17 @@ namespace GenomiX.Infrastructure.Migrations
                             Difficulty = (byte)3,
                             Information = "Cells use repair mechanisms to fix DNA damage. Examples include mismatch repair, nucleotide excision repair, and double-strand break repair. Nanobot simulation in GenomiX demonstrates these concepts.",
                             Title = "DNA Repair Mechanisms",
-                            Topic = "Repair"
+                            Topic = "Repair",
+                            UserId = new Guid("a7f9a7d5-56f5-4f3f-8a9f-8c2f0d3d7001")
                         },
                         new
                         {
                             Id = new Guid("dddd4444-dddd-4444-dddd-dddddddddddd"),
                             Difficulty = (byte)2,
-                            Information = "Probability is key in genetics. For example, Punnett squares can predict the likelihood of offspring inheriting traits. The law of independent assortment applies here.",
+                            Information = "Probability is key in genetics. For example, Punnett squares can predict the likelihood of offspring inheriting traits. The law of independent assortment applies.",
                             Title = "Probability in Genetics",
-                            Topic = "Probability"
+                            Topic = "Probability",
+                            UserId = new Guid("a7f9a7d5-56f5-4f3f-8a9f-8c2f0d3d7001")
                         },
                         new
                         {
@@ -670,7 +730,8 @@ namespace GenomiX.Infrastructure.Migrations
                             Difficulty = (byte)4,
                             Information = "Populations evolve through natural selection, genetic drift, and gene flow. Environmental factors such as temperature or disease pressure influence survival.",
                             Title = "Population Evolution",
-                            Topic = "Evolution"
+                            Topic = "Evolution",
+                            UserId = new Guid("a7f9a7d5-56f5-4f3f-8a9f-8c2f0d3d7001")
                         });
                 });
 
@@ -1148,6 +1209,36 @@ namespace GenomiX.Infrastructure.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("6e6f2c2a-7c3f-4e7d-9f84-2b3a4d9d1001"),
+                            ConcurrencyStamp = "a1111111-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+                            Name = "Admin",
+                            NormalizedName = "ADMIN"
+                        },
+                        new
+                        {
+                            Id = new Guid("6e6f2c2a-7c3f-4e7d-9f84-2b3a4d9d1002"),
+                            ConcurrencyStamp = "b2222222-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+                            Name = "Student",
+                            NormalizedName = "STUDENT"
+                        },
+                        new
+                        {
+                            Id = new Guid("6e6f2c2a-7c3f-4e7d-9f84-2b3a4d9d1003"),
+                            ConcurrencyStamp = "c3333333-cccc-cccc-cccc-cccccccccccc",
+                            Name = "Teacher",
+                            NormalizedName = "TEACHER"
+                        },
+                        new
+                        {
+                            Id = new Guid("6e6f2c2a-7c3f-4e7d-9f84-2b3a4d9d1004"),
+                            ConcurrencyStamp = "d4444444-dddd-dddd-dddd-dddddddddddd",
+                            Name = "Scientist",
+                            NormalizedName = "SCIENTIST"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
@@ -1234,6 +1325,33 @@ namespace GenomiX.Infrastructure.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("AspNetUserRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            UserId = new Guid("ea821ce2-2a3d-43ef-8978-5f34ee07d080"),
+                            RoleId = new Guid("6e6f2c2a-7c3f-4e7d-9f84-2b3a4d9d1001")
+                        },
+                        new
+                        {
+                            UserId = new Guid("9d5e0ac1-4f1b-422b-b7f0-0f7d5d2dbbb1"),
+                            RoleId = new Guid("6e6f2c2a-7c3f-4e7d-9f84-2b3a4d9d1002")
+                        },
+                        new
+                        {
+                            UserId = new Guid("58a7c2b5-1347-4f0a-b3ad-912d4f098aaa"),
+                            RoleId = new Guid("6e6f2c2a-7c3f-4e7d-9f84-2b3a4d9d1002")
+                        },
+                        new
+                        {
+                            UserId = new Guid("a7f9a7d5-56f5-4f3f-8a9f-8c2f0d3d7001"),
+                            RoleId = new Guid("6e6f2c2a-7c3f-4e7d-9f84-2b3a4d9d1003")
+                        },
+                        new
+                        {
+                            UserId = new Guid("c2b3d8ae-2b6d-4c41-9b8e-b1c2a3d4e005"),
+                            RoleId = new Guid("6e6f2c2a-7c3f-4e7d-9f84-2b3a4d9d1004")
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>

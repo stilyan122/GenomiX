@@ -9,46 +9,37 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace GenomiX.Common.Extensions
 {
-    /// <summary>
-    /// Creates extensions for the service collection.
-    /// </summary>
     public static class ServiceCollectionExtensions
     {
-        /// <summary>
-        /// Registers database context.
-        /// </summary>
         public static IServiceCollection AddGenomixDBServices(this IServiceCollection services, string connectionString)
         {
             services
-                .AddDbContext<ApplicationDbContext>(options =>
-                    options.UseSqlServer(connectionString))
+                .AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString))
                 .AddDefaultIdentity<GenUser>(options =>
-            {
-                options.SignIn.RequireConfirmedAccount = false;
-                options.SignIn.RequireConfirmedPhoneNumber = false;
-                options.SignIn.RequireConfirmedEmail = false;
-                options.Password.RequireDigit = false;
-                options.Password.RequiredLength = 6;
-                options.Password.RequireNonAlphanumeric = false;
-                options.Password.RequireLowercase = false;
-                options.Password.RequireUppercase = false;
-            })
-            .AddRoles<IdentityRole<Guid>>()
-            .AddEntityFrameworkStores<ApplicationDbContext>();
+                {
+                    options.SignIn.RequireConfirmedAccount = false;
+                    options.SignIn.RequireConfirmedPhoneNumber = false;
+                    options.SignIn.RequireConfirmedEmail = false;
+                    options.Password.RequireDigit = false;
+                    options.Password.RequiredLength = 6;
+                    options.Password.RequireNonAlphanumeric = false;
+                    options.Password.RequireLowercase = false;
+                    options.Password.RequireUppercase = false;
+                })
+                .AddRoles<IdentityRole<Guid>>()
+                .AddEntityFrameworkStores<ApplicationDbContext>();
 
             return services;
         }
 
-        /// <summary>
-        /// Registers application services.
-        /// </summary>
+        // App services only (sync)
         public static IServiceCollection AddGenomixAppServices(this IServiceCollection services)
         {
-            // Register repositories
-            services.AddScoped(typeof(IRepository<>), typeof(Repository<>))
-                    .AddScoped<IDNAService, DNAService>()
-                    .AddScoped<IOrganismService, OrganismService>()
-                    .AddScoped<ISequenceService, SequenceService>();
+            services
+                .AddScoped(typeof(IRepository<>), typeof(Repository<>))
+                .AddScoped<IDNAService, DNAService>()
+                .AddScoped<IOrganismService, OrganismService>()
+                .AddScoped<ISequenceService, SequenceService>();
 
             return services;
         }

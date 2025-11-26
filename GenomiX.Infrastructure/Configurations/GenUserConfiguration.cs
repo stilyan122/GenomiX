@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 namespace GenomiX.Infrastructure.Configurations
 {
     /// <summary>
-    /// User-specific configuration settings
+    /// Seeds application users (GenUser) from a JSON file.
     /// </summary>
     public class GenUserConfiguration : IEntityTypeConfiguration<GenUser>
     {
