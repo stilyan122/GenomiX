@@ -1,4 +1,6 @@
-﻿using GenomiX.Infrastructure.Models;
+﻿using System;
+using System.Threading.Tasks;
+using GenomiX.Infrastructure.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,32 +17,36 @@ namespace Genomix.Common.Extensions
         {
             using var scope = app.Services.CreateScope();
             var um = scope.ServiceProvider.GetRequiredService<UserManager<GenUser>>();
+            var hasher = new PasswordHasher<GenUser>();
 
-            await Set(um, "stilyan", "Admin.123");
-            await Set(um, "alice", "Student.123");
-            await Set(um, "ivan", "Student.123");
-            await Set(um, "maria.teacher", "Teacher.123");
-            await Set(um, "georgi.scientist", "Scientist.123");
+            await Force(um, hasher, "stilyan", "Admin!123");
+            await Force(um, hasher, "alice", "Student!123");
+            await Force(um, hasher, "ivan", "Student!123");
+            await Force(um, hasher, "maria.teacher", "Teacher!123");
+            await Force(um, hasher, "georgi.scientist", "Scientist!123");
+
+            await Verify(um, "stilyan", "Admin!123");
+            await Verify(um, "alice", "Student!123");
+            await Verify(um, "ivan", "Student!123");
+            await Verify(um, "maria.teacher", "Teacher!123");
+            await Verify(um, "georgi.scientist", "Scientist!123");
         }
 
-        private static async Task Set(UserManager<GenUser> um, string userName, string password)
+        private static async Task Force(UserManager<GenUser> um, PasswordHasher<GenUser> hasher,
+                                        string userName, string rawPassword)
         {
             var user = await um.FindByNameAsync(userName);
+            if (user is null) return;
 
-            if (user is null) 
-                return;
+            user.PasswordHash = hasher.HashPassword(user, rawPassword);
+            user.SecurityStamp = Guid.NewGuid().ToString(); 
+            await um.UpdateAsync(user);
+        }
 
-            if (await um.HasPasswordAsync(user))
-                await um.RemovePasswordAsync(user);
-
-            var result = await um.AddPasswordAsync(user, password);
-
-            if (!result.Succeeded)
-            {
-                var hasher = new PasswordHasher<GenUser>();
-                user.PasswordHash = hasher.HashPassword(user, password);
-                await um.UpdateAsync(user);
-            }
+        private static async Task Verify(UserManager<GenUser> um, string userName, string rawPassword)
+        {
+            var u = await um.FindByNameAsync(userName);
+            var ok = u != null && await um.CheckPasswordAsync(u, rawPassword);
         }
     }
 }

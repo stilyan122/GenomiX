@@ -1,9 +1,11 @@
-﻿using GenomiX.Core.Interfaces;
+﻿using Genomix.Common.Email;
+using GenomiX.Core.Interfaces;
 using GenomiX.Core.Services;
 using GenomiX.Infrastructure;
 using GenomiX.Infrastructure.Models;
 using GenomiX.Infrastructure.Repo;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -17,9 +19,9 @@ namespace GenomiX.Common.Extensions
                 .AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString))
                 .AddDefaultIdentity<GenUser>(options =>
                 {
-                    options.SignIn.RequireConfirmedAccount = false;
+                    options.SignIn.RequireConfirmedAccount = true;
                     options.SignIn.RequireConfirmedPhoneNumber = false;
-                    options.SignIn.RequireConfirmedEmail = false;
+                    options.SignIn.RequireConfirmedEmail = true;
                     options.Password.RequireDigit = false;
                     options.Password.RequiredLength = 6;
                     options.Password.RequireNonAlphanumeric = false;
@@ -40,6 +42,8 @@ namespace GenomiX.Common.Extensions
                 .AddScoped<IDNAService, DNAService>()
                 .AddScoped<IOrganismService, OrganismService>()
                 .AddScoped<ISequenceService, SequenceService>();
+
+            services.AddSingleton<IEmailSender, EmailSender>();
 
             return services;
         }

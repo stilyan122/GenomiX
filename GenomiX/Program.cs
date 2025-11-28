@@ -1,6 +1,8 @@
 using Genomix.Common.Extensions;
 using GenomiX.Common.Extensions;
 using Microsoft.EntityFrameworkCore;
+using GenomiX.Infrastructure;
+using Microsoft.AspNetCore.Identity;
 
 namespace GenomiX
 {
@@ -11,9 +13,8 @@ namespace GenomiX
             var builder = WebApplication.CreateBuilder(args);
 
             var connectionString = builder.Configuration
-                .GetConnectionString("DefaultConnection") ?? 
-                throw new InvalidOperationException("Connection string 'DefaultConnection' " +
-                "not found.");
+                .GetConnectionString("ApplicationDbContextConnection") ?? 
+                throw new InvalidOperationException("Connection string not found.");
 
             builder.Services
                 .AddDatabaseDeveloperPageExceptionFilter()
