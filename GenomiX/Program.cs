@@ -19,7 +19,7 @@ namespace GenomiX
             builder.Services
                 .AddDatabaseDeveloperPageExceptionFilter()
                 .AddGenomixDBServices(connectionString)
-                .AddGenomixAppServices();
+                .AddGenomixAppServices(builder.Configuration, "Email");
 
             builder.Services.AddRazorPages();
            

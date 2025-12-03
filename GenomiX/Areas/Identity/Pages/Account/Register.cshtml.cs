@@ -65,23 +65,26 @@ namespace GenomiX.Areas.Identity.Pages.Account
 
         public async Task OnGetAsync(string? returnUrl = null)
         {
-            ReturnUrl = returnUrl;
+            ReturnUrl = returnUrl ?? Url.Content("~/");
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
         }
 
         public async Task<IActionResult> OnPostAsync(string? returnUrl = null)
         {
-            returnUrl ??= Url.Content("~/");
+            ReturnUrl = returnUrl ?? Url.Content("~/");
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
 
             if (!ModelState.IsValid)
                 return Page();
 
-            var normalizedEmail = Input.Email.Trim().ToLowerInvariant();
+            // Trim & normalize
+            var email = Input.Email.Trim();
+            var normalizedEmail = email.ToLowerInvariant();
+
             var user = CreateUser();
 
             await _userStore.SetUserNameAsync(user, normalizedEmail, CancellationToken.None);
-            await _emailStore.SetEmailAsync(user, normalizedEmail, CancellationToken.None);
+            await _emailStore.SetEmailAsync(user, email, CancellationToken.None);
 
             user.FirstName = Input.FirstName.Trim();
             user.LastName = Input.LastName.Trim();
@@ -91,9 +94,9 @@ namespace GenomiX.Areas.Identity.Pages.Account
 
             if (result.Succeeded)
             {
-                _logger.LogInformation("User {Email} created a new account.", normalizedEmail);
+                _logger.LogInformation("User {Email} created a new account.", email);
 
-                if (await _userManager.IsInRoleAsync(user, DefaultRole) == false)
+                if (!await _userManager.IsInRoleAsync(user, DefaultRole))
                 {
                     var roleAdd = await _userManager.AddToRoleAsync(user, DefaultRole);
                     if (!roleAdd.Succeeded)
@@ -110,29 +113,31 @@ namespace GenomiX.Areas.Identity.Pages.Account
                 var callbackUrl = Url.Page(
                     "/Account/ConfirmEmail",
                     pageHandler: null,
-                    values: new { area = "Identity", userId, code, returnUrl },
+                    values: new { area = "Identity", userId, code, returnUrl = ReturnUrl },
                     protocol: Request.Scheme)!;
 
                 try
                 {
                     await _emailSender.SendEmailAsync(
-                        normalizedEmail,
+                        email,
                         "Confirm your GenomiX email",
                         $"""
                         <p>Welcome to GenomiX, {HtmlEncoder.Default.Encode(user.FirstName)}!</p>
-                        <p>Please confirm your account by <a href="{HtmlEncoder.Default.Encode(callbackUrl)}">clicking here</a>.</p>
+                        <p>Please confirm your account by 
+                           <a href="{HtmlEncoder.Default.Encode(callbackUrl)}">clicking here</a>.
+                        </p>
                         """);
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Failed sending confirmation email to {Email}.", normalizedEmail);
+                    _logger.LogError(ex, "Failed sending confirmation email to {Email}.", email);
                 }
 
                 if (_userManager.Options.SignIn.RequireConfirmedAccount)
-                    return RedirectToPage("RegisterConfirmation", new { email = normalizedEmail, returnUrl });
+                    return RedirectToPage("RegisterConfirmation", new { email, returnUrl = ReturnUrl });
 
                 await _signInManager.SignInAsync(user, isPersistent: false);
-                return LocalRedirect(returnUrl);
+                return LocalRedirect(ReturnUrl);
             }
 
             foreach (var error in result.Errors)

@@ -1,10 +1,7 @@
-﻿using System;
-using System.Threading.Tasks;
-using GenomiX.Infrastructure.Models;
+﻿using GenomiX.Infrastructure.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 
 namespace Genomix.Common.Extensions
 {
@@ -39,7 +36,9 @@ namespace Genomix.Common.Extensions
             if (user is null) return;
 
             user.PasswordHash = hasher.HashPassword(user, rawPassword);
-            user.SecurityStamp = Guid.NewGuid().ToString(); 
+            user.SecurityStamp = Guid.NewGuid().ToString();
+            user.EmailConfirmed = true;
+
             await um.UpdateAsync(user);
         }
 

@@ -7,6 +7,7 @@ using GenomiX.Infrastructure.Repo;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace GenomiX.Common.Extensions
@@ -29,13 +30,17 @@ namespace GenomiX.Common.Extensions
                     options.Password.RequireUppercase = false;
                 })
                 .AddRoles<IdentityRole<Guid>>()
-                .AddEntityFrameworkStores<ApplicationDbContext>();
+                .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddDefaultTokenProviders();
 
             return services;
         }
 
         // App services only (sync)
-        public static IServiceCollection AddGenomixAppServices(this IServiceCollection services)
+        public static IServiceCollection AddGenomixAppServices(
+            this IServiceCollection services,
+            IConfiguration configuration,
+            string emailSectionName = "Email")
         {
             services
                 .AddScoped(typeof(IRepository<>), typeof(Repository<>))
@@ -43,7 +48,10 @@ namespace GenomiX.Common.Extensions
                 .AddScoped<IOrganismService, OrganismService>()
                 .AddScoped<ISequenceService, SequenceService>();
 
-            services.AddSingleton<IEmailSender, EmailSender>();
+            services.Configure<EmailSettings>(
+                configuration.GetSection(emailSectionName));
+
+            services.AddTransient<IEmailSender, EmailSender>();
 
             return services;
         }
