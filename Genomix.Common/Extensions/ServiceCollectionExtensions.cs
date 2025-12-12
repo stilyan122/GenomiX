@@ -14,6 +14,7 @@ namespace GenomiX.Common.Extensions
 {
     public static class ServiceCollectionExtensions
     {
+        // Database services
         public static IServiceCollection AddGenomixDBServices(this IServiceCollection services, string connectionString)
         {
             services
@@ -31,12 +32,12 @@ namespace GenomiX.Common.Extensions
                 })
                 .AddRoles<IdentityRole<Guid>>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
-                .AddDefaultTokenProviders();
+                .AddDefaultTokenProviders(); 
 
             return services;
         }
 
-        // App services only (sync)
+        // App services
         public static IServiceCollection AddGenomixAppServices(
             this IServiceCollection services,
             IConfiguration configuration,
@@ -48,8 +49,9 @@ namespace GenomiX.Common.Extensions
                 .AddScoped<IOrganismService, OrganismService>()
                 .AddScoped<ISequenceService, SequenceService>();
 
-            services.Configure<EmailSettings>(
-                configuration.GetSection(emailSectionName));
+            var emailSection = configuration.GetSection(emailSectionName);
+
+            services.Configure<EmailSettings>(emailSection);
 
             services.AddTransient<IEmailSender, EmailSender>();
 

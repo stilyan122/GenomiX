@@ -77,7 +77,6 @@ namespace GenomiX.Areas.Identity.Pages.Account
             if (!ModelState.IsValid)
                 return Page();
 
-            // Trim & normalize
             var email = Input.Email.Trim();
             var normalizedEmail = email.ToLowerInvariant();
 

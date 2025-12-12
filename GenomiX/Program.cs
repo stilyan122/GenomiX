@@ -19,7 +19,7 @@ namespace GenomiX
             builder.Services
                 .AddDatabaseDeveloperPageExceptionFilter()
                 .AddGenomixDBServices(connectionString)
-                .AddGenomixAppServices(builder.Configuration, "Email");
+                .AddGenomixAppServices(builder.Configuration);
 
             builder.Services.AddRazorPages();
            
@@ -49,6 +49,22 @@ namespace GenomiX
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}")
                 .WithStaticAssets();
+
+            app.MapGet("/dev/email/config",
+                (Microsoft.Extensions.Options.IOptions<Genomix.Common.Email.EmailSettings> opt) =>
+                {
+                    var e = opt.Value;
+                    return Results.Json(new
+                    {
+                        e.Host,
+                        e.Port,
+                        e.User,
+                        e.UseStartTls,
+                        e.UseSsl,
+                        e.FromAddress,
+                        e.FromName
+                    });
+                });
 
             app.MapRazorPages()
                .WithStaticAssets();
