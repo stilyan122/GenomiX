@@ -1,8 +1,12 @@
-using Genomix.Common.Extensions;
+﻿using Genomix.Common.Extensions;
 using GenomiX.Common.Extensions;
-using Microsoft.EntityFrameworkCore;
 using GenomiX.Infrastructure;
+using MailKit.Security;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.EntityFrameworkCore;
+using System.Net;
+using System.Net.Mail;
 
 namespace GenomiX
 {
@@ -19,7 +23,8 @@ namespace GenomiX
             builder.Services
                 .AddDatabaseDeveloperPageExceptionFilter()
                 .AddGenomixDBServices(connectionString)
-                .AddGenomixAppServices(builder.Configuration);
+                .AddGenomixAppServices(builder.Configuration)
+                .AddAuthenticationServices(builder.Configuration);
 
             builder.Services.AddRazorPages();
            
@@ -49,22 +54,6 @@ namespace GenomiX
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}")
                 .WithStaticAssets();
-
-            app.MapGet("/dev/email/config",
-                (Microsoft.Extensions.Options.IOptions<Genomix.Common.Email.EmailSettings> opt) =>
-                {
-                    var e = opt.Value;
-                    return Results.Json(new
-                    {
-                        e.Host,
-                        e.Port,
-                        e.User,
-                        e.UseStartTls,
-                        e.UseSsl,
-                        e.FromAddress,
-                        e.FromName
-                    });
-                });
 
             app.MapRazorPages()
                .WithStaticAssets();

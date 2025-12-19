@@ -1,30 +1,59 @@
 ﻿using Genomix.Common.Email;
-using MailKit;
-using MailKit.Net.Smtp;
-using MailKit.Security;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using MimeKit;
+using System.Net;
+using System.Net.Mail;
 
 public sealed class EmailSender : IEmailSender
 {
-    private readonly EmailSettings _opt;
-    public EmailSender(IOptions<EmailSettings> options) => _opt = options.Value;
+    private readonly IConfiguration _cfg;
+    private readonly ILogger<EmailSender> _log;
 
-    public async Task SendEmailAsync(string to, string subject, string html)
+    public EmailSender(IConfiguration cfg, ILogger<EmailSender> log)
     {
-        var msg = new MimeMessage();
-        msg.From.Add(new MailboxAddress(_opt.FromName, _opt.FromAddress));
-        msg.To.Add(MailboxAddress.Parse(to));
-        msg.Subject = subject;
-        msg.Body = new BodyBuilder { HtmlBody = html }.ToMessageBody();
+        _cfg = cfg; _log = log;
+    }
 
-        using var logger = new ProtocolLogger("smtp-protocol.log"); 
-        using var smtp = new SmtpClient(logger);
+    public async Task SendEmailAsync(string email, string subject, string htmlMessage)
+    {
+        var s = _cfg.GetSection("Email");
+        var host = s["Host"]!;
+        var port = int.Parse(s["Port"] ?? "2525");
+        var user = s["User"]!;
+        var pass = s["Password"]!;
+        var from = s["FromAddress"]!;
+        var name = s["FromName"] ?? "GenomiX";
+        var enableSsl = bool.TryParse(s["EnableSsl"], out var ssl) ? ssl : true;
 
-        await smtp.ConnectAsync(_opt.Host, _opt.Port, SecureSocketOptions.StartTls);
-        await smtp.AuthenticateAsync(_opt.User, _opt.Password);
-        await smtp.SendAsync(msg);
-        await smtp.DisconnectAsync(true);
+        using var msg = new MailMessage
+        {
+            From = new MailAddress(from, name),
+            Subject = subject,
+            Body = htmlMessage,
+            IsBodyHtml = true
+        };
+        msg.To.Add(email);
+
+        using var client = new SmtpClient(host, port)
+        {
+            Credentials = new NetworkCredential(user, pass),
+            EnableSsl = enableSsl
+        };
+
+        try
+        {
+            _log.LogInformation("SMTP → {host}:{port} SSL:{ssl} From:{from} To:{to}",
+                                host, port, enableSsl, from, email);
+            await client.SendMailAsync(msg);
+            _log.LogInformation("SMTP OK");
+        }
+        catch (Exception ex)
+        {
+            _log.LogError(ex, "SMTP FAILED");
+            throw;
+        }
     }
 }
+    

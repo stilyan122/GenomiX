@@ -7,7 +7,7 @@ namespace GenomiX.Infrastructure.Models
     /// <summary>
     /// Represents an application user with additional profile information.
     /// Inherits from <see cref="IdentityUser"/> to integrate with ASP.NET Core Identity.
-/// </summary>
+    /// </summary>
     public class GenUser : IdentityUser<Guid>
     {
         /// <summary> Primary key (GUID). </summary>

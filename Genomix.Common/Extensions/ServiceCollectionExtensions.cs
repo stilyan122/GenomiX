@@ -57,5 +57,38 @@ namespace GenomiX.Common.Extensions
 
             return services;
         }
+
+        public static IServiceCollection AddAuthenticationServices(this IServiceCollection services,
+            IConfiguration configuration)
+        {
+            var authBuilder = services.AddAuthentication();
+
+            var gId = configuration["Auth:Google:ClientId"];
+            var gSecret = configuration["Auth:Google:ClientSecret"];
+            if (!string.IsNullOrWhiteSpace(gId) && !string.IsNullOrWhiteSpace(gSecret))
+            {
+                authBuilder.AddGoogle(o =>
+                {
+                    o.ClientId = gId!;
+                    o.ClientSecret = gSecret!;
+                    o.SaveTokens = true;
+                });
+            }
+
+            var fId = configuration["Auth:Facebook:AppId"];
+            var fSecret = configuration["Auth:Facebook:AppSecret"];
+            if (!string.IsNullOrWhiteSpace(fId) && !string.IsNullOrWhiteSpace(fSecret))
+            {
+                authBuilder.AddFacebook(o =>
+                {
+                    o.AppId = fId!;
+                    o.AppSecret = fSecret!;
+                    o.Fields.Add("email");
+                    o.SaveTokens = true;
+                });
+            }
+
+            return services;
+        }
     }
 }

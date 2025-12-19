@@ -32,6 +32,20 @@
                 <a id="forgot-password" class="auth-link" asp-page="./ForgotPassword">Forgot password?</a>
                 <a class="auth-link" asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">Create account</a>
             </div>
+
+            @if (Model.ExternalLogins?.Count > 0)
+            {
+                <form asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="ext-login">
+                    @foreach (var provider in Model.ExternalLogins)
+                    {
+                        <button type="submit" class="btn btn-ext"
+                                name="provider" value="@provider.Name"
+                                title="Sign in with @provider.DisplayName">
+                            Continue with @provider.DisplayName
+                        </button>
+                    }
+                </form>
+            }
         </form>
     </div>
 </div>

@@ -78,11 +78,9 @@ namespace GenomiX.Areas.Identity.Pages.Account
                 return Page();
 
             var email = Input.Email.Trim();
-            var normalizedEmail = email.ToLowerInvariant();
-
             var user = CreateUser();
 
-            await _userStore.SetUserNameAsync(user, normalizedEmail, CancellationToken.None);
+            await _userStore.SetUserNameAsync(user, email, CancellationToken.None);
             await _emailStore.SetEmailAsync(user, email, CancellationToken.None);
 
             user.FirstName = Input.FirstName.Trim();
@@ -117,14 +115,24 @@ namespace GenomiX.Areas.Identity.Pages.Account
 
                 try
                 {
+                    var safeFirst = HtmlEncoder.Default.Encode(user.FirstName);
+                    var safeUrl = HtmlEncoder.Default.Encode(callbackUrl);
+
                     await _emailSender.SendEmailAsync(
                         email,
-                        "Confirm your GenomiX email",
+                        "Confirm your GenomiX account",
                         $"""
-                        <p>Welcome to GenomiX, {HtmlEncoder.Default.Encode(user.FirstName)}!</p>
-                        <p>Please confirm your account by 
-                           <a href="{HtmlEncoder.Default.Encode(callbackUrl)}">clicking here</a>.
-                        </p>
+                        <div style="font-family:Arial,Helvetica,sans-serif;line-height:1.5">
+                          <h2 style="margin:0 0 12px">Welcome to GenomiX{(string.IsNullOrWhiteSpace(safeFirst) ? "" : $", {safeFirst}")}!</h2>
+                          <p>Finish setting up your account by confirming your email address.</p>
+                          <p style="margin:20px 0">
+                            <a href="{safeUrl}" style="background:#1a73e8;color:#fff;padding:10px 16px;border-radius:6px;text-decoration:none;display:inline-block">
+                              Confirm my email
+                            </a>
+                          </p>
+                          <p>If the button doesn’t work, paste this link into your browser:</p>
+                          <p style="word-break:break-all">{safeUrl}</p>
+                        </div>
                         """);
                 }
                 catch (Exception ex)
@@ -150,8 +158,7 @@ namespace GenomiX.Areas.Identity.Pages.Account
             try { return Activator.CreateInstance<GenUser>()!; }
             catch
             {
-                throw new InvalidOperationException($"Can't create an instance of '{nameof(GenUser)}'. " +
-                    $"Ensure '{nameof(GenUser)}' has a parameterless constructor.");
+                throw new InvalidOperationException($"Can't create an instance of '{nameof(GenUser)}'. Ensure it has a parameterless constructor.");
             }
         }
 
