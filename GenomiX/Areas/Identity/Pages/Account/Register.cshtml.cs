@@ -80,6 +80,15 @@ namespace GenomiX.Areas.Identity.Pages.Account
             var email = Input.Email.Trim();
             var user = CreateUser();
 
+            var existing = await _userManager.FindByEmailAsync(email)
+              ?? await _userManager.FindByNameAsync(email);
+
+            if (existing != null)
+            {
+                ModelState.AddModelError("Input.Email", "This email is already registered.");
+                return Page();
+            }
+
             await _userStore.SetUserNameAsync(user, email, CancellationToken.None);
             await _emailStore.SetEmailAsync(user, email, CancellationToken.None);
 
@@ -113,15 +122,9 @@ namespace GenomiX.Areas.Identity.Pages.Account
                     values: new { area = "Identity", userId, code, returnUrl = ReturnUrl },
                     protocol: Request.Scheme)!;
 
-                try
-                {
-                    var safeFirst = HtmlEncoder.Default.Encode(user.FirstName);
-                    var safeUrl = HtmlEncoder.Default.Encode(callbackUrl);
-
-                    await _emailSender.SendEmailAsync(
-                        email,
-                        "Confirm your GenomiX account",
-                        $"""
+                var safeFirst = HtmlEncoder.Default.Encode(user.FirstName);
+                var safeUrl = HtmlEncoder.Default.Encode(callbackUrl);
+                var htmlBody = $"""
                         <div style="font-family:Arial,Helvetica,sans-serif;line-height:1.5">
                           <h2 style="margin:0 0 12px">Welcome to GenomiX{(string.IsNullOrWhiteSpace(safeFirst) ? "" : $", {safeFirst}")}!</h2>
                           <p>Finish setting up your account by confirming your email address.</p>
@@ -133,11 +136,20 @@ namespace GenomiX.Areas.Identity.Pages.Account
                           <p>If the button doesn’t work, paste this link into your browser:</p>
                           <p style="word-break:break-all">{safeUrl}</p>
                         </div>
-                        """);
+                        """;
+
+                try
+                {
+                    await _emailSender.SendEmailAsync(email, "Confirm your GenomiX account", htmlBody);
                 }
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, "Failed sending confirmation email to {Email}.", email);
+
+                    await _userManager.DeleteAsync(user);
+
+                    ModelState.AddModelError(string.Empty, "We couldn't send a confirmation email. Please try again.");
+                    return Page();
                 }
 
                 if (_userManager.Options.SignIn.RequireConfirmedAccount)

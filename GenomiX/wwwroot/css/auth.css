@@ -525,3 +525,8 @@ form#registerForm, form#loginForm {
 .btn-neutral { 
     border-color: color-mix(in oklab, var(--gx-accent) 40%, var(--gx-border)); 
 }
+
+.auth-sub strong {
+    color: color-mix(in srgb, var(--text) 92%, var(--accent2));
+    font-weight: 800;
+}

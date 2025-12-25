@@ -16,37 +16,91 @@
 
             <div class="auth-field">
                 <label class="auth-label" asp-for="Input.EmailOrUserName">Email</label>
-                <input class="auth-input" asp-for="Input.EmailOrUserName" autocomplete="username" placeholder="your-email@example.com" />
+                <input class="auth-input"
+                       asp-for="Input.EmailOrUserName"
+                       autocomplete="username"
+                       placeholder="your-email@example.com" />
                 <span class="auth-error" asp-validation-for="Input.EmailOrUserName"></span>
             </div>
 
             <div class="auth-field">
                 <label class="auth-label" asp-for="Input.Password">Password</label>
-                <input class="auth-input" asp-for="Input.Password" autocomplete="current-password" placeholder="••••••••" />
+                <input class="auth-input"
+                       asp-for="Input.Password"
+                       type="password"
+                       autocomplete="current-password"
+                       placeholder="••••••••" />
                 <span class="auth-error" asp-validation-for="Input.Password"></span>
             </div>
 
             <button id="login-submit" type="submit" class="auth-button">Sign in</button>
 
             <div class="auth-foot">
-                <a id="forgot-password" class="auth-link" asp-page="./ForgotPassword">Forgot password?</a>
-                <a class="auth-link" asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">Create account</a>
+                <a id="forgot-password" class="link" asp-page="./ForgotPassword">Forgot password?</a>
+                <span>·</span>
+                <a class="link" asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">Create account</a>
+            </div>
+        </form>
+
+        @if (Model.ExternalLogins?.Count > 0)
+        {
+            <div class="auth-sep">
+                <div class="auth-sep-line"></div>
+                <div class="auth-sep-text">or</div>
+                <div class="auth-sep-line"></div>
             </div>
 
-            @if (Model.ExternalLogins?.Count > 0)
-            {
-                <form asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="ext-login">
-                    @foreach (var provider in Model.ExternalLogins)
-                    {
-                        <button type="submit" class="btn btn-ext"
-                                name="provider" value="@provider.Name"
-                                title="Sign in with @provider.DisplayName">
-                            Continue with @provider.DisplayName
-                        </button>
-                    }
-                </form>
-            }
-        </form>
+            <form asp-page="./ExternalLogin"
+                  asp-route-returnUrl="@Model.ReturnUrl"
+                  method="post"
+                  class="ext-login">
+                @Html.AntiForgeryToken()
+
+                @foreach (var provider in Model.ExternalLogins)
+                {
+                    var p = (provider.Name ?? "").ToLowerInvariant();
+
+                    var cls =
+                    p.Contains("google") ? "btn-google" :
+                    p.Contains("facebook") ? "btn-facebook" :
+                    p.Contains("microsoft") ? "btn-microsoft" :
+                    p.Contains("github") ? "btn-github" :
+                    "btn-neutral";
+
+                    <button type="submit"
+                            class="btn-ext @cls"
+                            name="provider"
+                            value="@provider.Name"
+                            title="Continue with @provider.DisplayName">
+                        <span class="ico" aria-hidden="true">
+                            @if (cls == "btn-google")
+                            {
+                                <svg viewBox="0 0 24 24" fill="none">
+                                    <path d="M21.8 12.2c0-.7-.1-1.2-.2-1.8H12v3.4h5.5c-.1.9-.8 2.2-2.3 3.1v2.2h3.3c1.9-1.8 3.3-4.4 3.3-7.9Z" fill="currentColor" opacity=".9" />
+                                    <path d="M12 22c2.7 0 5-.9 6.7-2.5l-3.3-2.2c-.9.6-2 1-3.4 1-2.6 0-4.8-1.8-5.6-4.2H3v2.3C4.7 19.7 8.1 22 12 22Z" fill="currentColor" opacity=".7" />
+                                    <path d="M6.4 14.1c-.2-.6-.3-1.3-.3-2.1s.1-1.4.3-2.1V7.6H3C2.4 8.9 2 10.4 2 12s.4 3.1 1 4.4l3.4-2.3Z" fill="currentColor" opacity=".6" />
+                                    <path d="M12 5.7c1.9 0 3.2.8 3.9 1.5l2.9-2.9C17 2.7 14.7 2 12 2 8.1 2 4.7 4.3 3 7.6l3.4 2.3C7.2 7.5 9.4 5.7 12 5.7Z" fill="currentColor" opacity=".5" />
+                                </svg>
+                            }
+                            else if (cls == "btn-github")
+                            {
+                                <svg viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48v-1.7c-2.77.6-3.35-1.17-3.35-1.17-.45-1.14-1.1-1.44-1.1-1.44-.9-.63.07-.62.07-.62 1 .07 1.53 1.03 1.53 1.03.9 1.54 2.36 1.1 2.94.85.09-.66.35-1.1.63-1.35-2.21-.25-4.54-1.1-4.54-4.9 0-1.08.39-1.96 1.03-2.65-.1-.25-.45-1.27.1-2.64 0 0 .84-.27 2.75 1.01A9.5 9.5 0 0 1 12 6.8c.85 0 1.7.11 2.5.33 1.9-1.28 2.74-1.01 2.74-1.01.55 1.37.2 2.39.1 2.64.64.69 1.03 1.57 1.03 2.65 0 3.81-2.34 4.64-4.57 4.89.36.31.68.92.68 1.86v2.75c0 .27.18.58.69.48A10 10 0 0 0 12 2Z" />
+                                </svg>
+                            }
+                            else
+                            {
+                                <svg viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2Zm1 17.9V19a1 1 0 0 0-2 0v.9A8 8 0 1 1 20 12h-1a1 1 0 0 0 0 2h.9A10 10 0 0 0 13 19.9Z" opacity=".75" />
+                                </svg>
+                            }
+                        </span>
+
+                        <span>Continue with @provider.DisplayName</span>
+                    </button>
+                }
+            </form>
+        }
     </div>
 </div>
 

@@ -1,58 +1,62 @@
 ﻿using Genomix.Common.Email;
+using MailKit.Net.Smtp;
+using MailKit.Security;
 using Microsoft.AspNetCore.Identity.UI.Services;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using System.Net;
-using System.Net.Mail;
+using MimeKit;
 
 public sealed class EmailSender : IEmailSender
 {
-    private readonly IConfiguration _cfg;
-    private readonly ILogger<EmailSender> _log;
+    private readonly EmailSettings _opt;
+    private readonly ILogger<EmailSender> _logger;
 
-    public EmailSender(IConfiguration cfg, ILogger<EmailSender> log)
+    public EmailSender(IOptions<EmailSettings> opt, ILogger<EmailSender> logger)
     {
-        _cfg = cfg; _log = log;
+        _opt = opt.Value;
+        _logger = logger;
     }
 
     public async Task SendEmailAsync(string email, string subject, string htmlMessage)
     {
-        var s = _cfg.GetSection("Email");
-        var host = s["Host"]!;
-        var port = int.Parse(s["Port"] ?? "2525");
-        var user = s["User"]!;
-        var pass = s["Password"]!;
-        var from = s["FromAddress"]!;
-        var name = s["FromName"] ?? "GenomiX";
-        var enableSsl = bool.TryParse(s["EnableSsl"], out var ssl) ? ssl : true;
+        if (string.IsNullOrWhiteSpace(_opt.Host))
+            throw new InvalidOperationException("SMTP Host is not configured (Email:Host).");
 
-        using var msg = new MailMessage
-        {
-            From = new MailAddress(from, name),
-            Subject = subject,
-            Body = htmlMessage,
-            IsBodyHtml = true
-        };
-        msg.To.Add(email);
+        var message = new MimeMessage();
+        message.From.Add(new MailboxAddress(_opt.FromName, _opt.FromEmail));
+        message.To.Add(MailboxAddress.Parse(email));
+        message.Subject = subject;
 
-        using var client = new SmtpClient(host, port)
+        message.Body = new BodyBuilder
         {
-            Credentials = new NetworkCredential(user, pass),
-            EnableSsl = enableSsl
-        };
+            HtmlBody = htmlMessage
+        }.ToMessageBody();
+
+        var secure = _opt.UseSsl
+            ? SecureSocketOptions.SslOnConnect
+            : (_opt.UseStartTls ? SecureSocketOptions.StartTls : SecureSocketOptions.None);
+
+        using var client = new SmtpClient();
 
         try
         {
-            _log.LogInformation("SMTP → {host}:{port} SSL:{ssl} From:{from} To:{to}",
-                                host, port, enableSsl, from, email);
-            await client.SendMailAsync(msg);
-            _log.LogInformation("SMTP OK");
+            await client.ConnectAsync(_opt.Host, _opt.Port, secure);
+
+            client.AuthenticationMechanisms.Remove("XOAUTH2");
+
+            if (!string.IsNullOrWhiteSpace(_opt.Username))
+                await client.AuthenticateAsync(_opt.Username, _opt.Password);
+
+            await client.SendAsync(message);
         }
         catch (Exception ex)
         {
-            _log.LogError(ex, "SMTP FAILED");
-            throw;
+            _logger.LogError(ex, "Failed to send email to {Email}. Subject: {Subject}", email, subject);
+            throw; 
+        }
+        finally
+        {
+            await client.DisconnectAsync(true);
         }
     }
 }

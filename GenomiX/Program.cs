@@ -1,12 +1,5 @@
-﻿using Genomix.Common.Extensions;
-using GenomiX.Common.Extensions;
-using GenomiX.Infrastructure;
-using MailKit.Security;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
+using Genomix.Common.Extensions;
 using Microsoft.EntityFrameworkCore;
-using System.Net;
-using System.Net.Mail;
 
 namespace GenomiX
 {
@@ -17,7 +10,7 @@ namespace GenomiX
             var builder = WebApplication.CreateBuilder(args);
 
             var connectionString = builder.Configuration
-                .GetConnectionString("ApplicationDbContextConnection") ?? 
+                .GetConnectionString("DefaultConnection") ?? 
                 throw new InvalidOperationException("Connection string not found.");
 
             builder.Services

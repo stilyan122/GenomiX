@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace GenomiX.Common.Extensions
+namespace Genomix.Common.Extensions
 {
     public static class ServiceCollectionExtensions
     {
@@ -21,11 +21,12 @@ namespace GenomiX.Common.Extensions
                 .AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString))
                 .AddDefaultIdentity<GenUser>(options =>
                 {
-                    options.SignIn.RequireConfirmedAccount = true;
-                    options.SignIn.RequireConfirmedPhoneNumber = false;
-                    options.SignIn.RequireConfirmedEmail = true;
-                    options.Password.RequireDigit = false;
                     options.Password.RequiredLength = 6;
+                    options.SignIn.RequireConfirmedAccount = true;
+                    options.SignIn.RequireConfirmedEmail = true;
+                    options.User.RequireUniqueEmail = true;
+                    options.Password.RequireDigit = false;
+                    options.SignIn.RequireConfirmedPhoneNumber = false;
                     options.Password.RequireNonAlphanumeric = false;
                     options.Password.RequireLowercase = false;
                     options.Password.RequireUppercase = false;
@@ -57,6 +58,8 @@ namespace GenomiX.Common.Extensions
 
             return services;
         }
+
+        // Authentication services
 
         public static IServiceCollection AddAuthenticationServices(this IServiceCollection services,
             IConfiguration configuration)
