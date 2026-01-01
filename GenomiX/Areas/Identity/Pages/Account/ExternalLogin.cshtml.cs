@@ -107,19 +107,45 @@ namespace GenomiX.Areas.Identity.Pages.Account
             {
                 ReturnUrl = returnUrl;
                 ProviderDisplayName = info.ProviderDisplayName;
-                if (info.Principal.HasClaim(c => c.Type == ClaimTypes.Email))
+
+                var email =
+                    info.Principal.FindFirstValue(ClaimTypes.Email) ??
+                    info.Principal.FindFirstValue("email") ??
+                    "";
+
+                var fullName =
+                    info.Principal.FindFirstValue(ClaimTypes.Name) ??
+                    info.Principal.FindFirstValue("name") ??   
+                    info.Principal.Identity?.Name ??
+                    "";
+
+                string firstName = info.Principal.FindFirstValue(ClaimTypes.GivenName)
+                    ?? info.Principal.FindFirstValue("given_name")
+                    ?? "";
+
+                string lastName = info.Principal.FindFirstValue(ClaimTypes.Surname)
+                    ?? info.Principal.FindFirstValue("family_name")
+                    ?? "";
+
+                if ((string.IsNullOrWhiteSpace(firstName) || string.IsNullOrWhiteSpace(lastName)) && !string.IsNullOrWhiteSpace(fullName))
                 {
-                    Input = new InputModel
+                    var parts = fullName.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                    if (parts.Length == 1)
+                        firstName = firstName.Length == 0 ? parts[0] : firstName;
+                    else if (parts.Length >= 2)
                     {
-                        Email = info.Principal.FindFirstValue(ClaimTypes.Email) ?? "",
-                        FirstName = info.Principal.FindFirstValue(ClaimTypes.GivenName)
-                        ?? info.Principal.FindFirstValue("given_name")
-                         ?? "",
-                                LastName = info.Principal.FindFirstValue(ClaimTypes.Surname)
-                        ?? info.Principal.FindFirstValue("family_name")
-                        ?? "",
-                    };
+                        firstName = firstName.Length == 0 ? parts[0] : firstName;
+                        lastName = lastName.Length == 0 ? string.Join(" ", parts.Skip(1)) : lastName;
+                    }
                 }
+
+                Input = new InputModel
+                {
+                    Email = email,
+                    FirstName = firstName,
+                    LastName = lastName
+                };
+
                 return Page();
             }
         }

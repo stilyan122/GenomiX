@@ -1,7 +1,15 @@
 ﻿@page
+@using Microsoft.AspNetCore.Authentication
 @model GenomiX.Areas.Identity.Pages.Account.RegisterModel
 @{
     ViewData["Title"] = "Create account";
+
+    var allowed = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+    { "google", "facebook", "github" };
+
+    var providers = ((List<AuthenticationScheme>)Model.ExternalLogins ?? new List<AuthenticationScheme>())
+        .Where(p => allowed.Contains(p.Name ?? ""))
+        .ToList();
 }
 
 <div class="auth-wrap">
@@ -9,7 +17,7 @@
         <h1 class="auth-title">Create your account</h1>
         <p class="auth-sub">
             Join GenomiX to build and save your own DNA models.
-            We’ll send you a confirmation email to activate your account.
+            We'll send you a confirmation email to activate your account.
         </p>
 
         <form id="registerForm"
@@ -85,31 +93,32 @@
             </div>
         </form>
 
-        @if (Model.ExternalLogins?.Count > 0)
+        @if (providers.Count > 0)
         {
             <div class="auth-sep">
                 <div class="auth-sep-line"></div>
-                <div class="auth-sep-text">or continue with</div>
+                <div class="auth-sep-text">or</div>
                 <div class="auth-sep-line"></div>
             </div>
 
             <form asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="ext-login">
-                @foreach (var provider in Model.ExternalLogins)
+                @Html.AntiForgeryToken()
+                
+                @foreach (var provider in providers)
                 {
                     var name = provider.Name?.ToLowerInvariant() ?? "";
                     var btnClass = name switch
                     {
                         "google" => "btn-google",
                         "facebook" => "btn-facebook",
-                        "microsoft" => "btn-microsoft",
                         "github" => "btn-github",
                         _ => "btn-neutral"
                     };
 
                     <button type="submit"
-                            class="btn-ext @btnClass"
-                            name="provider" value="@provider.Name"
-                            title="Continue with @provider.DisplayName">
+                        class="btn-ext @btnClass"
+                        name="provider" value="@provider.Name"
+                        title="Register with @provider.DisplayName">
                         <span class="ico">
                             @if (name == "google")
                             {
@@ -121,27 +130,18 @@
                                 @:
                                 <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#1877F2" d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078V12.07h3.047V9.412c0-3.007 1.792-4.668 4.533-4.668 1.313 0 2.686.235 2.686.235v2.953h-1.515c-1.492 0-1.955.927-1.955 1.878v2.26h3.328l-.532 3.493h-2.796V24C19.612 23.094 24 18.1 24 12.073z" /></svg>
                             }
-                            else if (name == "microsoft")
-                            {
-                                @:
-                                <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#F25022" d="M11 11H1V1h10z" /><path fill="#7FBA00" d="M23 11H13V1h10z" /><path fill="#00A4EF" d="M11 23H1V13h10z" /><path fill="#FFB900" d="M23 23H13V13h10z" /></svg>
-                            }
                             else if (name == "github")
                             {
                                 @:
                                 <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#fff" d="M12 .5C5.73.5.99 5.23.99 11.5c0 4.86 3.15 8.98 7.52 10.43.55.1.75-.24.75-.53 0-.26-.01-1.1-.02-1.99-3.06.66-3.7-1.3-3.7-1.3-.5-1.27-1.22-1.61-1.22-1.61-.99-.67.07-.66.07-.66 1.1.08 1.67 1.12 1.67 1.12.98 1.67 2.58 1.19 3.2.91.1-.71.38-1.19.69-1.46-2.44-.28-5-1.22-5-5.43 0-1.2.43-2.18 1.13-2.95-.11-.28-.49-1.42.11-2.96 0 0 .93-.3 3.05 1.13a10.5 10.5 0 0 1 5.56 0c2.12-1.43 3.05-1.13 3.05-1.13.6 1.54.22 2.68.11 2.96.7.77 1.13 1.75 1.13 2.95 0 4.22-2.57 5.14-5.02 5.41.39.33.74.97.74 1.96 0 1.42-.01 2.57-.01 2.92 0 .29.2.64.76.53A10.99 10.99 0 0 0 23 11.5C23 5.23 18.27.5 12 .5z" /></svg>
                             }
-                            else
-                            {
-                                @:
-                                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="currentColor" opacity=".15" /><path d="M12 6v6l4 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></svg>
-                            }
                         </span>
-                        <span>Continue with @provider.DisplayName</span>
+                        <span>Register with @provider.DisplayName</span>
                     </button>
                 }
             </form>
         }
+
     </div>
 </div>
 

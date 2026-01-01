@@ -1,0 +1,9 @@
+@using GenomiX.Areas.Identity.Pages.Account.Manage
+
+<nav class="gx-actions" aria-label="Manage account">
+    <a class="@ManageNavPages.IndexNavClass(ViewContext)" asp-page="./Index">Profile</a>
+    <a class="@ManageNavPages.EmailNavClass(ViewContext)" asp-page="./Email">Email</a>
+
+    <a class="@ManageNavPages.ChangePasswordNavClass(ViewContext)" asp-page="./ChangePassword">Change password</a>
+    <a class="@ManageNavPages.SetPasswordNavClass(ViewContext)" asp-page="./SetPassword">Set password</a>
+</nav>

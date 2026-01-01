@@ -1,5 +1,7 @@
 using Genomix.Common.Extensions;
 using Microsoft.EntityFrameworkCore;
+using GenomiX.Infrastructure;
+using Microsoft.AspNetCore.Identity;
 
 namespace GenomiX
 {

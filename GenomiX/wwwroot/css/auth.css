@@ -500,17 +500,6 @@ form#registerForm, form#loginForm {
     border-color: color-mix(in oklab, var(--brand-facebook) 75%, var(--gx-border)); 
 }
 
-.btn-microsoft {
-  border-color: color-mix(in oklab, var(--brand-microsoft) 55%, var(--gx-border));
-  background:
-    radial-gradient(120% 120% at 0% 0%, color-mix(in oklab, var(--brand-microsoft) 12%, transparent) 0%, transparent 60%),
-    var(--bg);
-}
-
-.btn-microsoft:hover { 
-    border-color: color-mix(in oklab, var(--brand-microsoft) 75%, var(--gx-border));
-}
-
 .btn-github {
   border-color: color-mix(in oklab, var(--brand-github) 55%, var(--gx-border));
   background:
@@ -529,4 +518,409 @@ form#registerForm, form#loginForm {
 .auth-sub strong {
     color: color-mix(in srgb, var(--text) 92%, var(--accent2));
     font-weight: 800;
+}
+
+.ext-login--stack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.btn-ext--full {
+  width: 100%;
+  min-width: 0;     
+  justify-content: center;
+}
+
+.auth-foot--spread {
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.auth-links {
+  display: inline-flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.auth-dot { opacity: .6; }
+
+.auth-remember {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+  color: var(--muted);
+  font-size: .95rem;
+}
+
+.auth-remember__input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.auth-remember__box {
+  width: 18px;
+  height: 18px;
+  border-radius: 6px;
+  border: 1px solid color-mix(in srgb, var(--stroke) 70%, transparent);
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  box-shadow: 0 8px 18px rgba(0,0,0,.22);
+  display: grid;
+  place-items: center;
+  transition: transform .08s, border-color .2s, box-shadow .2s, background .2s;
+}
+
+.auth-remember__box::after {
+  content: "";
+  width: 10px;
+  height: 6px;
+  border-left: 2px solid transparent;
+  border-bottom: 2px solid transparent;
+  transform: rotate(-45deg);
+  margin-top: -1px;
+  opacity: 0;
+  transition: opacity .12s ease;
+}
+
+.auth-remember:hover .auth-remember__box {
+  border-color: color-mix(in srgb, var(--accent2) 45%, var(--stroke));
+  transform: translateY(-1px);
+}
+
+.auth-remember__input:focus-visible + .auth-remember__box {
+  box-shadow: var(--ring);
+  border-color: color-mix(in srgb, var(--accent) 60%, var(--stroke));
+}
+
+.auth-remember__input:checked + .auth-remember__box {
+  border-color: color-mix(in srgb, var(--accent) 70%, var(--stroke));
+  background: radial-gradient(120% 120% at 0% 0%, color-mix(in srgb, var(--accent2) 20%, transparent) 0%, transparent 60%),
+              color-mix(in srgb, var(--accent) 18%, var(--card));
+}
+
+.auth-remember__input:checked + .auth-remember__box::after {
+  border-left-color: #fff;
+  border-bottom-color: #fff;
+  opacity: 1;
+}
+
+.auth-remember__text { color: color-mix(in srgb, var(--text) 85%, var(--muted)); }
+
+.ext-login {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 14px;
+}
+
+.btn-ext {
+    width: 100%;
+    justify-content: center; 
+    min-width: 0;
+}
+
+.auth-foot--spread{
+  justify-content:space-between;
+  gap:12px;
+  flex-wrap:wrap;
+}
+
+.auth-remember{
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  cursor:pointer;
+  user-select:none;
+  color: var(--muted);
+  font-weight: 650;
+}
+
+.auth-remember__input{
+  position:absolute;
+  opacity:0;
+  pointer-events:none;
+}
+
+.auth-remember__box{
+  width:18px;
+  height:18px;
+  border-radius:6px;
+  border:1px solid color-mix(in srgb, var(--stroke) 70%, transparent);
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  box-shadow: 0 10px 20px rgba(0,0,0,.18);
+  display:grid;
+  place-items:center;
+}
+
+.auth-remember__box::after{
+  content:"";
+  width:10px;
+  height:10px;
+  border-radius:3px;
+  background: color-mix(in srgb, var(--accent) 75%, transparent);
+  transform: scale(0);
+  transition: transform .12s ease;
+}
+
+.auth-remember__input:checked + .auth-remember__box::after{
+  transform: scale(1);
+}
+
+.auth-remember:focus-within .auth-remember__box{
+  box-shadow: var(--ring);
+  border-color: color-mix(in srgb, var(--accent) 55%, var(--stroke));
+}
+
+.auth-links{
+  display:flex;
+  gap:10px;
+  align-items:center;
+}
+
+.auth-dot{ opacity:.6; }
+
+.manage-grid{
+  display:grid;
+  grid-template-columns: 220px 1fr;
+  gap: 18px;
+  margin-top: 12px;
+}
+
+@media (max-width: 720px){
+  .manage-grid{ grid-template-columns: 1fr; }
+}
+
+.manage-nav{
+  border: 1px solid color-mix(in srgb, var(--stroke) 70%, transparent);
+  border-radius: calc(var(--radius) - 6px);
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.015));
+  padding: 10px;
+  display: grid;
+  gap: 6px;
+}
+
+.manage-link{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: calc(var(--radius) - 8px);
+  color: var(--text);
+  text-decoration:none;
+  border: 1px solid transparent;
+  background: transparent;
+  transition: border-color .2s, background .2s, transform .06s;
+}
+
+.manage-link:hover{
+  border-color: color-mix(in srgb, var(--accent2) 40%, var(--stroke));
+  background: color-mix(in srgb, var(--accent2) 10%, transparent);
+}
+
+.manage-link.active{
+  border-color: color-mix(in srgb, var(--accent) 60%, var(--stroke));
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+}
+
+.manage-link small{
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.manage-content{
+  display:grid;
+  gap: 14px;
+}
+
+.auth-note{
+  padding: 10px 12px;
+  border-radius: calc(var(--radius) - 6px);
+  border: 1px solid color-mix(in srgb, var(--stroke) 70%, transparent);
+  background: color-mix(in srgb, var(--accent2) 10%, transparent);
+  color: color-mix(in srgb, var(--text) 90%, var(--muted));
+  font-size: .95rem;
+}
+
+.status-message{
+  padding: 10px 12px;
+  border-radius: calc(var(--radius) - 6px);
+  border: 1px solid color-mix(in srgb, var(--stroke) 70%, transparent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  color: color-mix(in srgb, var(--text) 92%, var(--muted));
+  font-size: .95rem;
+}
+
+.auth-toggle{
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  cursor:pointer;
+  user-select:none;
+}
+
+.auth-toggle__input{
+  position:absolute;
+  opacity:0;
+  pointer-events:none;
+}
+
+.auth-toggle__box{
+  width: 18px;
+  height: 18px;
+  border-radius: 6px;
+  border: 1px solid color-mix(in srgb, var(--stroke) 70%, transparent);
+  background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
+  display:grid;
+  place-items:center;
+  transition: box-shadow .2s, border-color .2s, background .2s, transform .06s;
+}
+
+.auth-toggle__box::after{
+  content:"";
+  width: 10px;
+  height: 10px;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--accent) 75%, transparent);
+  opacity:0;
+  transform: scale(.85);
+  transition: opacity .15s, transform .15s;
+}
+
+.auth-toggle__input:focus-visible + .auth-toggle__box{
+  box-shadow: var(--ring);
+  border-color: color-mix(in srgb, var(--accent) 60%, var(--stroke));
+}
+
+.auth-toggle__input:checked + .auth-toggle__box{
+  border-color: color-mix(in srgb, var(--accent) 70%, var(--stroke));
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+}
+
+.auth-toggle__input:checked + .auth-toggle__box::after{
+  opacity: 1;
+  transform: scale(1);
+}
+
+.auth-toggle__text{
+  color: color-mix(in srgb, var(--text) 90%, var(--muted));
+  font-weight: 650;
+  font-size: .95rem;
+}
+
+.auth-button--ghost{
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.015));
+  border: 1px solid color-mix(in srgb, var(--stroke) 70%, transparent);
+  box-shadow: none;
+  font-weight: 750;
+}
+
+.gx-auth--manage {
+  min-height: 68vh;
+}
+
+.gx-form {
+  display: grid;
+  gap: 16px;
+  margin-top: 10px;
+}
+
+.gx-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 14px 0 0;
+}
+
+.gx-nav__item {
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid color-mix(in oklab, var(--gx-border) 92%, transparent);
+  background: color-mix(in oklab, var(--gx-panel) 70%, black 30%);
+  color: var(--gx-text);
+  text-decoration: none;
+  font-weight: 700;
+  transition: transform .08s ease, filter .15s ease, border-color .2s ease;
+}
+
+.gx-nav__item:hover { transform: translateY(-1px); filter: brightness(1.06); }
+.gx-nav__item.is-active {
+  border-color: color-mix(in oklab, var(--gx-accent) 60%, var(--gx-border));
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--gx-accent) 18%, transparent);
+}
+
+.gx-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: .85rem;
+  font-weight: 800;
+  margin-left: 8px;
+  border: 1px solid transparent;
+}
+
+.gx-pill--ok {
+  background: color-mix(in srgb, #34A853 16%, transparent);
+  border-color: color-mix(in srgb, #34A853 42%, transparent);
+  color: #c9ffd9;
+}
+
+.gx-pill--warn {
+  background: color-mix(in srgb, #FBBC05 14%, transparent);
+  border-color: color-mix(in srgb, #FBBC05 40%, transparent);
+  color: #ffe9b0;
+}
+
+/* make external buttons full-width (you asked this earlier) */
+.ext-login { display: grid; gap: 10px; margin-top: 14px; }
+.btn-ext { width: 100%; min-width: 0; justify-content: center; }
+
+/* optional: nicer remember-me checkbox (if you use the auth-remember markup) */
+.auth-remember {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.auth-remember__input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.auth-remember__box {
+  width: 18px;
+  height: 18px;
+  border-radius: 6px;
+  border: 1px solid color-mix(in srgb, var(--stroke) 70%, transparent);
+  background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.015));
+  box-shadow: 0 6px 16px rgba(0,0,0,.28);
+  display: inline-grid;
+  place-items: center;
+  transition: transform .08s, box-shadow .2s, border-color .2s, background .2s;
+}
+
+.auth-remember__input:focus-visible + .auth-remember__box {
+  box-shadow: var(--ring);
+}
+
+.auth-remember__input:checked + .auth-remember__box {
+  border-color: color-mix(in srgb, var(--accent) 70%, var(--stroke));
+  background: radial-gradient(120% 120% at 0% 0%, color-mix(in srgb, var(--accent2) 20%, transparent) 0%, transparent 60%),
+              color-mix(in srgb, var(--accent) 22%, var(--card));
+}
+
+.auth-remember__input:checked + .auth-remember__box::after {
+  content: "✓";
+  font-weight: 900;
+  font-size: 12px;
 }

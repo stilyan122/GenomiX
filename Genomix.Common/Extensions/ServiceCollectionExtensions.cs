@@ -4,11 +4,16 @@ using GenomiX.Core.Services;
 using GenomiX.Infrastructure;
 using GenomiX.Infrastructure.Models;
 using GenomiX.Infrastructure.Repo;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Net.Http.Headers;
+using System.Security.Claims;
+using System.Text.Json;
 
 namespace Genomix.Common.Extensions
 {
@@ -33,7 +38,7 @@ namespace Genomix.Common.Extensions
                 })
                 .AddRoles<IdentityRole<Guid>>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
-                .AddDefaultTokenProviders(); 
+                .AddDefaultTokenProviders();
 
             return services;
         }
@@ -66,32 +71,72 @@ namespace Genomix.Common.Extensions
         {
             var authBuilder = services.AddAuthentication();
 
-            var gId = configuration["Auth:Google:ClientId"];
-            var gSecret = configuration["Auth:Google:ClientSecret"];
-            if (!string.IsNullOrWhiteSpace(gId) && !string.IsNullOrWhiteSpace(gSecret))
+            var gId = configuration["Auth:Google:ClientId"] ?? "";
+            var gSecret = configuration["Auth:Google:ClientSecret"] ?? "";
+
+            RegisterGoogle(gId, gSecret, authBuilder);
+
+            var fId = configuration["Auth:Facebook:AppId"] ?? "";
+            var fSecret = configuration["Auth:Facebook:AppSecret"] ?? "";
+
+            RegisterFacebook(fId, fSecret, authBuilder);
+
+            var ghId = configuration["Auth:GitHub:ClientId"] ?? "";
+            var ghSecret = configuration["Auth:GitHub:ClientSecret"] ?? "";
+
+            RegisterGitHub(ghId, ghSecret, authBuilder);
+
+
+            return services;
+        }
+
+        private static void RegisterGoogle(string id, string secret, AuthenticationBuilder authBuilder)
+        {
+            if (!string.IsNullOrWhiteSpace(id) && !string.IsNullOrWhiteSpace(secret))
             {
                 authBuilder.AddGoogle(o =>
                 {
-                    o.ClientId = gId!;
-                    o.ClientSecret = gSecret!;
+                    o.ClientId = id!;
+                    o.ClientSecret = secret!;
                     o.SaveTokens = true;
                 });
             }
+        }
 
-            var fId = configuration["Auth:Facebook:AppId"];
-            var fSecret = configuration["Auth:Facebook:AppSecret"];
-            if (!string.IsNullOrWhiteSpace(fId) && !string.IsNullOrWhiteSpace(fSecret))
+        private static void RegisterFacebook(string id, string secret, AuthenticationBuilder authBuilder)
+        {
+            if (!string.IsNullOrWhiteSpace(id) && !string.IsNullOrWhiteSpace(secret))
             {
                 authBuilder.AddFacebook(o =>
                 {
-                    o.AppId = fId!;
-                    o.AppSecret = fSecret!;
+                    o.AppId = id!;
+                    o.AppSecret = secret!;
                     o.Fields.Add("email");
                     o.SaveTokens = true;
                 });
             }
+        }
 
-            return services;
+        private static void RegisterGitHub(string id, string secret, AuthenticationBuilder authBuilder)
+        {
+            if (!string.IsNullOrWhiteSpace(id) && !string.IsNullOrWhiteSpace(secret))
+            {
+                authBuilder.AddGitHub(options =>
+                {
+                    options.ClientId = id!;
+                    options.ClientSecret = secret!;    
+                    options.SaveTokens = true;
+
+                    options.Scope.Add("user:email");
+                });
+            }   
+        }
+
+        private sealed class GithubEmail
+        {
+            public string Email { get; set; } = "";
+            public bool Primary { get; set; }
+            public bool Verified { get; set; }
         }
     }
 }
