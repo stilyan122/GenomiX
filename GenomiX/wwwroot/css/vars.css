@@ -8,4 +8,22 @@
     --accent2: #56e6c1;
     --radius: 14px;
     --shadow: 0 14px 30px rgba(0,0,0,.35);
+    --bg-main: #0b1020;
+    --bg-panel: rgba(255, 255, 255, 0.05);
+    --bg-panel-strong: rgba(255, 255, 255, 0.08);
+    --text-main: #ffffff;
+    --text-muted: #a8b0d3;
+    --primary-1: #60a5fa;
+    --primary-2: #818cf8;
+    --stroke: rgba(255, 255, 255, 0.14);
+    --stroke-soft: rgba(255, 255, 255, 0.08);
+    --radius-lg: 18px;
+    --radius-pill: 999px;
+    --blur: blur(14px);
+    --ring: 0 0 0 3px color-mix(in srgb, var(--accent) 45%, transparent);
+    --ring-error: 0 0 0 3px color-mix(in srgb, #ff6b6b 55%, transparent);
+    --brand-google: #4285F4;
+    --brand-facebook: #1877F2;
+    --brand-microsoft: #737373;
+    --brand-github: #24292e;
 }

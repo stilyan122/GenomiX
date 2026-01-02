@@ -260,6 +260,37 @@ namespace GenomiX.Infrastructure.Migrations
                 comment: "A population of organisms simulated under given environmental/selection factors.");
 
             migrationBuilder.CreateTable(
+                name: "RoleRequests",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    RequestedRole = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(16)", maxLength: 16, nullable: false),
+                    Note = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
+                    RequestType = table.Column<string>(type: "nvarchar(16)", maxLength: 16, nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    DecidedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DecidedByUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RoleRequests", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_RoleRequests_AspNetUsers_DecidedByUserId",
+                        column: x => x.DecidedByUserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_RoleRequests_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "DNA_Model_Mutations",
                 columns: table => new
                 {
@@ -692,6 +723,16 @@ namespace GenomiX.Infrastructure.Migrations
                 column: "TestId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_RoleRequests_DecidedByUserId",
+                table: "RoleRequests",
+                column: "DecidedByUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RoleRequests_UserId",
+                table: "RoleRequests",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Tests_LessonId",
                 table: "Tests",
                 column: "LessonId");
@@ -729,6 +770,9 @@ namespace GenomiX.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "Reference_Sequences");
+
+            migrationBuilder.DropTable(
+                name: "RoleRequests");
 
             migrationBuilder.DropTable(
                 name: "Questions");

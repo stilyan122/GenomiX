@@ -45,6 +45,8 @@ namespace GenomiX.Areas.Identity.Pages.Account.Manage
                 LastName = user.LastName ?? ""
             };
 
+            ViewData["HasPassword"] = await _userManager.HasPasswordAsync(user);
+
             return Page();
         }
 

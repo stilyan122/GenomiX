@@ -1,0 +1,132 @@
+﻿@page
+@model GenomiX.Areas.Identity.Pages.Account.Manage.RolesModel
+
+@{
+    ViewData["Title"] = "Roles";
+    Layout = "_ManageShell";
+}
+
+@if (Model.CurrentRoles.Count > 1)
+{
+    <div class="roles-row roles-row--compact">
+        <div class="roles-row__label">Current roles</div>
+
+        <div class="roles-row__chips">
+            @foreach (var r in Model.CurrentRoles)
+            {
+                <span class="role-chip role-chip--subtle">@r</span>
+            }
+        </div>
+    </div>
+}
+else
+{
+    <div class="gx-hint gx-hint--spaced">
+        Current role:
+        <span class="role-inline">@Model.CurrentRoles.FirstOrDefault()</span>
+    </div>
+}
+
+<form method="get" class="gx-form" id="rolesStateForm">
+    <div class="auth-field">
+        <label class="auth-label auth-label--muted">Action</label>
+        <select asp-for="Input.Type" class="auth-input" onchange="this.form.submit()">
+            <option value="Add">Request add role</option>
+            <option value="Remove">Request remove role</option>
+        </select>
+    </div>
+
+    <p class="gx-hint">
+        @(Model.Input.Type == "Add"
+                ? "Request an additional role. An admin must approve it."
+                : "Request removal of an existing role. An admin must approve it.")
+    </p>
+
+    <div class="auth-field">
+        <label class="auth-label">Role</label>
+
+        <select asp-for="Input.Role" class="auth-input" onchange="this.form.submit()">
+            @if (Model.Input.Type == "Remove")
+            {
+                @foreach (var r in Model.AvailableRemoveRoles)
+                {
+                    <option value="@r">@r</option>
+                }
+            }
+            else
+            {
+                @foreach (var r in Model.AvailableAddRoles)
+                {
+                    <option value="@r">@r</option>
+                }
+            }
+        </select>
+
+        <span class="auth-error" asp-validation-for="Input.Role"></span>
+    </div>
+</form>
+
+<form method="post" asp-page-handler="Request" class="gx-form" style="margin-top:0;">
+    <input type="hidden" asp-for="Input.Type" />
+    <input type="hidden" asp-for="Input.Role" />
+
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div asp-validation-summary="All" class="auth-validation"></div>
+    }
+
+    @if ((Model.Input.Type == "Add" && !Model.AvailableAddRoles.Any()) ||
+        (Model.Input.Type == "Remove" && !Model.AvailableRemoveRoles.Any()))
+    {
+        <p class="gx-hint">No roles available for this action.</p>
+    }
+    else
+    {
+        <button class="auth-button" type="submit">Send request</button>
+    }
+</form>
+
+    @if (Model.MyRequests.Any())
+{
+    <hr class="gx-divider" />
+
+    <div class="auth-note">
+        <strong>Your requests</strong>
+        <span class="gx-hint">(@Model.MyRequests.Count)</span>
+    </div>
+
+    <div class="role-req-list">
+        @foreach (var r in Model.MyRequests)
+        {
+            <div class="role-req-item">
+                <div class="role-req-main">
+                    <div class="role-req-title">
+                        <span class="role-req-type">@r.RequestType</span>
+                        <span class="role-req-role">@r.RequestedRole</span>
+                    </div>
+
+                    <div class="role-req-meta">
+                        <span class="role-req-status role-req-status--@r.Status.ToLower()">@r.Status</span>
+                        <span class="role-req-dot">•</span>
+                        <span>@r.CreatedAt.ToLocalTime()</span>
+                    </div>
+                </div>
+
+                <div class="role-req-actions">
+                    @if (r.Status == "Pending")
+                    {
+                        <form method="post" asp-page-handler="Cancel">
+                            <input type="hidden" name="id" value="@r.Id" />
+                            <button class="auth-button auth-button--ghost" type="submit">Cancel</button>
+                        </form>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <hr class="gx-divider" />
+    <p class="gx-hint">No requests yet.</p>
+}

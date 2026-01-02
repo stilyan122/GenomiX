@@ -37,6 +37,9 @@ namespace GenomiX.Areas.Identity.Pages.Account.Manage
         public async Task<IActionResult> OnGetAsync()
         {
             var user = await _userManager.GetUserAsync(User);
+
+            ViewData["HasPassword"] = await _userManager.HasPasswordAsync(user);
+
             if (user == null) return NotFound("Unable to load user.");
 
             if (!await _userManager.HasPasswordAsync(user))

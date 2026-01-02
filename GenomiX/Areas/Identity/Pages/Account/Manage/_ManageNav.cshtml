@@ -1,9 +1,48 @@
 @using GenomiX.Areas.Identity.Pages.Account.Manage
+@inject SignInManager<GenomiX.Infrastructure.Models.GenUser> SignInManager
 
-<nav class="gx-actions" aria-label="Manage account">
-    <a class="@ManageNavPages.IndexNavClass(ViewContext)" asp-page="./Index">Profile</a>
-    <a class="@ManageNavPages.EmailNavClass(ViewContext)" asp-page="./Email">Email</a>
+@{
+    var hasExternalLogins = (await SignInManager.GetExternalAuthenticationSchemesAsync()).Any();
+}
 
-    <a class="@ManageNavPages.ChangePasswordNavClass(ViewContext)" asp-page="./ChangePassword">Change password</a>
-    <a class="@ManageNavPages.SetPasswordNavClass(ViewContext)" asp-page="./SetPassword">Set password</a>
+<nav class="manage-nav">
+    <div class="manage-tabs">
+        <a class="manage-tab @ManageNavPages.IndexNavClass(ViewContext)"
+           asp-page="./Index">
+            Profile
+        </a>
+
+        <a class="manage-tab @ManageNavPages.EmailNavClass(ViewContext)"
+           asp-page="./Email">
+            Email
+        </a>
+
+        @if (ViewContext.ViewData["HasPassword"] as bool? == true)
+        {
+            <a class="manage-tab @ManageNavPages.ChangePasswordNavClass(ViewContext)"
+               asp-page="./ChangePassword">
+                Password
+            </a>
+        }
+        else
+        {
+            <a class="manage-tab @ManageNavPages.SetPasswordNavClass(ViewContext)"
+               asp-page="./SetPassword">
+                Set password
+            </a>
+        }
+
+        <a class="manage-tab @ManageNavPages.RolesNavClass(ViewContext)"
+           asp-page="./Roles">
+            Roles
+        </a>
+
+        @if (User.IsInRole("Admin"))
+        {
+            <a class="manage-tab @ManageNavPages.RoleRequestsNavClass(ViewContext)"
+               asp-page="./RoleRequests">
+                Requests
+            </a>
+        }
+    </div>
 </nav>

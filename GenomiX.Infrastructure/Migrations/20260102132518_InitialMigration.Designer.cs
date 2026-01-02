@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GenomiX.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251225190115_InitialMigration")]
+    [Migration("20260102132518_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -1124,6 +1124,54 @@ namespace GenomiX.Infrastructure.Migrations
                         });
                 });
 
+            modelBuilder.Entity("GenomiX.Infrastructure.Models.RoleRequest", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DecidedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("DecidedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Note")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("RequestType")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("nvarchar(16)");
+
+                    b.Property<string>("RequestedRole")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("nvarchar(16)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DecidedByUserId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("RoleRequests");
+                });
+
             modelBuilder.Entity("GenomiX.Infrastructure.Models.Test", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1468,6 +1516,23 @@ namespace GenomiX.Infrastructure.Migrations
                         .HasForeignKey("TestId");
 
                     b.Navigation("Test");
+                });
+
+            modelBuilder.Entity("GenomiX.Infrastructure.Models.RoleRequest", b =>
+                {
+                    b.HasOne("GenomiX.Infrastructure.Models.GenUser", "DecidedByUser")
+                        .WithMany()
+                        .HasForeignKey("DecidedByUserId");
+
+                    b.HasOne("GenomiX.Infrastructure.Models.GenUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("DecidedByUser");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("GenomiX.Infrastructure.Models.Test", b =>

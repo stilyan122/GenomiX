@@ -39,6 +39,8 @@ namespace GenomiX.Areas.Identity.Pages.Account.Manage
             if (await _userManager.HasPasswordAsync(user))
                 return RedirectToPage("./ChangePassword");
 
+            ViewData["HasPassword"] = await _userManager.HasPasswordAsync(user);
+
             return Page();
         }
 

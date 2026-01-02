@@ -1,0 +1,48 @@
+﻿@{
+    Layout = "/Views/Shared/_Layout.cshtml";
+
+    var roles = User?.Claims?
+        .Where(c => c.Type == ClaimTypes.Role || c.Type == "role")
+        .Select(c => c.Value)
+        .Distinct(StringComparer.OrdinalIgnoreCase)
+        .ToList() ?? new List<string>();
+
+    if (roles.Count == 0) roles.Add("Student");
+
+    var primary = roles.First(); 
+    var extraCount = Math.Max(0, roles.Count - 2);
+    var shown = roles.Take(2).ToList();
+}
+
+<div class="auth-wrap">
+    <div class="auth-card auth-card--wide">
+        <div class="manage-head">
+            <div class="manage-head__row">
+                <h1 class="auth-title">Account</h1>
+
+                <div class="role-chips" title="Your roles">
+                    @foreach (var r in shown)
+                    {
+                        <span class="role-chip">@r</span>
+                    }
+                    @if (extraCount > 0)
+                    {
+                        <span class="role-chip role-chip--more">+@extraCount</span>
+                    }
+                </div>
+            </div>
+
+            <p class="auth-subtitle">Manage your profile, email and password.</p>
+        </div>
+
+        <div class="manage-tabs">
+            <partial name="_ManageNav" />
+        </div>
+
+        <div class="manage-body">
+            @RenderBody()
+        </div>
+    </div>
+</div>
+
+@await RenderSectionAsync("Scripts", required: false)

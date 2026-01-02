@@ -44,6 +44,9 @@ namespace GenomiX.Areas.Identity.Pages.Account.Manage
 
             Email = await _userManager.GetEmailAsync(user) ?? "";
             IsEmailConfirmed = await _userManager.IsEmailConfirmedAsync(user);
+
+            ViewData["HasPassword"] = await _userManager.HasPasswordAsync(user);
+
             return Page();
         }
 

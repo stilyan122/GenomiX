@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace GenomiX.Areas.Identity.Pages.Account.Manage
 {
-    public class _ManageLayoutModel : PageModel
+    public class _ManageShellModel : PageModel
     {
         public void OnGet()
         {

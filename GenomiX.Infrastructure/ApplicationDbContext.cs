@@ -30,6 +30,9 @@ namespace GenomiX.Infrastructure
         public DbSet<Answer> Answers => Set<Answer>();
         public DbSet<Question> Questions => Set<Question>();
 
+        // Authentication & Authorization
+        public DbSet<RoleRequest> RoleRequests { get; set; } = null!;
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             builder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
