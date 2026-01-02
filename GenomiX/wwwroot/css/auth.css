@@ -183,6 +183,10 @@ form#loginForm {
     flex-wrap: wrap;
 }
 
+.btn-logout{ opacity: .85; }
+
+.btn-logout:hover{ opacity: 1; }
+
 .auth-links {
     display: inline-flex;
     gap: 10px;

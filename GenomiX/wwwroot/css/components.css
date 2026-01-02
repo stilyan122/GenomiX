@@ -72,7 +72,6 @@
     color: #ffd8d8;
 }
 
-/* ................................................................ */
 .auth-field {
     display: grid;
     gap: 8px;
@@ -93,22 +92,21 @@
     outline: none;
 }
 
-    .auth-input::placeholder {
-        color: #9fb0e6;
-        opacity: .65;
-    }
+.auth-input::placeholder {
+    color: #9fb0e6;
+    opacity: .65;
+}
 
-    .auth-input:focus {
-        border-color: #4a74ff;
-        box-shadow: 0 0 0 3px rgba(74, 116, 255, .22);
-    }
+.auth-input:focus {
+    border-color: #4a74ff;
+    box-shadow: 0 0 0 3px rgba(74, 116, 255, .22);
+}
 
 .auth-error {
     color: #ffb1b1;
     font-size: .85rem;
 }
 
-/* Remember me */
 .auth-remember {
     display: flex;
     align-items: center;
@@ -117,12 +115,11 @@
     margin-bottom: 14px;
 }
 
-    .auth-remember input[type="checkbox"] {
-        width: 16px;
-        height: 16px;
-    }
+.auth-remember input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+}
 
-/* Primary button */
 .auth-button {
     width: 100%;
     padding: 14px;
@@ -137,15 +134,14 @@
     transition: transform .06s ease, filter .2s ease, box-shadow .2s ease;
 }
 
-    .auth-button:hover {
-        filter: brightness(1.05);
-    }
+.auth-button:hover {
+    filter: brightness(1.05);
+}
 
-    .auth-button:active {
-        transform: translateY(1px);
-    }
+.auth-button:active {
+    transform: translateY(1px);
+}
 
-/* Footer links */
 .auth-foot {
     display: flex;
     justify-content: space-between;
@@ -162,7 +158,6 @@
     font-weight: 700;
 }
 
-/* External providers (optional) */
 .auth-sep {
     display: grid;
     grid-template-columns: 1fr auto 1fr;
@@ -195,6 +190,49 @@
     cursor: pointer;
 }
 
-    .auth-external-btn:hover {
-        background: rgba(255,255,255,.06);
-    }
+.auth-external-btn:hover {
+    background: rgba(255,255,255,.06);
+}
+
+.auth-nav{
+  display:flex;
+  gap: 10px;
+  align-items:center;
+  list-style:none;
+  margin:0;
+  padding:0;
+}
+
+.auth-nav__hello {
+    display: none;
+}
+
+.auth-nav__user{
+  color: color-mix(in srgb, var(--text) 70%, var(--muted));
+  text-decoration:none;
+  font-weight: 750;
+  padding: 8px 10px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  transition: background .2s ease, border-color .2s ease, color .2s ease;
+}
+
+.auth-nav__user:hover{
+  color: var(--text);
+  background: rgba(255,255,255,.04);
+  border-color: rgba(255,255,255,.10);
+}
+
+.auth-nav__logout{
+  margin:0;
+}
+
+.btn--sm{
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-weight: 800;
+}
+
+@media (min-width: 980px){
+  .auth-nav__hello{ display:block; }
+}

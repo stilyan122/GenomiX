@@ -1,25 +1,27 @@
 ﻿@using GenomiX.Infrastructure.Models
 @using Microsoft.AspNetCore.Identity
 @inject SignInManager<GenUser> SignInManager
-@inject UserManager<GenUser> UserManager
 
-<ul class="navbar-nav" style="display:flex; gap:.75rem; align-items:center; list-style:none; margin:0; padding:0;">
+<ul class="auth-nav" role="list">
     @if (SignInManager.IsSignedIn(User))
     {
         <li>
-            <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">
-                Hello, @UserManager.GetUserName(User)!
-            </a>
+            <a class="btn ghost btn--sm" asp-area="Identity" asp-page="/Account/Manage/Index">Account</a>
         </li>
+
         <li>
-            <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="~/" method="post">
-                <button type="submit" class="btn btn-sm btn-outline-secondary">Log out</button>
+            <form class="auth-nav__logout" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="~/" method="post">
+                <button type="submit" class="btn ghost btn--sm btn-logout">Log out</button>
             </form>
         </li>
     }
     else
     {
-        <li><a class="btn btn-sm btn-outline-secondary" asp-area="Identity" asp-page="/Account/Login">Log in</a></li>
-        <li><a class="btn btn-sm btn-primary" asp-area="Identity" asp-page="/Account/Register">Register</a></li>
+        <li>
+            <a class="btn ghost btn--sm" asp-area="Identity" asp-page="/Account/Login">Log in</a>
+        </li>
+        <li>
+            <a class="btn ghost btn--sm" asp-area="Identity" asp-page="/Account/Register">Register</a>
+        </li>
     }
 </ul>
