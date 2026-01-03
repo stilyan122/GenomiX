@@ -51,9 +51,9 @@ namespace GenomiX.Core.Services
             throw new NotImplementedException();
         }
 
-        public Task<ReferenceSequence?> GetReferenceSequenceByIdAsync(object id)
+        public async Task<ReferenceSequence?> GetReferenceSequenceByIdAsync(object id)
         {
-            throw new NotImplementedException();
+            return await _reference_sequence_repository.GetByIdAsync(id);
         }
 
         public Task<DNASequence?> GetUserSequenceByIdAsync(object id)

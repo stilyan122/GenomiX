@@ -3,42 +3,70 @@
     ViewData["ActiveNav"] = "dna";
 }
 
-<div class="gx-container gx-dna">
-    <header class="gx-dna__header">
-        <h1 class="title">🧬 Build Your Own DNA</h1>
-        <p class="subtitle">
-            Create your sequence in real time, switch between <strong>Basic</strong> and <strong>Scientific</strong> view,
-            and watch the double helix come alive.
-        </p>
-    </header>
+@if (TempData["CustomError"] is string err && !string.IsNullOrWhiteSpace(err))
+{
+    <div class="gx-msg gx-msg--err">@err</div>
+}
 
-    <div class="gx-dna__modes" role="group" aria-label="Mode switch">
-        <label class="gx-toggle">
-            <input type="radio" name="mode" id="basicMode" checked />
-            <span>Basic Mode</span>
-        </label>
-        <label class="gx-toggle">
-            <input type="radio" name="mode" id="scientificMode" />
-            <span>Scientific Mode</span>
-        </label>
+<section class="gx-dna-page">
+    <div class="container container--wide gx-dna">
+        <header class="gx-dna__header">
+            <div class="gx-dna__head-left">
+                <div class="gx-dna__kicker">DNA Builder</div>
+                <h1 class="gx-dna__title">Create a new model</h1>
+                <p class="gx-dna__subtitle">
+                    Paste <strong>one strand</strong> (we generate the complement) or <strong>two strands</strong> on separate lines.
+                    Then we'll create the model and open it in the workspace.
+                </p>
+            </div>
+
+            <div class="gx-dna__head-right">
+                <a class="btn ghost btn--lg" href="/dna/choose">Back</a>
+            </div>
+        </header>
+
+        <div class="gx-dna__topbar">
+            <div class="gx-dna__hintbar">
+                <span class="gx-pill">A • C • G • T only</span>
+                <span class="gx-pill">Two lines = double strand</span>
+                <span class="gx-pill">Import .txt / .json</span>
+            </div>
+        </div>
+
+        <div id="gxMsg" class="gx-msg" role="status" aria-live="polite" hidden></div>
+
+        <section class="gx-dna__input">
+            <div class="gx-card gx-card--pad">
+                <label for="sequence" class="gx-label">DNA input</label>
+
+                <textarea id="sequence"
+                          class="gx-textarea gx-textarea--xl mono"
+                          rows="7"
+                          placeholder="ATGCGTACG...
+(optional second line = complement)"
+                          spellcheck="false"></textarea>
+
+                <div class="gx-dna__help">
+                    Tip: If you provide one strand, the complementary strand is generated automatically.
+                </div>
+
+                <div class="gx-actions gx-actions--split">
+                    <div class="gx-actions__left">
+                        <button id="import-btn" class="btn ghost btn--lg" type="button">Import</button>
+                        <button id="create-btn" class="btn primary btn--lg" type="button">Create & Open</button>
+                    </div>
+                </div>
+
+                <form method="post" action="/dna/custom/create" id="customCreateForm" class="gx-hidden">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="RawInput" id="rawInputHidden" />
+                    <button type="submit" id="realSubmit" class="gx-hidden"></button>
+                </form>
+            </div>
+        </section>
     </div>
+</section>
 
-    <section id="dna-input-section" class="gx-dna__input">
-        <label for="sequence" class="gx-label">Enter DNA Strand(s) (A, C, G, T only)</label>
-        <textarea id="sequence" name="sequence" class="gx-textarea" rows="4" placeholder="ATGCGTACG..." spellcheck="false"></textarea>
-        <p class="gx-help">
-            Tip: If you enter one strand, the complementary strand is generated automatically.
-            If you prefer, enter two strands on separate lines.
-        </p>
-
-        <div class="gx-actions">
-            <button id="import-btn" class="btn ghost">📂 Import (.txt / .json)</button>
-            <button id="visualize-btn" class="btn primary">🔬 Visualize DNA</button>
-        </div>
-    </section>
-
-    <section id="dna-visualizer-section" class="gx-dna__viewer" style="display:none;">
-        <div id="dna-visual" class="gx-dna__canvas">
-        </div>
-    </section>
-</div>
+@section Scripts {
+    <script type="module" src="~/js/dna-custom.js" asp-append-version="true"></script>
+}

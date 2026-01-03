@@ -1,0 +1,85 @@
+﻿@model DNABuilderViewModel
+
+@{
+    ViewData["Title"] = "DNA Builder";
+    ViewData["ActiveNav"] = "dna";
+}
+
+<section class="gx-dna-page">
+    <div class="container container--wide gx-dna">
+        <header class="gx-dna__header">
+            <div class="gx-dna__head-left">
+                <div class="gx-dna__kicker">DNA Builder</div>
+                <h1 class="gx-dna__title">Model workspace</h1>
+                <p class="gx-dna__subtitle">
+                    <span class="mono">Model</span> <span class="mono">@Model.Name</span>
+                    • <strong>@Model.Length</strong> bp
+                </p>
+            </div>
+
+            <div class="gx-dna__head-right">
+                <a class="btn ghost btn--lg" href="/dna/models">Back to models</a>
+            </div>
+        </header>
+
+        <div class="gx-dna__topbar">
+            <div class="gx-dna__modes" role="group" aria-label="Mode switch">
+                <label class="gx-toggle">
+                    <input type="radio" name="mode" id="basicMode" checked />
+                    <span>Basic Mode</span>
+                </label>
+                <label class="gx-toggle">
+                    <input type="radio" name="mode" id="scientificMode" />
+                    <span>Scientific Mode</span>
+                </label>
+            </div>
+
+            <div class="gx-dna__hintbar">
+                <span class="gx-pill">2D ladder</span>
+                <span class="gx-pill">3D helix</span>
+                <span class="gx-pill">Inspector</span>
+            </div>
+        </div>
+
+        <section id="dna-input-section" class="gx-hidden">
+            <textarea id="sequence" class="gx-hidden" spellcheck="false"></textarea>
+            <button id="import-btn" type="button" class="gx-hidden"></button>
+            <button id="visualize-btn" type="button" class="gx-hidden"></button>
+        </section>
+
+        <section id="dna-visualizer-section" class="gx-dna__viewer">
+            <div class="gx-dna__viewerbar">
+                <a class="btn ghost btn--lg" href="/dna/models">Exit</a>
+                <div class="gx-dna__viewerhint">Use ⟨ ⟩ to move base, click the progress bar to jump.</div>
+            </div>
+
+            <div id="dnaMount"
+                 data-s1="@Model.Strand1"
+                 data-s2="@Model.Strand2"></div>
+
+            <div id="dna-visual" class="gx-dna__canvas"></div>
+        </section>
+    </div>
+</section>
+
+@section Scripts {
+    <script type="module" src="~/js/dna-builder.js" asp-append-version="true"></script>
+
+    <script type="module">
+        document.addEventListener("DOMContentLoaded", () => {
+          const mount = document.getElementById("dnaMount");
+          const s1 = mount?.dataset?.s1 ?? "";
+          const s2 = mount?.dataset?.s2 ?? "";
+
+          const textarea = document.getElementById("sequence");
+          if (textarea) textarea.value = `${s1}\n${s2}`;
+
+          const btn = document.getElementById("visualize-btn");
+          btn?.click();
+
+          const mode = document.getElementById("basicMode");
+          mode?.dispatchEvent(new Event("change", { bubbles: true }));
+        });
+    </script>
+
+}

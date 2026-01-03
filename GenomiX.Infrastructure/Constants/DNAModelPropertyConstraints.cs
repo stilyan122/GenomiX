@@ -6,18 +6,8 @@ namespace GenomiX.Infrastructure.Constants
     public static class DNAModelPropertyConstraints
     {
         /// <summary>
-        /// The minimum allowed value for CurrentIndex (zero-based).
+        /// The maximum length allowed for the Name property.
         /// </summary>
-        public const int CurrentIndex_Min = 0;
-
-        /// <summary>
-        /// The minimum allowed value for DisplayMode (0 = Basic shapes).
-        /// </summary>
-        public const byte DisplayMode_Min = 0;
-
-        /// <summary>
-        /// The maximum allowed value for DisplayMode (1 = Scientific atomic view).
-        /// </summary>
-        public const byte DisplayMode_Max = 1;
+        public const int Name_MaxLength = 80;
     }
 }

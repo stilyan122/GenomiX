@@ -26,6 +26,11 @@ namespace GenomiX.Infrastructure.Models
         [AllowedDnaSequence]
         public string Sequence { get; set; } = "";
 
+        [Comment("Strand index (1 = forward, 2 = complementary).")]
+        [Range(Constants.DNASequencePropertyConstraints.Strand_MinLength, 
+            Constants.DNASequencePropertyConstraints.Strand_MaxLength)]
+        public byte Strand { get; set; } = 1;
+
         /// <summary> UTC timestamp when this snapshot was created. </summary>
         [Comment("UTC timestamp when the snapshot was created.")]
         public DateTimeOffset CreatedAt { get; set; }

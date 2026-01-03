@@ -37,15 +37,6 @@ namespace GenomiX.Infrastructure.Models
         [AllowedDnaSequence]
         public string Sequence { get; set; } = "";
 
-        /// <summary> Strand index (1 or 2). </summary>
-        [Comment("Strand index of the reference sequence (1 = forward, 2 = complementary).")]
-        [Range(1, 2)]
-        public byte Strand { get; set; }
-
-        /// <summary> Pair index (groups complementary strands together). </summary>
-        [Comment("Pair index groups complementary strands together (e.g., 0 = initial pair).")]
-        public int PairIndex { get; set; }
-
         /// <summary> UTC timestamp when this reference sequence was created. </summary>
         [Comment("UTC timestamp when the reference sequence was created.")]
         public DateTimeOffset CreatedAt { get; set; }

@@ -1,19 +1,35 @@
 ﻿@{
-    ViewData["Title"] = "Choose DNA Demo";
+    ViewData["Title"] = "DNA Builder";
     ViewData["ActiveNav"] = "dna";
 }
 
-<div class="container mt-5 text-center">
-    <h1 class="mb-4">DNA Demo</h1>
-    <p class="lead">Choose how you want to start:</p>
+<section class="gx-choose">
+    <div class="container">
+        <header class="gx-choose__head">
+            <div>
+                <h1 class="gx-choose__title">Start a DNA model</h1>
+                <p class="gx-choose__sub">Create from a template or build your own custom sequence.</p>
+            </div>
 
-    <div class="d-flex justify-content-center gap-4 mt-4">
-        <a class="btn btn-lg btn-outline-primary" href="/dna/predefined">
-            <i class="bi bi-collection"></i> Use Predefined DNA
-        </a>
+            <div class="gx-choose__actions">
+                <a class="btn ghost btn--lg" href="/dna/models">My models</a>
+            </div>
+        </header>
 
-        <a class="btn btn-lg btn-outline-success" href="/dna/custom">
-            <i class="bi bi-pencil-square"></i> Create Your Own
-        </a>
+        <div class="gx-choose__grid">
+            <article class="glass-card gx-choose__card">
+                <div class="gx-choose__icon" aria-hidden="true">🧬</div>
+                <h3 class="gx-choose__h">Predefined templates</h3>
+                <p class="gx-choose__p">Start from Human / Mouse / etc. We auto-generate the complement.</p>
+                <a class="btn primary btn--lg gx-choose__btn" href="/dna/predefined">Browse templates</a>
+            </article>
+
+            <article class="glass-card gx-choose__card">
+                <div class="gx-choose__icon" aria-hidden="true">✍️</div>
+                <h3 class="gx-choose__h">Custom DNA</h3>
+                <p class="gx-choose__p">Paste 1 strand (we generate the other) or paste both strands.</p>
+                <a class="btn ghost btn--lg gx-choose__btn" href="/dna/custom">Create custom</a>
+            </article>
+        </div>
     </div>
-</div>
+</section>

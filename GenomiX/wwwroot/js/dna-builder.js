@@ -345,7 +345,7 @@ function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
             const h = (b1 === "A" && b2 === "T") || (b1 === "T" && b2 === "A") ? 2 :
                 (b1 === "C" && b2 === "G") || (b1 === "G" && b2 === "C") ? 3 : "-";
 
-            if (tooltipEl) tooltipEl.textContent = `Base ${current + 1}: ${b1}–${b2} (${h} H)`;
+            if (tooltipEl) tooltipEl.textContent = `Base ${current + 1}: ${b1}-${b2} (${h} H)`;
 
             if (panelRefs) {
                 panelRefs.s_idx.textContent = String(current + 1);

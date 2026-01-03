@@ -14,22 +14,16 @@ namespace GenomiX.Infrastructure.Models
         [Key]
         public Guid Id { get; set; }
 
+        /// <summary> User-defined name for this DNA model. </summary>
+        [Comment("User-defined name for this DNA model.")]
+        [Required]
+        [MaxLength(Constants.DNAModelPropertyConstraints.Name_MaxLength)]
+        public string Name { get; set; } = "Untitled model";
+
         /// <summary> Owner user (FK). </summary>
         [Comment("Owner user (FK).")]
         [ForeignKey(nameof(User))]
         public Guid? UserId { get; set; }
-
-        /// <summary> Active timeline index (zero-based). Must be >= 0 and &lt;= last PairIndex in this model. </summary>
-        [Comment("Active timeline index (zero-based).")]
-        [Required]
-        [Range(DNAModelPropertyConstraints.CurrentIndex_Min, double.MaxValue)]
-        public int CurrentIndex { get; set; } = 0;
-
-        /// <summary> 0 = Basic shapes, 1 = Scientific atomic view. </summary>
-        [Comment("0 = Basic shapes, 1 = Scientific atomic view.")]
-        [Required]
-        [Range(DNAModelPropertyConstraints.DisplayMode_Min, DNAModelPropertyConstraints.DisplayMode_Max)]
-        public byte DisplayMode { get; set; }
 
         /// <summary> UTC created timestamp. </summary>
         [Comment("UTC created timestamp.")]
@@ -43,7 +37,7 @@ namespace GenomiX.Infrastructure.Models
         public ICollection<DNAModelMutation> Mutations { get; set; } = new List<DNAModelMutation>();
         public ICollection<DNAModelDisease> DNAModelDiseases { get; set; } = new List<DNAModelDisease>();
 
-        /// <summary> All strand snapshots owned by this model (two rows per PairIndex). </summary>
+        /// <summary> All strand snapshots owned by this model (2). </summary>
         public ICollection<DNASequence> Sequences { get; set; } = new List<DNASequence>();
 
         /// <summary> Navigation property to the owning user. </summary>

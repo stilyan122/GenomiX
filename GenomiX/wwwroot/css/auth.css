@@ -183,9 +183,7 @@ form#loginForm {
     flex-wrap: wrap;
 }
 
-.btn-logout{ opacity: .85; }
-
-.btn-logout:hover{ opacity: 1; }
+.btn-logout:hover{ cursor: pointer; }
 
 .auth-links {
     display: inline-flex;
@@ -991,17 +989,6 @@ select.auth-input option{
     color: color-mix(in srgb, var(--text) 90%, var(--muted));
     font-weight: 650;
     font-size: .95rem;
-}
-
-.gx-pill{
-    display: inline-flex;
-    align-items: center;
-    padding: 4px 10px;
-    border-radius: 999px;
-    font-size: .85rem;
-    font-weight: 800;
-    margin-left: 8px;
-    border: 1px solid transparent;
 }
 
 .gx-pill--ok{

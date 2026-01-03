@@ -3,20 +3,99 @@
 @{
     ViewData["Title"] = "Predefined DNA";
     ViewData["ActiveNav"] = "dna";
+
+    var items = Model?.ToList() ?? new List<SequenceViewModel>();
+    var species = items
+        .Select(x => (x.Species ?? "").Trim())
+        .Where(x => x.Length > 0)
+        .Distinct(StringComparer.OrdinalIgnoreCase)
+        .OrderBy(x => x)
+        .ToList();
 }
 
-<div class="container mt-5">
-    <h2>Choose a Predefined DNA Sequence</h2>
+<section class="gx-predef">
+    <div class="container">
+        <header class="gx-predef__head">
+            <div>
+                <h1 class="gx-predef__title">Predefined DNA templates</h1>
+                <p class="gx-predef__sub">
+                    Pick a template to create a new editable model. We generate the complementary strand automatically.
+                </p>
+            </div>
 
-    <ul class="list-group mt-4">
-        @foreach (var seq in Model)
+            <div class="gx-predef__actions">
+                <a class="btn ghost btn--lg" href="/dna/choose">Back</a>
+            </div>
+        </header>
+
+        <div class="gx-predef__toolbar">
+            <div class="gx-predef__search">
+                <input id="gxPredefSearch" class="gx-predef__input" type="search" placeholder="Search species..." autocomplete="off" />
+                <span class="gx-predef__hint">Type to filter</span>
+            </div>
+
+            <div class="gx-predef__chips" role="list" aria-label="Species filters">
+                <button class="gx-predef__chip is-active" type="button" data-filter="all">All</button>
+                @foreach (var sp in species)
+                {
+                    <button class="gx-predef__chip" type="button" data-filter="@sp">@sp</button>
+                }
+            </div>
+        </div>
+
+        @if (!items.Any())
         {
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-                <div>
-                    <strong>@seq.Species</strong> - @seq.Sequence.Length bp
-                </div>
-                <a class="btn btn-sm btn-primary" href="/dna/load/@seq.Id">Select</a>
-            </li>
+            <article class="glass-card">
+                <h3>No templates yet</h3>
+                <p>Add some <span class="mono">ReferenceSequence</span> rows and they'll appear here.</p>
+            </article>
         }
-    </ul>
-</div>
+        else
+        {
+            <div class="gx-predef__grid" id="gxPredefGrid">
+                @foreach (var seq in items)
+                {
+                    var sp = (seq.Species ?? "").Trim();
+                    var len = (seq.Sequence ?? "").Length;
+
+                    <article class="glass-card gx-predef__card" data-species="@sp">
+                        <div class="gx-predef__top">
+                            <div class="gx-predef__titleRow">
+                                <div class="gx-predef__species">@sp</div>
+                                <div class="gx-predef__meta">@len bp</div>
+                            </div>
+                            <div class="gx-predef__badge" title="Reference template">Template</div>
+                        </div>
+
+                        <div class="gx-predef__preview mono" aria-hidden="true">
+                            @{
+                                var preview = (seq.Sequence ?? "");
+                                if (preview.Length > 96) preview = preview.Substring(0, 96) + "…";
+                            }
+                            @preview
+                        </div>
+
+                        <div class="gx-predef__bottom">
+                            <form method="post" action="/dna/predefined/create/@seq.Id" class="gx-predef__form">
+                                @Html.AntiForgeryToken()
+
+                                <input class="gx-predef__name"
+                                       name="Name"
+                                       maxlength="80"
+                                       required
+                                       placeholder="Model name (required)"
+                                       autocomplete="off" />
+
+                                <button type="submit" class="btn primary btn--lg gx-predef__btn">Use template</button>
+                            </form>
+
+                            <div class="gx-predef__note">
+                                Creates a model in <a class="gx-predef__link" href="/dna/models">My Models</a>
+                            </div>
+                        </div>
+                    </article>
+                }
+            </div>
+        }
+    </div>
+</section>

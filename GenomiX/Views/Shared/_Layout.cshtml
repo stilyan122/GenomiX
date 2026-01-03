@@ -32,7 +32,7 @@
                 </a>
 
                 <div class="navlinks navlinks--primary">
-                    <a class="navlink @(ViewData["ActiveNav"] as string == "dna" ? "is-active" : "")" href="/dna/choose">DNA Builder</a>
+                    <a class="navlink @(ViewData["ActiveNav"] as string == "dna" ? "is-active" : "")" href="/dna">DNA Builder</a>
                     <a class="navlink @(ViewData["ActiveNav"] as string == "sim" ? "is-active" : "")" href="/simulations">Simulations</a>
                     <a class="navlink @(ViewData["ActiveNav"] as string == "ai" ? "is-active" : "")" href="/learning">AI Learning</a>
                 </div>
@@ -69,6 +69,8 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script type="module" src="~/js/dna-builder.js" asp-append-version="true"></script>
     <script type="module" src="~/js/reveal.js" asp-append-version="true"></script>
+    <script type="module" src="~/js/dna-predefined.js" asp-append-version="true"></script>
+    <script type="module" src="~/js/dna-custom.js" asp-append-version="true"></script>
 
     @await RenderSectionAsync("Scripts", required: false)
 </body>

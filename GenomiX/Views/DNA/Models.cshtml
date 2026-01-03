@@ -1,0 +1,42 @@
+﻿@model IEnumerable<DNAModelListViewModel>
+
+@{
+    ViewData["Title"] = "My DNA Models";
+    ViewData["ActiveNav"] = "dna";
+}
+
+<div class="container">
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;">
+        <div>
+            <h1 class="home-h2">My DNA Models</h1>
+            <p class="home-sub">Continue where you left off or create a new model.</p>
+        </div>
+        <div class="home-cta">
+            <a class="btn ghost btn--lg" href="/dna/choose">+ New model</a>
+        </div>
+    </div>
+
+    <div style="height:14px;"></div>
+
+    @if (!Model.Any())
+    {
+        <article class="glass-card">
+            <h3>No models yet</h3>
+            <p>Create a model from a predefined template or your own DNA string.</p>
+            <a class="card-link" href="/dna/choose">Create model →</a>
+        </article>
+    }
+    else
+    {
+        <div class="tri-grid">
+            @foreach (var m in Model)
+            {
+                <article class="glass-card">
+                    <h3>@m.Name</h3>
+                    <p>@m.Length bp • Updated @m.UpdatedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</p>
+                    <a class="card-link" href="/dna/builder/@m.Id">Continue →</a>
+                </article>
+            }
+        </div>
+    }
+</div>
