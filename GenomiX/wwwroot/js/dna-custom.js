@@ -50,12 +50,15 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!textarea || !form || !rawHidden || !realSubmit) return;
 
         const res = parseTextareaStrict(textarea.value);
+        const nameInput = document.getElementById("modelName");
+        const name = nameInput?.value.trim() || "Custom Model";
         if (!res.ok) {
             setMsg(res.error, "err");
             return;
         }
 
         rawHidden.value = `${res.s1}\n${res.s2}`;
+        nameHidden.value = name;
 
         setMsg("Creating model…", "info");
 

@@ -21,7 +21,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const dnaSequenceInput = document.getElementById("sequence");
     const importBtn = document.getElementById("import-btn");
     const visualizeBtn = document.getElementById("visualize-btn");
-    const visualizer = document.getElementById("dna-visual");
     const dnaInputSection = document.getElementById("dna-input-section");
     const dnaVisualizerSection = document.getElementById("dna-visualizer-section");
     const modeBasic = document.getElementById("basicMode");
@@ -91,6 +90,208 @@ function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
 
     let panelRefs = null;
     let threeApi = null;
+
+    let editPop = null;
+    let editOpen = false;
+
+    let editIdx = 0;
+    let posRAF1 = 0, posRAF2 = 0;
+
+    function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
+
+    function scheduleEditPopPosition(i) {
+        if (!editPop || !editOpen) return;
+        editIdx = i;
+
+        cancelAnimationFrame(posRAF1);
+        cancelAnimationFrame(posRAF2);
+
+        posRAF1 = requestAnimationFrame(() => {
+            posRAF2 = requestAnimationFrame(() => {
+                positionEditPopAtPair(editIdx);
+            });
+        });
+    }
+
+    function setPairDom(i) {
+        const pair = pairs[i];
+        if (!pair) return;
+
+        const top = pair.children[0];
+        const bot = pair.children[1];
+
+        const b1 = s1[i], b2 = s2[i];
+
+        top.className = `base ${b1}`;
+        top.textContent = b1;
+
+        bot.className = `base ${b2}`;
+        bot.textContent = b2;
+    }
+
+    function mutateAt(i, newBase) {
+        if (!s1[i]) return;
+        if (!COMP[newBase]) return;
+
+        s1[i] = newBase;
+        s2[i] = COMP[newBase];
+
+        setPairDom(i);
+        syncEditPopMeta(i);
+        updateView();
+    }
+
+    function positionEditPopAtPair(i) {
+        if (!editPop) return;
+        const pair = pairs?.[i];
+        if (!pair) return;
+
+        editPop.style.position = "fixed";
+
+        const r = pair.getBoundingClientRect();
+        const popRect = editPop.getBoundingClientRect();
+        const popW = popRect.width || 280;
+        const popH = popRect.height || 170;
+
+        const gap = 14;
+        const pad = 10;
+
+        const prevR = prevEl?.getBoundingClientRect?.();
+        const nextR = nextEl?.getBoundingClientRect?.();
+
+        const clampToViewport = (left, top) => ({
+            left: clamp(left, pad, window.innerWidth - popW - pad),
+            top: clamp(top, pad, window.innerHeight - popH - pad),
+        });
+
+        const overlaps = (a, b) =>
+            b && !(a.right < b.left || a.left > b.right || a.bottom < b.top || a.top > b.bottom);
+
+        const overlapsArrow = (left, top) => {
+            const rect = { left, top, right: left + popW, bottom: top + popH };
+            return overlaps(rect, prevR) || overlaps(rect, nextR);
+        };
+
+        const centerTop = r.top + r.height / 2 - popH / 2;
+
+        let pos = clampToViewport(r.right + gap, centerTop);
+
+        const nearRightEdge = r.right > window.innerWidth * 0.78;
+        if (nearRightEdge || overlapsArrow(pos.left, pos.top)) {
+            pos = clampToViewport(r.left - popW - gap, centerTop);
+        }
+
+        if (overlapsArrow(pos.left, pos.top)) {
+            const below = clampToViewport(r.left + r.width / 2 - popW / 2, r.bottom + gap);
+            if (!overlapsArrow(below.left, below.top)) pos = below;
+            else pos = clampToViewport(r.left + r.width / 2 - popW / 2, r.top - popH - gap);
+        }
+
+        editPop.style.left = `${pos.left}px`;
+        editPop.style.top = `${pos.top}px`;
+    }
+
+    const COMP = { A: "T", T: "A", C: "G", G: "C" };
+
+    let s1 = strand1.split("");
+    let s2 = strand2.split("");
+
+    function buildEditPop() {
+        const pop = document.createElement("div");
+        pop.className = "gx-editpop is-hidden";
+        pop.innerHTML = `
+          <div class="gx-editpop__head">
+            <div class="gx-editpop__title">Edit base pair</div>
+            <button class="gx-editpop__x" type="button" aria-label="Close">×</button>
+          </div>
+
+          <div class="gx-editpop__meta">
+            <span class="gx-editpop__chip mono" data-role="idx">#-</span>
+            <span class="gx-editpop__chip mono" data-role="pair">-–-</span>
+            <span class="gx-editpop__badge" data-role="badge" hidden>Mismatch</span>
+          </div>
+
+          <div class="gx-editpop__actions">
+            <button class="gx-editpop__pill" type="button" data-act="mutate">Mutate</button>
+            <button class="gx-editpop__pill" type="button" data-act="insert">Insert</button>
+            <button class="gx-editpop__pill" type="button" data-act="delete">Delete</button>
+            <button class="gx-editpop__pill" type="button" data-act="move">Move</button>
+          </div>
+
+          <div class="gx-editpop__mutate is-hidden" data-role="mutate">
+            <div class="gx-editpop__hint" style="margin-bottom:8px;opacity:.85">Pick new base (strand 1)</div>
+            <div class="gx-editpop__actions">
+              <button class="gx-editpop__pill" type="button" data-mbase="A">A</button>
+              <button class="gx-editpop__pill" type="button" data-mbase="T">T</button>
+              <button class="gx-editpop__pill" type="button" data-mbase="C">C</button>
+              <button class="gx-editpop__pill" type="button" data-mbase="G">G</button>
+            </div>
+          </div>
+        `;
+
+        pop.querySelector(".gx-editpop__x")?.addEventListener("click", () => closeEditPop());
+
+        const mutateBox = pop.querySelector('[data-role="mutate"]');
+
+        pop.querySelectorAll("[data-act]").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const act = btn.getAttribute("data-act");
+
+                if (mutateBox) {
+                    if (act === "mutate") mutateBox.classList.toggle("is-hidden");
+                    else mutateBox.classList.add("is-hidden");
+                }
+
+                if (tooltipEl) tooltipEl.textContent = `Selected: ${act}`;
+            });
+        });
+
+        pop.querySelectorAll("[data-mbase]").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const b = btn.getAttribute("data-mbase");
+                mutateAt(current, b);
+                mutateBox?.classList.add("is-hidden");
+            });
+        });
+
+        return pop;
+    }
+
+    function syncEditPopMeta(i) {
+        if (!editPop) return;
+        const idxEl = editPop.querySelector('[data-role="idx"]');
+        const pairEl = editPop.querySelector('[data-role="pair"]');
+        const badge = editPop.querySelector('[data-role="badge"]');
+
+        const b1 = s1[i], b2 = s2[i];
+        if (idxEl) idxEl.textContent = `#${i + 1}`;
+        if (pairEl) pairEl.textContent = `${b1}–${b2}`;
+
+        const mismatch = (COMP[b1] || "") !== b2;
+        if (badge) badge.hidden = !mismatch;
+    }
+
+    function openEditPop(i) {
+        if (!editPop) {
+            editPop = buildEditPop();
+            document.body.appendChild(editPop);
+        }
+
+        syncEditPopMeta(i);
+        editPop.querySelector('[data-role="mutate"]')?.classList.add("is-hidden");
+
+        editOpen = true;
+        editPop.classList.remove("is-hidden");
+
+        editPop.getBoundingClientRect();
+        scheduleEditPopPosition(i);
+    }
+
+    function closeEditPop() {
+        editOpen = false;
+        editPop?.classList.add("is-hidden");
+    }
+
 
     if (scientific) {
         const shell = document.createElement("div");
@@ -211,12 +412,17 @@ function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
             tab3d.classList.remove("is-active");
             threeWrap.classList.add("hidden");
             ladderWrap.classList.remove("hidden");
+
             containerForLadder = ladderWrap;
             if (threeApi) threeApi.pause();
+
             ladderWrap.appendChild(overlay);
             ladderWrap.appendChild(progCont);
             ladderWrap.appendChild(prevBtn);
             ladderWrap.appendChild(nextBtn);
+
+            if (editPop && editOpen) document.body.appendChild(editPop);
+
             updateView();
         });
 
@@ -228,10 +434,13 @@ function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
 
             ensure3D(current);
             containerForLadder = threeWrap;
+
             threeWrap.appendChild(overlay);
             threeWrap.appendChild(progCont);
             threeWrap.appendChild(prevBtn);
             threeWrap.appendChild(nextBtn);
+
+            if (editPop && editOpen) document.body.appendChild(editPop);
 
             threeApi.refresh?.();
             threeApi.frameAll?.();
@@ -293,19 +502,34 @@ function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
     for (let i = 0; i < strand1.length; i++) {
         const pair = document.createElement("div");
         pair.className = "base-pair";
+
         const top = document.createElement("div");
-        top.className = `base ${strand1[i]}`;
-        top.textContent = strand1[i];
+        top.className = `base ${s1[i]}`;
+        top.textContent = s1[i];
+
         const bot = document.createElement("div");
-        bot.className = `base ${strand2[i]}`;
-        bot.textContent = strand2[i];
+        bot.className = `base ${s2[i]}`;
+        bot.textContent = s2[i];
+
         pair.appendChild(top);
         pair.appendChild(bot);
+
         ladderEl.appendChild(pair);
         pairs.push(pair);
     }
 
     let current = Math.floor(strand1.length / 2);
+    let lastTx = null;
+    let slideRAF = 0;
+
+    pairs.forEach((pairEl, i) => {
+        pairEl.addEventListener("click", (e) => {
+            e.preventDefault();
+            current = i;
+            openEditPop(current);
+            updateView();
+        });
+    });
 
     function measureStep() {
         const sample = ladderEl.querySelector(".base-pair");
@@ -319,12 +543,16 @@ function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
         const totalWidth = pairs.length * step;
         const viewWidth = containerForLadder.clientWidth;
         const targetCenter = (idx + 0.5) * step;
+
         let tx = viewWidth / 2 - targetCenter;
+
         const edgeOffset = Math.min(viewWidth * 0.25, 40);
         const maxTx = edgeOffset;
         const minTx = viewWidth - totalWidth - edgeOffset;
+
         if (totalWidth <= viewWidth) tx = (viewWidth - totalWidth) / 2;
         else tx = Math.max(minTx, Math.min(maxTx, tx));
+
         return tx;
     }
 
@@ -334,16 +562,51 @@ function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
         if (threeApi && typeof threeApi.toIndex === "function") {
             threeApi.toIndex(current);
         }
+        if (editOpen) ladderEl.classList.add("no-anim");
 
-        ladderEl.style.transform = `translateX(${edgeTranslateX(current)}px) translateY(-50%)`;
+        const targetTx = edgeTranslateX(current);
+
+        const prevTx = (lastTx ?? targetTx);
+        const dist = Math.abs(targetTx - prevTx);
+
+        const glideMs = Math.max(240, Math.min(1100, dist * 2.0));
+
+        ladderEl.style.transition = `transform ${glideMs}ms cubic-bezier(.22,1,.36,1)`;
+        ladderEl.style.transform = `translateX(${targetTx}px) translateY(-50%)`;
+        ladderEl.dataset.tx = String(targetTx);
+        lastTx = targetTx;
+
+        if (editOpen && editPop) {
+            editPop.classList.add("is-hidden");
+
+            const onEnd = (ev) => {
+                if (ev.propertyName !== "transform") return;
+                ladderEl.removeEventListener("transitionend", onEnd);
+
+                if (editOpen && editPop) {
+                    syncEditPopMeta(current);
+                    positionEditPopAtPair(current);
+                    editPop.classList.remove("is-hidden");
+                }
+            };
+
+            ladderEl.addEventListener("transitionend", onEnd);
+        }
+
+        if (editOpen) {
+            requestAnimationFrame(() => ladderEl.classList.remove("no-anim"));
+        }
 
         pairs.forEach(p => p.classList.remove("active"));
         const active = pairs[current];
+
         if (active) {
             active.classList.add("active");
-            const b1 = strand1[current], b2 = strand2[current];
-            const h = (b1 === "A" && b2 === "T") || (b1 === "T" && b2 === "A") ? 2 :
-                (b1 === "C" && b2 === "G") || (b1 === "G" && b2 === "C") ? 3 : "-";
+
+            const b1 = s1[current], b2 = s2[current];
+            const h =
+                (b1 === "A" && b2 === "T") || (b1 === "T" && b2 === "A") ? 2 :
+                    (b1 === "C" && b2 === "G") || (b1 === "G" && b2 === "C") ? 3 : "-";
 
             if (tooltipEl) tooltipEl.textContent = `Base ${current + 1}: ${b1}-${b2} (${h} H)`;
 
@@ -352,32 +615,50 @@ function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
                 panelRefs.s_pair.textContent = `${b1}–${b2}`;
                 panelRefs.s_bonds.textContent = String(h);
                 panelRefs.s_type.textContent = `${purinePyrimidine(b1)}/${purinePyrimidine(b2)}`;
-                const { codon, aa } = codonAt(strand1, current, 0);
+                const { codon, aa } = codonAt(s1.join(""), current, 0);
                 panelRefs.s_codon.textContent = codon || "-";
                 panelRefs.s_aa.textContent = aa || "-";
             }
         }
 
         if (progressEl) progressEl.style.width = `${((current + 1) / pairs.length) * 100}%`;
+
+        if (editOpen) syncEditPopMeta(current);
     }
 
     nextEl?.addEventListener("click", () => {
         if (current < pairs.length - 1) current++;
+        closeEditPop();
         updateView();
     });
 
     prevEl?.addEventListener("click", () => {
         if (current > 0) current--;
+        closeEditPop();
         updateView();
     });
 
     progressContainerEl?.addEventListener("click", e => {
         const rect = progressContainerEl.getBoundingClientRect();
         current = Math.round(((e.clientX - rect.left) / rect.width) * (pairs.length - 1));
+        closeEditPop();
         updateView();
     });
 
     window.addEventListener("resize", updateView, { passive: true });
+
+    const onPointerDown = (e) => {
+        if (!editOpen || !editPop) return;
+        const t = e.target;
+        const clickedOnPair = pairs.some(p => p.contains(t));
+        if (!editPop.contains(t) && !clickedOnPair) closeEditPop();
+    };
+    document.addEventListener("pointerdown", onPointerDown, { capture: true });
+
+    const onKeyDown = (e) => {
+        if (e.key === "Escape") closeEditPop();
+    };
+    window.addEventListener("keydown", onKeyDown);
 
     updateView();
 }
@@ -422,7 +703,11 @@ function mountHelix3D(strand1, strand2, mount, initialIndex = null) {
     const baseMeshes1 = [], baseMeshes2 = [];
     const rungMeshes = [], rungBaseOpacity = [];
 
-    function relLum(hex) { const rr = (hex >> 16) & 255, gg = (hex >> 8) & 255, bb = hex & 255; const t = v => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4) }; return 0.2126 * t(rr) + 0.7152 * t(gg) + 0.0722 * t(bb) }
+    function relLum(hex) {
+        const rr = (hex >> 16) & 255, gg = (hex >> 8) & 255, bb = hex & 255;
+        const t = v => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4) };
+        return 0.2126 * t(rr) + 0.7152 * t(gg) + 0.0722 * t(bb);
+    }
     function textColor(hex) { return relLum(hex) > 0.60 ? "#111111" : "#ffffff" }
     function makeLabel(letter, colorHex) {
         const s = 96, c = document.createElement("canvas"); c.width = s; c.height = s;

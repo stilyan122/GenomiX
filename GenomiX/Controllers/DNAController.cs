@@ -149,6 +149,7 @@ namespace GenomiX.Controllers
         [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Route("dna/custom/create")]
         public async Task<IActionResult> CreateCustom(CreateCustomModelInputModel input)
         {
             if (!ModelState.IsValid)
