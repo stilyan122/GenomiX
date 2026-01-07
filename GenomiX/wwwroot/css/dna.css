@@ -1050,3 +1050,79 @@
 .gx-editpop__mutate.is-hidden {
     display: none !important;
 }
+
+.gx-mutate__label{display:none}
+
+.gx-mutate__choices{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+
+.gx-mutate__b{
+  width:44px;height:36px;
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,.14);
+  background:rgba(255,255,255,.06);
+  color:#eaf1ff;
+  font-weight:800;
+  letter-spacing:.5px;
+  cursor:pointer;
+  transition:transform .15s ease, box-shadow .15s ease, filter .15s ease;
+}
+.gx-mutate__b:hover{transform:translateY(-1px);filter:brightness(1.08)}
+.gx-mutate__b:active{transform:translateY(0px) scale(.98)}
+
+.gx-mutate__b[data-base="A"]{background:rgba(255,75,75,.22);box-shadow:0 0 0 1px rgba(255,75,75,.25) inset}
+.gx-mutate__b[data-base="T"]{background:rgba(255,213,75,.20);box-shadow:0 0 0 1px rgba(255,213,75,.22) inset}
+.gx-mutate__b[data-base="C"]{background:rgba(75,163,255,.20);box-shadow:0 0 0 1px rgba(75,163,255,.22) inset}
+.gx-mutate__b[data-base="G"]{background:rgba(75,255,136,.18);box-shadow:0 0 0 1px rgba(75,255,136,.20) inset}
+
+.gx-mutate{display:none}
+.gx-mutate.is-open{display:block}
+
+
+.base{position:relative}
+
+.base.is-selected{
+  animation: gxSelectedPulse .85s ease-in-out infinite;
+  box-shadow: 0 0 14px rgba(255,255,255,.22);
+}
+
+@keyframes gxSelectedPulse{
+  0%,100%{ transform: translateY(0) scale(1); }
+  50%{ transform: translateY(-3px) scale(1.2); }
+}
+
+.base-pair.is-mismatch {
+    outline: 1px solid rgba(255,80,80,.75);
+    outline-offset: 4px;
+    box-shadow: 0 0 0 1px rgba(0,0,0,.25) inset, 0 0 0 1px rgba(255,80,80,.30), 0 0 5px rgba(255,80,80,.22);
+    animation: gxMismatchPulse 1.35s ease-in-out infinite;
+}
+
+@keyframes gxMismatchJitter {
+    0%,92%,100% {
+        transform: translateZ(0);
+    }
+
+    94% {
+        transform: translateX(-1px);
+    }
+
+    96% {
+        transform: translateX(1px);
+    }
+
+    98% {
+        transform: translateX(0);
+    }
+}
+
+@keyframes gxMismatchPulse {
+    0%,100% {
+        transform: translateZ(0);
+        filter: saturate(1);
+    }
+
+    50% {
+        transform: translateY(-5px);
+        filter: saturate(1.15);
+    }
+}

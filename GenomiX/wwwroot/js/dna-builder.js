@@ -127,18 +127,29 @@ function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
 
         bot.className = `base ${b2}`;
         bot.textContent = b2;
+
+        top.dataset.strand = "1";
+        bot.dataset.strand = "2";   
     }
 
-    function mutateAt(i, newBase) {
-        if (!s1[i]) return;
+    function setMismatchDom(i) {
+        const pair = pairs[i];
+        if (!pair) return;
+        const b1 = s1[i], b2 = s2[i];
+        const mismatch = (COMP[b1] || "") !== b2;
+        pair.classList.toggle("is-mismatch", mismatch);
+    }
+
+    function mutateAt(i, strandNum, newBase) {
         if (!COMP[newBase]) return;
 
-        s1[i] = newBase;
-        s2[i] = COMP[newBase];
+        if (strandNum === 1) s1[i] = newBase;
+        else s2[i] = newBase;
 
         setPairDom(i);
         syncEditPopMeta(i);
         updateView();
+        setMismatchDom(i);
     }
 
     function positionEditPopAtPair(i) {
@@ -218,39 +229,32 @@ function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
             <button class="gx-editpop__pill" type="button" data-act="move">Move</button>
           </div>
 
-          <div class="gx-editpop__mutate is-hidden" data-role="mutate">
-            <div class="gx-editpop__hint" style="margin-bottom:8px;opacity:.85">Pick new base (strand 1)</div>
-            <div class="gx-editpop__actions">
-              <button class="gx-editpop__pill" type="button" data-mbase="A">A</button>
-              <button class="gx-editpop__pill" type="button" data-mbase="T">T</button>
-              <button class="gx-editpop__pill" type="button" data-mbase="C">C</button>
-              <button class="gx-editpop__pill" type="button" data-mbase="G">G</button>
+          <div class="gx-mutate is-hidden" data-role="mutbox">
+            <div class="gx-mutate__choices">
+              <button class="gx-mutate__b" data-base="A">A</button>
+              <button class="gx-mutate__b" data-base="T">T</button>
+              <button class="gx-mutate__b" data-base="C">C</button>
+              <button class="gx-mutate__b" data-base="G">G</button>
             </div>
           </div>
         `;
 
         pop.querySelector(".gx-editpop__x")?.addEventListener("click", () => closeEditPop());
 
-        const mutateBox = pop.querySelector('[data-role="mutate"]');
+        const mutBox = pop.querySelector('[data-role="mutbox"]');
 
-        pop.querySelectorAll("[data-act]").forEach(btn => {
-            btn.addEventListener("click", () => {
-                const act = btn.getAttribute("data-act");
+        mutBox.classList.remove("is-hidden");
+        mutBox.classList.remove("is-open");
 
-                if (mutateBox) {
-                    if (act === "mutate") mutateBox.classList.toggle("is-hidden");
-                    else mutateBox.classList.add("is-hidden");
-                }
-
-                if (tooltipEl) tooltipEl.textContent = `Selected: ${act}`;
-            });
+        pop.querySelector('[data-act="mutate"]')?.addEventListener("click", () => {
+            mutBox.classList.toggle("is-open");
         });
 
-        pop.querySelectorAll("[data-mbase]").forEach(btn => {
+        pop.querySelectorAll(".gx-mutate__b").forEach(btn => {
             btn.addEventListener("click", () => {
-                const b = btn.getAttribute("data-mbase");
-                mutateAt(current, b);
-                mutateBox?.classList.add("is-hidden");
+                const b = btn.getAttribute("data-base");
+                mutateAt(current, selectedStrand, b);
+                mutBox.classList.add("is-hidden");
             });
         });
 
@@ -271,14 +275,18 @@ function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
         if (badge) badge.hidden = !mismatch;
     }
 
-    function openEditPop(i) {
+    function openEditPop(i, strandClicked = 1) {
         if (!editPop) {
             editPop = buildEditPop();
             document.body.appendChild(editPop);
         }
 
+        selectedStrand = strandClicked;
+        setSelectedBase(pairs[i]?.querySelector(`.base[data-strand="${selectedStrand}"]`));
+
         syncEditPopMeta(i);
-        editPop.querySelector('[data-role="mutate"]')?.classList.add("is-hidden");
+        editPop.querySelector('[data-role="mutbox"]')?.classList.remove("is-open");
+        editPop.querySelector('[data-role="mutbox"]')?.classList.add("is-hidden");
 
         editOpen = true;
         editPop.classList.remove("is-hidden");
@@ -457,7 +465,8 @@ function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
 
         visualizer._dispose3D?.();
         visualizer._dispose3D = () => { if (threeApi) { threeApi.dispose(); threeApi = null; } };
-    } else {
+    }
+    else {
         const ladder = document.createElement("div");
         ladder.className = "dna-ladder";
         visualizer.appendChild(ladder);
@@ -506,27 +515,47 @@ function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
         const top = document.createElement("div");
         top.className = `base ${s1[i]}`;
         top.textContent = s1[i];
+        top.dataset.strand = "1";
 
         const bot = document.createElement("div");
         bot.className = `base ${s2[i]}`;
         bot.textContent = s2[i];
+        bot.dataset.strand = "2";
+
+        pair.dataset.i = String(i);
 
         pair.appendChild(top);
         pair.appendChild(bot);
 
         ladderEl.appendChild(pair);
         pairs.push(pair);
+
+        setPairDom(i);
     }
 
     let current = Math.floor(strand1.length / 2);
     let lastTx = null;
-    let slideRAF = 0;
+    let selectedStrand = 1;
+    let selectedBaseEl = null;
+
+    function setSelectedBase(el) {
+        if (selectedBaseEl) selectedBaseEl.classList.remove("is-selected");
+        selectedBaseEl = el;
+        if (selectedBaseEl) selectedBaseEl.classList.add("is-selected");
+    }
 
     pairs.forEach((pairEl, i) => {
         pairEl.addEventListener("click", (e) => {
             e.preventDefault();
+
+            let baseEl = e.target.closest(".base");
+            if (!baseEl) baseEl = pairEl.querySelector('.base[data-strand="1"]');
+
+            selectedStrand = baseEl?.dataset?.strand === "2" ? 2 : 1;
+            setSelectedBase(baseEl);
+
             current = i;
-            openEditPop(current);
+            openEditPop(current, selectedStrand);
             updateView();
         });
     });
