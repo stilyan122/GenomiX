@@ -140,6 +140,30 @@ function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
         pair.classList.toggle("is-mismatch", mismatch);
     }
 
+    function movePair(from, to) {
+        if (to < 0 || to >= pairs.length) return;
+        if (from === to) return;
+
+        const b1 = s1.splice(from, 1)[0];
+        const b2 = s2.splice(from, 1)[0];
+        s1.splice(to, 0, b1);
+        s2.splice(to, 0, b2);
+
+        const el = pairs.splice(from, 1)[0];
+        pairs.splice(to, 0, el);
+
+        const refNode = ladderEl.children[to] || null;
+        ladderEl.insertBefore(el, refNode);
+
+        const start = Math.min(from, to);
+        reindexPairs(start);
+
+        for (let i = Math.max(0, start - 1); i <= Math.min(pairs.length - 1, start + 1); i++) {
+            setPairDom(i);
+            setMismatchDom(i);
+        }
+    }
+
     function mutateAt(i, strandNum, newBase) {
         if (!COMP[newBase]) return;
 
@@ -230,20 +254,27 @@ function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
           </div>
 
           <div class="gx-mutate is-hidden" data-role="mutbox">
-          <div class="gx-mutate__hint" data-role="pickhint">Pick base</div>
-
-          <div class="gx-mutate__choices">
-            <button class="gx-mutate__b" data-base="A">A</button>
-            <button class="gx-mutate__b" data-base="T">T</button>
-            <button class="gx-mutate__b" data-base="C">C</button>
-            <button class="gx-mutate__b" data-base="G">G</button>
+            <div class="gx-mutate__hint" data-role="pickhint">Pick base</div>
+            <div class="gx-mutate__choices">
+              <button class="gx-mutate__b" data-base="A">A</button>
+              <button class="gx-mutate__b" data-base="T">T</button>
+              <button class="gx-mutate__b" data-base="C">C</button>
+              <button class="gx-mutate__b" data-base="G">G</button>
+            </div>
           </div>
-        </div>
+
+          <div class="gx-move is-hidden" data-role="movebox">
+            <div class="gx-move__row">
+              <button class="gx-move__btn" type="button" data-move="left">← Left</button>
+              <button class="gx-move__btn" type="button" data-move="right">Right →</button>
+            </div>
+          </div>
         `;
 
         pop.querySelector(".gx-editpop__x")?.addEventListener("click", () => closeEditPop());
 
         const mutBox = pop.querySelector('[data-role="mutbox"]');
+        const moveBox = pop.querySelector('[data-role="movebox"]');
         const pickHint = pop.querySelector('[data-role="pickhint"]');
         const setHint = (t) => { if (pickHint) pickHint.textContent = t; };
 
@@ -251,31 +282,48 @@ function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
         let insertIdx = 0;
         let pick1 = null;
 
-        mutBox.classList.add("is-hidden");
-        mutBox.classList.remove("is-open");
+        mutBox?.classList.add("is-hidden");
+        mutBox?.classList.remove("is-open");
+
+        moveBox?.classList.add("is-hidden"); 
 
         function openPicker() {
-            mutBox.classList.remove("is-hidden");
-            mutBox.classList.add("is-open");
+            moveBox?.classList.add("is-hidden");
+            mutBox?.classList.remove("is-hidden");
+            mutBox?.classList.add("is-open");
         }
         function closePicker() {
-            mutBox.classList.add("is-hidden");
-            mutBox.classList.remove("is-open");
+            mutBox?.classList.add("is-hidden");
+            mutBox?.classList.remove("is-open");
             insertMode = false;
             pick1 = null;
+            mutBox?.classList.remove("has-first-pick");
+        }
+        function openMoveBox() {
+            mutBox?.classList.add("is-hidden");
+            mutBox?.classList.remove("is-open");
+            moveBox?.classList.remove("is-hidden");
+        }
+        function closeMoveBox() {
+            moveBox?.classList.add("is-hidden");
+        }
+        function toggleMoveBox() {
+            const open = moveBox && !moveBox.classList.contains("is-hidden");
+            if (open) closeMoveBox();
+            else openMoveBox();
         }
 
         pop.querySelector('[data-act="mutate"]')?.addEventListener("click", () => {
+            closeMoveBox();
             insertMode = false;
             pick1 = null;
-            mutBox.classList.remove("has-first-pick");
-            setHint(`Mutate: pick new base (strand ${selectedStrand})`);
 
             if (mutBox.classList.contains("is-open")) closePicker();
             else openPicker();
         });
 
         pop.querySelector('[data-act="insert"]')?.addEventListener("click", () => {
+            closeMoveBox();
             insertMode = true;
             pick1 = null;
             mutBox.classList.remove("has-first-pick");
@@ -283,7 +331,24 @@ function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
             insertIdx = Math.min(current + 1, pairs.length);
 
             setHint("Insert: pick base for strand 1");
-            openPicker();
+
+            if (mutBox.classList.contains("is-open")) closePicker();
+            else openPicker();
+        });
+
+        moveBox?.querySelectorAll("[data-move]").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const dir = btn.getAttribute("data-move");
+                const from = current;
+                const to = dir === "left" ? from - 1 : from + 1;
+
+                movePair(from, to);
+
+                current = Math.max(0, Math.min(to, pairs.length - 1));
+                syncEditPopMeta(current);
+                scheduleEditPopPosition(current);
+                updateView();
+            });
         });
 
         pop.querySelector('[data-act="delete"]')?.addEventListener("click", () => {
@@ -294,6 +359,10 @@ function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
             closeEditPop();
             closePicker();
             updateView();
+        });
+
+        pop.querySelector('[data-act="move"]')?.addEventListener("click", () => {
+            toggleMoveBox();
         });
 
         pop.querySelectorAll(".gx-mutate__b").forEach(btn => {
