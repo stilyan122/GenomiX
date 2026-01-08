@@ -12,7 +12,7 @@ namespace GenomiX
             var builder = WebApplication.CreateBuilder(args);
 
             var connectionString = builder.Configuration
-                .GetConnectionString("DefaultConnection") ?? 
+                .GetConnectionString("ApplicationDbContextConnection") ?? 
                 throw new InvalidOperationException("Connection string not found.");
 
             builder.Services

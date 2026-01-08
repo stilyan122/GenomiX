@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace GenomiX.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialMigration : Migration
+    public partial class NewMigrationTest : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -77,8 +77,6 @@ namespace GenomiX.Infrastructure.Migrations
                     Species = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false, comment: "Species or organism identifier for the reference sequence (e.g., Human, Mouse, Dog)."),
                     Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false, comment: "Descriptive name for the reference sequence (e.g., Beta-globin fragment)."),
                     Sequence = table.Column<string>(type: "nvarchar(max)", maxLength: 10000, nullable: false, comment: "Raw uppercase DNA string (A,C,G,T only)."),
-                    Strand = table.Column<byte>(type: "tinyint", nullable: false, comment: "Strand index of the reference sequence (1 = forward, 2 = complementary)."),
-                    PairIndex = table.Column<int>(type: "int", nullable: false, comment: "Pair index groups complementary strands together (e.g., 0 = initial pair)."),
                     CreatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false, comment: "UTC timestamp when the reference sequence was created.")
                 },
                 constraints: table =>
@@ -198,9 +196,8 @@ namespace GenomiX.Infrastructure.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, comment: "Primary key (GUID)."),
+                    Name = table.Column<string>(type: "nvarchar(80)", maxLength: 80, nullable: false, comment: "User-defined name for this DNA model."),
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true, comment: "Owner user (FK)."),
-                    CurrentIndex = table.Column<int>(type: "int", nullable: false, comment: "Active timeline index (zero-based)."),
-                    DisplayMode = table.Column<byte>(type: "tinyint", nullable: false, comment: "0 = Basic shapes, 1 = Scientific atomic view."),
                     CreatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false, comment: "UTC created timestamp."),
                     UpdatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false, comment: "UTC updated timestamp.")
                 },
@@ -346,6 +343,7 @@ namespace GenomiX.Infrastructure.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, comment: "Primary key (GUID)."),
                     ModelId = table.Column<Guid>(type: "uniqueidentifier", nullable: false, comment: "Owning DNAModel (FK)."),
                     Sequence = table.Column<string>(type: "nvarchar(max)", maxLength: 10000, nullable: false, comment: "Raw uppercase DNA string (A,C,G,T only)."),
+                    Strand = table.Column<byte>(type: "tinyint", nullable: false, comment: "Strand index (1 = forward, 2 = complementary)."),
                     CreatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false, comment: "UTC timestamp when the snapshot was created.")
                 },
                 constraints: table =>
@@ -487,15 +485,15 @@ namespace GenomiX.Infrastructure.Migrations
 
             migrationBuilder.InsertData(
                 table: "Reference_Sequences",
-                columns: new[] { "Id", "CreatedAt", "Name", "PairIndex", "Sequence", "Species", "Strand" },
+                columns: new[] { "Id", "CreatedAt", "Name", "Sequence", "Species" },
                 values: new object[,]
                 {
-                    { new Guid("11111111-0000-0000-0000-000000000001"), new DateTimeOffset(new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "BRCA1 fragment", 0, "ATGGAAGAGCTGTCAGGAGAGCTGCCAGCTGGTGAGGAAGCAGTGAGCCTGAGCAAGAGCTGAG", "Homo sapiens", (byte)1 },
-                    { new Guid("11111111-0000-0000-0000-000000000002"), new DateTimeOffset(new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "BRCA1 fragment (complement)", 0, "CTCAGCTCTTGCTCAGGCTCACTGCTTCCTCACCAGCTGGCAGCTCTCCTGACAGCTCTTCCAT", "Homo sapiens", (byte)2 },
-                    { new Guid("22222222-0000-0000-0000-000000000001"), new DateTimeOffset(new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "TP53 fragment", 1, "ATGGTCAGGACCTGGAGAAGGAGCTGAGGCTGGATGAAGTCAAGAGTGTCAAGCGAGCTGAGG", "Mus musculus", (byte)1 },
-                    { new Guid("22222222-0000-0000-0000-000000000002"), new DateTimeOffset(new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "TP53 fragment (complement)", 1, "CCTCAGCTCGCTTGACACTCTTGACTTCATCCAGCCTCAGCTCCTTCTCCAGGTCCTGACCAG", "Mus musculus", (byte)2 },
-                    { new Guid("33333333-0000-0000-0000-000000000001"), new DateTimeOffset(new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "COX1 mitochondrial fragment", 2, "ATGGAAGAGGAGCTGCTGAGGAGCTGGTGAGGAAGCAGTGAGCCTGAGCAAGAGCTGAGCTA", "Canis lupus familiaris", (byte)1 },
-                    { new Guid("33333333-0000-0000-0000-000000000002"), new DateTimeOffset(new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "COX1 mitochondrial fragment (complement)", 2, "TAGCTCAGCTCTTGCTCAGGCTCACTGCTTCCTCACCAGCTCCTCAGCAGCTCCTCTTCCAT", "Canis lupus familiaris", (byte)2 }
+                    { new Guid("11111111-0000-0000-0000-000000000001"), new DateTimeOffset(new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "BRCA1 fragment", "ATGGAAGAGCTGTCAGGAGAGCTGCCAGCTGGTGAGGAAGCAGTGAGCCTGAGCAAGAGCTGAG", "Homo sapiens" },
+                    { new Guid("11111111-0000-0000-0000-000000000002"), new DateTimeOffset(new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "BRCA1 fragment (complement)", "CTCAGCTCTTGCTCAGGCTCACTGCTTCCTCACCAGCTGGCAGCTCTCCTGACAGCTCTTCCAT", "Homo sapiens" },
+                    { new Guid("22222222-0000-0000-0000-000000000001"), new DateTimeOffset(new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "TP53 fragment", "ATGGTCAGGACCTGGAGAAGGAGCTGAGGCTGGATGAAGTCAAGAGTGTCAAGCGAGCTGAGG", "Mus musculus" },
+                    { new Guid("22222222-0000-0000-0000-000000000002"), new DateTimeOffset(new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "TP53 fragment (complement)", "CCTCAGCTCGCTTGACACTCTTGACTTCATCCAGCCTCAGCTCCTTCTCCAGGTCCTGACCAG", "Mus musculus" },
+                    { new Guid("33333333-0000-0000-0000-000000000001"), new DateTimeOffset(new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "COX1 mitochondrial fragment", "ATGGAAGAGGAGCTGCTGAGGAGCTGGTGAGGAAGCAGTGAGCCTGAGCAAGAGCTGAGCTA", "Canis lupus familiaris" },
+                    { new Guid("33333333-0000-0000-0000-000000000002"), new DateTimeOffset(new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "COX1 mitochondrial fragment (complement)", "TAGCTCAGCTCTTGCTCAGGCTCACTGCTTCCTCACCAGCTCCTCAGCAGCTCCTCTTCCAT", "Canis lupus familiaris" }
                 });
 
             migrationBuilder.InsertData(
@@ -512,14 +510,14 @@ namespace GenomiX.Infrastructure.Migrations
 
             migrationBuilder.InsertData(
                 table: "DNA_Models",
-                columns: new[] { "Id", "CreatedAt", "CurrentIndex", "DisplayMode", "UpdatedAt", "UserId" },
+                columns: new[] { "Id", "CreatedAt", "Name", "UpdatedAt", "UserId" },
                 values: new object[,]
                 {
-                    { new Guid("44444444-0000-0000-0000-000000000001"), new DateTimeOffset(new DateTime(2024, 6, 15, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), 0, (byte)1, new DateTimeOffset(new DateTime(2024, 6, 15, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("ea821ce2-2a3d-43ef-8978-5f34ee07d080") },
-                    { new Guid("44444444-0000-0000-0000-000000000002"), new DateTimeOffset(new DateTime(2024, 7, 20, 9, 30, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), 0, (byte)0, new DateTimeOffset(new DateTime(2024, 7, 20, 9, 30, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("9d5e0ac1-4f1b-422b-b7f0-0f7d5d2dbbb1") },
-                    { new Guid("44444444-0000-0000-0000-000000000003"), new DateTimeOffset(new DateTime(2024, 8, 25, 10, 45, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), 0, (byte)1, new DateTimeOffset(new DateTime(2024, 8, 25, 10, 45, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("58a7c2b5-1347-4f0a-b3ad-912d4f098aaa") },
-                    { new Guid("44444444-0000-0000-0000-000000000004"), new DateTimeOffset(new DateTime(2024, 7, 20, 9, 5, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), 0, (byte)1, new DateTimeOffset(new DateTime(2024, 7, 20, 9, 5, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("a7f9a7d5-56f5-4f3f-8a9f-8c2f0d3d7001") },
-                    { new Guid("44444444-0000-0000-0000-000000000005"), new DateTimeOffset(new DateTime(2024, 9, 10, 11, 20, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), 0, (byte)1, new DateTimeOffset(new DateTime(2024, 9, 10, 11, 20, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("c2b3d8ae-2b6d-4c41-9b8e-b1c2a3d4e005") }
+                    { new Guid("44444444-0000-0000-0000-000000000001"), new DateTimeOffset(new DateTime(2024, 6, 15, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "Untitled model", new DateTimeOffset(new DateTime(2024, 6, 15, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("ea821ce2-2a3d-43ef-8978-5f34ee07d080") },
+                    { new Guid("44444444-0000-0000-0000-000000000002"), new DateTimeOffset(new DateTime(2024, 7, 20, 9, 30, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "Untitled model", new DateTimeOffset(new DateTime(2024, 7, 20, 9, 30, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("9d5e0ac1-4f1b-422b-b7f0-0f7d5d2dbbb1") },
+                    { new Guid("44444444-0000-0000-0000-000000000003"), new DateTimeOffset(new DateTime(2024, 8, 25, 10, 45, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "Untitled model", new DateTimeOffset(new DateTime(2024, 8, 25, 10, 45, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("58a7c2b5-1347-4f0a-b3ad-912d4f098aaa") },
+                    { new Guid("44444444-0000-0000-0000-000000000004"), new DateTimeOffset(new DateTime(2024, 7, 20, 9, 5, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "Untitled model", new DateTimeOffset(new DateTime(2024, 7, 20, 9, 5, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("a7f9a7d5-56f5-4f3f-8a9f-8c2f0d3d7001") },
+                    { new Guid("44444444-0000-0000-0000-000000000005"), new DateTimeOffset(new DateTime(2024, 9, 10, 11, 20, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "Untitled model", new DateTimeOffset(new DateTime(2024, 9, 10, 11, 20, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("c2b3d8ae-2b6d-4c41-9b8e-b1c2a3d4e005") }
                 });
 
             migrationBuilder.InsertData(
@@ -566,15 +564,15 @@ namespace GenomiX.Infrastructure.Migrations
 
             migrationBuilder.InsertData(
                 table: "DNA_Sequences",
-                columns: new[] { "Id", "CreatedAt", "ModelId", "Sequence" },
+                columns: new[] { "Id", "CreatedAt", "ModelId", "Sequence", "Strand" },
                 values: new object[,]
                 {
-                    { new Guid("a1111111-1111-1111-1111-111111111111"), new DateTimeOffset(new DateTime(2024, 6, 1, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("44444444-0000-0000-0000-000000000001"), "ATGGTGCACCTGACTCCTGAGGAGAAGTCTGCCGTTACTGCCCTGTGGGGCAAGGTGAACGTGGATGAAGTTGGTGGTGAGGCCCTGGGCAG" },
-                    { new Guid("a2222222-2222-2222-2222-222222222222"), new DateTimeOffset(new DateTime(2024, 6, 1, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("44444444-0000-0000-0000-000000000001"), "TACACCACGTGGACTGAGACTCCTTTCAGACGGCAATGACGGGACACCCCGTTCCACTTGCACCTACTTCAACCACCACTCCGGGACCCGTC" },
-                    { new Guid("b1111111-1111-1111-1111-111111111111"), new DateTimeOffset(new DateTime(2024, 7, 15, 10, 30, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("44444444-0000-0000-0000-000000000002"), "ATGGATGCCATGGGACCTGAGGAAGGAGAAGGCCCTGGGCCCTGAGGACCTTGGCTACACAGGCTGTTGGTGGTGCTGAGGAGGCTGGCCAC" },
-                    { new Guid("b2222222-2222-2222-2222-222222222222"), new DateTimeOffset(new DateTime(2024, 7, 15, 10, 30, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("44444444-0000-0000-0000-000000000002"), "TACCTACGGTACCCTGGACTCCTTCCTCTTCCGGGACCCGGGACTCCTGGAACCGATGTGTCCGACAACCACCACGACTCCTCCGACCGGTG" },
-                    { new Guid("c1111111-1111-1111-1111-111111111111"), new DateTimeOffset(new DateTime(2024, 8, 20, 8, 45, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("44444444-0000-0000-0000-000000000003"), "ATGCCAGGAGCTGCTGGAGGAGGTGCTGGAGGCTGGAGGCGTTCCTGGGCTGAGTGGCTGGAGGAGGAGGAGCAGGAGGCTGGCTGCTGGAG" },
-                    { new Guid("c2222222-2222-2222-2222-222222222222"), new DateTimeOffset(new DateTime(2024, 8, 20, 8, 45, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("44444444-0000-0000-0000-000000000003"), "TACGGTCC TCGACGACCTCCTCCACGACCTCCGACCTCCGCAAGGACCCGACTCACCGACCTCCTCCTCGTCCTCCGACCGACGACCTC" }
+                    { new Guid("a1111111-1111-1111-1111-111111111111"), new DateTimeOffset(new DateTime(2024, 6, 1, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("44444444-0000-0000-0000-000000000001"), "ATGGTGCACCTGACTCCTGAGGAGAAGTCTGCCGTTACTGCCCTGTGGGGCAAGGTGAACGTGGATGAAGTTGGTGGTGAGGCCCTGGGCAG", (byte)1 },
+                    { new Guid("a2222222-2222-2222-2222-222222222222"), new DateTimeOffset(new DateTime(2024, 6, 1, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("44444444-0000-0000-0000-000000000001"), "TACACCACGTGGACTGAGACTCCTTTCAGACGGCAATGACGGGACACCCCGTTCCACTTGCACCTACTTCAACCACCACTCCGGGACCCGTC", (byte)1 },
+                    { new Guid("b1111111-1111-1111-1111-111111111111"), new DateTimeOffset(new DateTime(2024, 7, 15, 10, 30, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("44444444-0000-0000-0000-000000000002"), "ATGGATGCCATGGGACCTGAGGAAGGAGAAGGCCCTGGGCCCTGAGGACCTTGGCTACACAGGCTGTTGGTGGTGCTGAGGAGGCTGGCCAC", (byte)1 },
+                    { new Guid("b2222222-2222-2222-2222-222222222222"), new DateTimeOffset(new DateTime(2024, 7, 15, 10, 30, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("44444444-0000-0000-0000-000000000002"), "TACCTACGGTACCCTGGACTCCTTCCTCTTCCGGGACCCGGGACTCCTGGAACCGATGTGTCCGACAACCACCACGACTCCTCCGACCGGTG", (byte)1 },
+                    { new Guid("c1111111-1111-1111-1111-111111111111"), new DateTimeOffset(new DateTime(2024, 8, 20, 8, 45, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("44444444-0000-0000-0000-000000000003"), "ATGCCAGGAGCTGCTGGAGGAGGTGCTGGAGGCTGGAGGCGTTCCTGGGCTGAGTGGCTGGAGGAGGAGGAGCAGGAGGCTGGCTGCTGGAG", (byte)1 },
+                    { new Guid("c2222222-2222-2222-2222-222222222222"), new DateTimeOffset(new DateTime(2024, 8, 20, 8, 45, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("44444444-0000-0000-0000-000000000003"), "TACGGTCC TCGACGACCTCCTCCACGACCTCCGACCTCCGCAAGGACCCGACTCACCGACCTCCTCCTCGTCCTCCGACCGACGACCTC", (byte)1 }
                 });
 
             migrationBuilder.InsertData(

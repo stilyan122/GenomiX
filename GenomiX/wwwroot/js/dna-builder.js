@@ -230,31 +230,102 @@ function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
           </div>
 
           <div class="gx-mutate is-hidden" data-role="mutbox">
-            <div class="gx-mutate__choices">
-              <button class="gx-mutate__b" data-base="A">A</button>
-              <button class="gx-mutate__b" data-base="T">T</button>
-              <button class="gx-mutate__b" data-base="C">C</button>
-              <button class="gx-mutate__b" data-base="G">G</button>
-            </div>
+          <div class="gx-mutate__hint" data-role="pickhint">Pick base</div>
+
+          <div class="gx-mutate__choices">
+            <button class="gx-mutate__b" data-base="A">A</button>
+            <button class="gx-mutate__b" data-base="T">T</button>
+            <button class="gx-mutate__b" data-base="C">C</button>
+            <button class="gx-mutate__b" data-base="G">G</button>
           </div>
+        </div>
         `;
 
         pop.querySelector(".gx-editpop__x")?.addEventListener("click", () => closeEditPop());
 
         const mutBox = pop.querySelector('[data-role="mutbox"]');
+        const pickHint = pop.querySelector('[data-role="pickhint"]');
+        const setHint = (t) => { if (pickHint) pickHint.textContent = t; };
 
-        mutBox.classList.remove("is-hidden");
+        let insertMode = false;
+        let insertIdx = 0;
+        let pick1 = null;
+
+        mutBox.classList.add("is-hidden");
         mutBox.classList.remove("is-open");
 
+        function openPicker() {
+            mutBox.classList.remove("is-hidden");
+            mutBox.classList.add("is-open");
+        }
+        function closePicker() {
+            mutBox.classList.add("is-hidden");
+            mutBox.classList.remove("is-open");
+            insertMode = false;
+            pick1 = null;
+        }
+
         pop.querySelector('[data-act="mutate"]')?.addEventListener("click", () => {
-            mutBox.classList.toggle("is-open");
+            insertMode = false;
+            pick1 = null;
+            mutBox.classList.remove("has-first-pick");
+            setHint(`Mutate: pick new base (strand ${selectedStrand})`);
+
+            if (mutBox.classList.contains("is-open")) closePicker();
+            else openPicker();
+        });
+
+        pop.querySelector('[data-act="insert"]')?.addEventListener("click", () => {
+            insertMode = true;
+            pick1 = null;
+            mutBox.classList.remove("has-first-pick");
+
+            insertIdx = Math.min(current + 1, pairs.length);
+
+            setHint("Insert: pick base for strand 1");
+            openPicker();
+        });
+
+        pop.querySelector('[data-act="delete"]')?.addEventListener("click", () => {
+            const idx = current;
+            deletePairAt(idx);
+
+            current = Math.max(0, Math.min(idx, pairs.length - 1));
+            closeEditPop();
+            closePicker();
+            updateView();
         });
 
         pop.querySelectorAll(".gx-mutate__b").forEach(btn => {
             btn.addEventListener("click", () => {
                 const b = btn.getAttribute("data-base");
-                mutateAt(current, selectedStrand, b);
-                mutBox.classList.add("is-hidden");
+                if (!b) return;
+
+                if (!insertMode) {
+                    mutateAt(current, selectedStrand, b);
+                    closePicker();
+                    return;
+                }
+
+                if (pick1 === null) {
+                    pick1 = b;
+                    mutBox.classList.add("has-first-pick");
+                    setHint("Insert: pick base for strand 2");
+                    return;
+                }
+
+                mutBox.classList.remove("has-first-pick");
+                setHint("Insert: pick base for strand 1"); 
+
+                const pickedTop = pick1;
+                const pickedBottom = b;
+
+                insertPairAt(insertIdx, pickedTop, pickedBottom);
+
+                current = insertIdx;
+                closeEditPop();
+                closePicker();
+                updateView();
             });
         });
 
@@ -544,7 +615,7 @@ function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
         if (selectedBaseEl) selectedBaseEl.classList.add("is-selected");
     }
 
-    pairs.forEach((pairEl, i) => {
+    function bindPairClick(pairEl) {
         pairEl.addEventListener("click", (e) => {
             e.preventDefault();
 
@@ -554,11 +625,68 @@ function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
             selectedStrand = baseEl?.dataset?.strand === "2" ? 2 : 1;
             setSelectedBase(baseEl);
 
-            current = i;
+            current = Number(pairEl.dataset.i || 0);
             openEditPop(current, selectedStrand);
             updateView();
         });
+    }
+
+    pairs.forEach((pairEl, i) => {
+        pairEl.dataset.i = String(i);
+        bindPairClick(pairEl);
     });
+
+    function reindexPairs(from = 0) {
+        for (let k = from; k < pairs.length; k++) {
+            pairs[k].dataset.i = String(k);
+        }
+    }
+
+    function makePairEl(i) {
+        const pair = document.createElement("div");
+        pair.className = "base-pair";
+
+        const top = document.createElement("div");
+        top.className = `base ${s1[i]}`;
+        top.textContent = s1[i];
+        top.dataset.strand = "1";
+
+        const bot = document.createElement("div");
+        bot.className = `base ${s2[i]}`;
+        bot.textContent = s2[i];
+        bot.dataset.strand = "2";
+
+        pair.appendChild(top);
+        pair.appendChild(bot);
+
+        return pair;
+    }
+
+    function insertPairAt(idx, b1, b2) {
+        s1.splice(idx, 0, b1);
+        s2.splice(idx, 0, b2);
+
+        const pairEl = makePairEl(idx);
+        pairs.splice(idx, 0, pairEl);
+
+        ladderEl.insertBefore(pairEl, ladderEl.children[idx] || null);
+        bindPairClick(pairEl);
+
+        reindexPairs(idx);
+        setMismatchDom(idx);
+    }
+
+    function deletePairAt(idx) {
+        if (pairs.length <= 1) return;
+
+        s1.splice(idx, 1);
+        s2.splice(idx, 1);
+
+        const removed = pairs.splice(idx, 1)[0];
+        removed?.remove();
+
+        reindexPairs(idx);
+    }
 
     function measureStep() {
         const sample = ladderEl.querySelector(".base-pair");

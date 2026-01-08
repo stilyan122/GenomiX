@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GenomiX.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260103153629_DNASequenceEntitySlightChanges")]
-    partial class DNASequenceEntitySlightChanges
+    [Migration("20260107092535_NewMigrationTest")]
+    partial class NewMigrationTest
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -139,6 +139,12 @@ namespace GenomiX.Infrastructure.Migrations
                         .HasColumnType("datetimeoffset")
                         .HasComment("UTC created timestamp.");
 
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("nvarchar(80)")
+                        .HasComment("User-defined name for this DNA model.");
+
                     b.Property<DateTimeOffset>("UpdatedAt")
                         .HasColumnType("datetimeoffset")
                         .HasComment("UTC updated timestamp.");
@@ -161,6 +167,7 @@ namespace GenomiX.Infrastructure.Migrations
                         {
                             Id = new Guid("44444444-0000-0000-0000-000000000001"),
                             CreatedAt = new DateTimeOffset(new DateTime(2024, 6, 15, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Name = "Untitled model",
                             UpdatedAt = new DateTimeOffset(new DateTime(2024, 6, 15, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             UserId = new Guid("ea821ce2-2a3d-43ef-8978-5f34ee07d080")
                         },
@@ -168,6 +175,7 @@ namespace GenomiX.Infrastructure.Migrations
                         {
                             Id = new Guid("44444444-0000-0000-0000-000000000002"),
                             CreatedAt = new DateTimeOffset(new DateTime(2024, 7, 20, 9, 30, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Name = "Untitled model",
                             UpdatedAt = new DateTimeOffset(new DateTime(2024, 7, 20, 9, 30, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             UserId = new Guid("9d5e0ac1-4f1b-422b-b7f0-0f7d5d2dbbb1")
                         },
@@ -175,6 +183,7 @@ namespace GenomiX.Infrastructure.Migrations
                         {
                             Id = new Guid("44444444-0000-0000-0000-000000000003"),
                             CreatedAt = new DateTimeOffset(new DateTime(2024, 8, 25, 10, 45, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Name = "Untitled model",
                             UpdatedAt = new DateTimeOffset(new DateTime(2024, 8, 25, 10, 45, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             UserId = new Guid("58a7c2b5-1347-4f0a-b3ad-912d4f098aaa")
                         },
@@ -182,6 +191,7 @@ namespace GenomiX.Infrastructure.Migrations
                         {
                             Id = new Guid("44444444-0000-0000-0000-000000000004"),
                             CreatedAt = new DateTimeOffset(new DateTime(2024, 7, 20, 9, 5, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Name = "Untitled model",
                             UpdatedAt = new DateTimeOffset(new DateTime(2024, 7, 20, 9, 5, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             UserId = new Guid("a7f9a7d5-56f5-4f3f-8a9f-8c2f0d3d7001")
                         },
@@ -189,6 +199,7 @@ namespace GenomiX.Infrastructure.Migrations
                         {
                             Id = new Guid("44444444-0000-0000-0000-000000000005"),
                             CreatedAt = new DateTimeOffset(new DateTime(2024, 9, 10, 11, 20, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Name = "Untitled model",
                             UpdatedAt = new DateTimeOffset(new DateTime(2024, 9, 10, 11, 20, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             UserId = new Guid("c2b3d8ae-2b6d-4c41-9b8e-b1c2a3d4e005")
                         });
