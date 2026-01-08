@@ -40,12 +40,15 @@
                 <span class="gx-pill">Inspector</span>
             </div>
         </div>
+        
+        <button id="save-btn" type="button">Save model</button>
 
         <section id="dna-input-section" class="gx-hidden">
             <textarea id="sequence" class="gx-hidden" spellcheck="false"></textarea>
             <button id="import-btn" type="button" class="gx-hidden"></button>
             <button id="visualize-btn" type="button" class="gx-hidden"></button>
         </section>
+
 
         <section id="dna-visualizer-section" class="gx-dna__viewer">
             <div class="gx-dna__viewerbar">
@@ -67,18 +70,53 @@
 
     <script type="module">
         document.addEventListener("DOMContentLoaded", () => {
-          const mount = document.getElementById("dnaMount");
-          const s1 = mount?.dataset?.s1 ?? "";
-          const s2 = mount?.dataset?.s2 ?? "";
+            const mount = document.getElementById("dnaMount");
+            const s1 = mount?.dataset?.s1 ?? "";
+            const s2 = mount?.dataset?.s2 ?? "";
+            
+            const textarea = document.getElementById("sequence");
+            if (textarea) textarea.value = `${s1}\n${s2}`;
+            
+            const btn = document.getElementById("visualize-btn");
+            btn?.click();
+            
+            const mode = document.getElementById("basicMode");
+            mode?.dispatchEvent(new Event("change", { bubbles: true }));
 
-          const textarea = document.getElementById("sequence");
-          if (textarea) textarea.value = `${s1}\n${s2}`;
+            const saveBtn = document.getElementById("save-btn");
 
-          const btn = document.getElementById("visualize-btn");
-          btn?.click();
+            saveBtn?.addEventListener("click", () => {
+              if (!currentModel) {
+                const res = parseTextareaStrict(dnaSequenceInput.value);
+                if (!res.ok) { alert("Nothing to save yet."); return; }
+                currentModel = {
+                  version: 1,
+                  createdAt: new Date().toISOString(),
+                  updatedAt: new Date().toISOString(),
+                  s1: res.s1,
+                  s2: res.s2,
+                };
+              }
 
-          const mode = document.getElementById("basicMode");
-          mode?.dispatchEvent(new Event("change", { bubbles: true }));
+              const payload = {
+                app: "GenomiX",
+                type: "dna-model",
+                ...currentModel,
+              };
+
+              const json = JSON.stringify(payload, null, 2);
+              const blob = new Blob([json], { type: "application/json" });
+
+              const a = document.createElement("a");
+              const ts = new Date().toISOString().replace(/[:.]/g, "-");
+              a.href = URL.createObjectURL(blob);
+              a.download = `genomix-model-${ts}.json`;
+              document.body.appendChild(a);
+              a.click();
+              a.remove();
+
+              setTimeout(() => URL.revokeObjectURL(a.href), 250);
+            });
         });
     </script>
 

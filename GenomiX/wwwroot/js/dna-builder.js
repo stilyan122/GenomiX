@@ -8,6 +8,7 @@ import { OrbitControls } from "https://esm.sh/three@0.159.0/examples/jsm/control
 
 let lastS1 = null;
 let lastS2 = null;
+let currentModel = null;
 
 let ladderEl = null;
 let containerForLadder = null;
@@ -99,6 +100,22 @@ function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
 
     function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
 
+    function syncCurrentModel() {
+        const now = new Date().toISOString();
+
+        const s1Str = s1.join("");
+        const s2Str = s2.join("");
+
+        lastS1 = s1Str;
+        lastS2 = s2Str;
+
+        if (!currentModel) {
+            currentModel = { version: 1, createdAt: now, updatedAt: now, s1: s1Str, s2: s2Str };
+        } else {
+            currentModel = { ...currentModel, version: 1, updatedAt: now, s1: s1Str, s2: s2Str };
+        }
+    }
+
     function scheduleEditPopPosition(i) {
         if (!editPop || !editOpen) return;
         editIdx = i;
@@ -162,6 +179,8 @@ function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
             setPairDom(i);
             setMismatchDom(i);
         }
+
+        syncCurrentModel();
     }
 
     function mutateAt(i, strandNum, newBase) {
@@ -172,6 +191,7 @@ function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
 
         setPairDom(i);
         syncEditPopMeta(i);
+        syncCurrentModel();
         updateView();
         setMismatchDom(i);
     }
@@ -230,6 +250,13 @@ function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
 
     let s1 = strand1.split("");
     let s2 = strand2.split("");
+
+    const dnaSequenceInput = document.getElementById("sequence");
+
+    function syncTextarea() {
+        if (!dnaSequenceInput) return;
+        dnaSequenceInput.value = `${s1.join("")}\n${s2.join("")}`;
+    }
 
     function buildEditPop() {
         const pop = document.createElement("div");
@@ -743,6 +770,7 @@ function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
 
         reindexPairs(idx);
         setMismatchDom(idx);
+        syncCurrentModel();
     }
 
     function deletePairAt(idx) {
@@ -755,6 +783,7 @@ function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
         removed?.remove();
 
         reindexPairs(idx);
+        syncCurrentModel();
     }
 
     function measureStep() {
@@ -886,6 +915,7 @@ function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
     };
     window.addEventListener("keydown", onKeyDown);
 
+    syncCurrentModel();
     updateView();
 }
 
