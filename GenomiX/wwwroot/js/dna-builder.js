@@ -26,6 +26,49 @@ document.addEventListener("DOMContentLoaded", () => {
     const dnaVisualizerSection = document.getElementById("dna-visualizer-section");
     const modeBasic = document.getElementById("basicMode");
     const modeSci = document.getElementById("scientificMode");
+    const saveBtn = document.getElementById("save-btn");
+    const modelIdEl = document.getElementById("gx-model-id");
+    const tokenEl = document.querySelector('input[name="__RequestVerificationToken"]');
+
+    saveBtn?.addEventListener("click", async () => {
+        try {
+            const modelId = modelIdEl?.value;
+            const token = tokenEl?.value;
+
+            if (!modelId) { alert("Missing model id."); return; }
+
+            const s1 = currentModel?.s1 ?? lastS1 ?? "";
+            const s2 = currentModel?.s2 ?? lastS2 ?? "";
+
+            if (!s1 || !s2) { alert("Nothing to save."); return; }
+
+            saveBtn.disabled = true;
+            const old = saveBtn.textContent;
+            saveBtn.textContent = "Saving...";
+
+            const res = await fetch("/dna/builder/save", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "RequestVerificationToken": token || ""
+                },
+                body: JSON.stringify({ modelId, strand1: s1, strand2: s2 })
+            });
+
+            if (!res.ok) {
+                const msg = await res.text().catch(() => "");
+                throw new Error(msg || `Save failed (${res.status})`);
+            }
+
+            saveBtn.textContent = "Saved ✓";
+            setTimeout(() => (saveBtn.textContent = old), 900);
+        } catch (e) {
+            alert(e?.message || "Save failed.");
+            saveBtn.textContent = "Save model";
+        } finally {
+            saveBtn.disabled = false;
+        }
+    });
 
     importBtn?.addEventListener("click", () => {
         const input = document.createElement("input");
@@ -95,6 +138,42 @@ function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
     let editPop = null;
     let editOpen = false;
 
+    const undoStack = [];
+    const redoStack = [];
+    let replaying = false;
+
+    const undoBtn = document.getElementById("undo-btn");
+    const redoBtn = document.getElementById("redo-btn");
+
+    function syncUndoRedoUI() {
+        if (undoBtn) undoBtn.disabled = undoStack.length === 0;
+        if (redoBtn) redoBtn.disabled = redoStack.length === 0;
+    }
+
+    function uidOfIndex(i) {
+        return pairs[i]?.dataset?.uid ?? null;
+    }
+
+    function indexOfUid(uid) {
+        return pairs.findIndex(p => p.dataset.uid === uid);
+    }
+
+    function clearRedo() {
+        redoStack.length = 0;
+        syncUndoRedoUI();
+    }
+
+    function record(op) {
+        if (replaying) return;
+        undoStack.push(op);
+        clearRedo();
+        syncUndoRedoUI();
+    }
+
+    function refreshAllMismatch() {
+        for (let i = 0; i < pairs.length; i++) setMismatchDom(i);
+    }   
+
     let editIdx = 0;
     let posRAF1 = 0, posRAF2 = 0;
 
@@ -113,6 +192,126 @@ function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
             currentModel = { version: 1, createdAt: now, updatedAt: now, s1: s1Str, s2: s2Str };
         } else {
             currentModel = { ...currentModel, version: 1, updatedAt: now, s1: s1Str, s2: s2Str };
+        }
+
+        syncTextarea();
+    }
+
+    function applyMutationByUid(uid, strand, base) {
+        const i = indexOfUid(uid);
+        if (i < 0) return;
+        if (strand === 1) s1[i] = base;
+        else s2[i] = base;
+
+        setPairDom(i);
+        setMismatchDom(i);
+    }
+
+    function insertByOp(op) {
+        const idx = Math.max(0, Math.min(op.idx, pairs.length));
+        s1.splice(idx, 0, op.b1);
+        s2.splice(idx, 0, op.b2);
+
+        const pairEl = makePairEl(idx, op.uid);
+        pairs.splice(idx, 0, pairEl);
+        ladderEl.insertBefore(pairEl, ladderEl.children[idx] || null);
+        bindPairClick(pairEl);
+
+        reindexPairs(idx);
+        refreshAllMismatch();
+    }
+
+    function deleteByUid(uid) {
+        const idx = indexOfUid(uid);
+        if (idx < 0) return;
+        if (pairs.length <= 1) return;
+
+        s1.splice(idx, 1);
+        s2.splice(idx, 1);
+
+        const removed = pairs.splice(idx, 1)[0];
+        removed?.remove();
+
+        reindexPairs(idx);
+        refreshAllMismatch();
+    }
+
+    function moveByUid(uid, toIndex) {
+        const from = indexOfUid(uid);
+        if (from < 0) return;
+        const to = Math.max(0, Math.min(toIndex, pairs.length - 1));
+        if (from === to) return;
+
+        const b1 = s1.splice(from, 1)[0];
+        const b2 = s2.splice(from, 1)[0];
+        s1.splice(to, 0, b1);
+        s2.splice(to, 0, b2);
+
+        const el = pairs.splice(from, 1)[0];
+        pairs.splice(to, 0, el);
+
+        const refNode = ladderEl.children[to] || null;
+        ladderEl.insertBefore(el, refNode);
+
+        reindexPairs(Math.min(from, to));
+        refreshAllMismatch();
+    }
+
+    function undo() {
+        if (!undoStack.length) return;
+
+        const op = undoStack.pop();
+        replaying = true;
+
+        try {
+            if (op.type === "mutate") {
+                applyMutationByUid(op.uid, op.strand, op.from);
+            }
+            else if (op.type === "insert") {
+                deleteByUid(op.uid);
+            }
+            else if (op.type === "delete") {
+                insertByOp(op);
+            }
+            else if (op.type === "move") {
+                moveByUid(op.uid, op.from);
+            }
+
+            syncCurrentModel();
+            updateView();
+            redoStack.push(op);
+            syncUndoRedoUI();
+        } finally {
+            replaying = false;
+        }
+    }
+
+    function redo() {
+        if (!redoStack.length) return;
+
+        const op = redoStack.pop();
+        replaying = true;
+
+        try {
+            if (op.type === "mutate") {
+                applyMutationByUid(op.uid, op.strand, op.to);
+            }
+            else if (op.type === "insert") {
+                insertByOp(op);
+            }
+            else if (op.type === "delete") {
+                deleteByUid(op.uid);
+            }
+            else if (op.type === "move") {
+                moveByUid(op.uid, op.to);
+            }
+
+            syncCurrentModel();
+            updateView();
+            undoStack.push(op);
+            syncUndoRedoUI();
+        } finally {
+            replaying = false;
         }
     }
 
@@ -161,6 +360,8 @@ function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
         if (to < 0 || to >= pairs.length) return;
         if (from === to) return;
 
+        const uid = uidOfIndex(from);
+
         const b1 = s1.splice(from, 1)[0];
         const b2 = s2.splice(from, 1)[0];
         s1.splice(to, 0, b1);
@@ -174,17 +375,19 @@ function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
 
         const start = Math.min(from, to);
         reindexPairs(start);
-
-        for (let i = Math.max(0, start - 1); i <= Math.min(pairs.length - 1, start + 1); i++) {
-            setPairDom(i);
-            setMismatchDom(i);
-        }
-
+        refreshAllMismatch();
         syncCurrentModel();
+
+        record({ type: "move", uid, from, to });
     }
 
     function mutateAt(i, strandNum, newBase) {
         if (!COMP[newBase]) return;
+
+        const uid = uidOfIndex(i);
+        if (!uid) return;
+
+        const prev = (strandNum === 1) ? s1[i] : s2[i];
 
         if (strandNum === 1) s1[i] = newBase;
         else s2[i] = newBase;
@@ -194,6 +397,14 @@ function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
         syncCurrentModel();
         updateView();
         setMismatchDom(i);
+
+        record({
+            type: "mutate",
+            uid,
+            strand: strandNum,
+            from: prev,
+            to: newBase,
+        });
     }
 
     function positionEditPopAtPair(i) {
@@ -257,6 +468,16 @@ function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
         if (!dnaSequenceInput) return;
         dnaSequenceInput.value = `${s1.join("")}\n${s2.join("")}`;
     }
+
+    undoBtn?.addEventListener("click", () => {
+        closeEditPop();
+        undo();
+    });
+
+    redoBtn?.addEventListener("click", () => {
+        closeEditPop();
+        redo();
+    });
 
     function buildEditPop() {
         const pop = document.createElement("div");
@@ -678,6 +899,9 @@ function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
     for (let i = 0; i < strand1.length; i++) {
         const pair = document.createElement("div");
         pair.className = "base-pair";
+        pair.dataset.i = String(i);
+
+        pair.dataset.uid = crypto.randomUUID?.() ?? (String(Math.random()).slice(2) + "-" + Date.now() + "-" + i);
 
         const top = document.createElement("div");
         top.className = `base ${s1[i]}`;
@@ -689,8 +913,6 @@ function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
         bot.textContent = s2[i];
         bot.dataset.strand = "2";
 
-        pair.dataset.i = String(i);
-
         pair.appendChild(top);
         pair.appendChild(bot);
 
@@ -698,6 +920,7 @@ function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
         pairs.push(pair);
 
         setPairDom(i);
+        setMismatchDom(i);
     }
 
     let current = Math.floor(strand1.length / 2);
@@ -738,9 +961,11 @@ function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
         }
     }
 
-    function makePairEl(i) {
+    function makePairEl(i, uid) {
         const pair = document.createElement("div");
         pair.className = "base-pair";
+
+        pair.dataset.uid = uid ?? (crypto.randomUUID?.() ?? (String(Math.random()).slice(2) + "-" + Date.now()));
 
         const top = document.createElement("div");
         top.className = `base ${s1[i]}`;
@@ -754,7 +979,6 @@ function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
 
         pair.appendChild(top);
         pair.appendChild(bot);
-
         return pair;
     }
 
@@ -762,19 +986,26 @@ function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
         s1.splice(idx, 0, b1);
         s2.splice(idx, 0, b2);
 
-        const pairEl = makePairEl(idx);
-        pairs.splice(idx, 0, pairEl);
+        const uid = crypto.randomUUID?.() ?? String(Math.random()).slice(2) + Date.now();
+        const pairEl = makePairEl(idx, uid);
 
+        pairs.splice(idx, 0, pairEl);
         ladderEl.insertBefore(pairEl, ladderEl.children[idx] || null);
         bindPairClick(pairEl);
 
         reindexPairs(idx);
-        setMismatchDom(idx);
+        refreshAllMismatch();
         syncCurrentModel();
+
+        record({ type: "insert", uid, idx, b1, b2 });
     }
 
     function deletePairAt(idx) {
         if (pairs.length <= 1) return;
+
+        const uid = uidOfIndex(idx);
+        const b1 = s1[idx];
+        const b2 = s2[idx];
 
         s1.splice(idx, 1);
         s2.splice(idx, 1);
@@ -783,7 +1014,10 @@ function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
         removed?.remove();
 
         reindexPairs(idx);
+        refreshAllMismatch();
         syncCurrentModel();
+
+        record({ type: "delete", uid, idx, b1, b2 });
     }
 
     function measureStep() {
@@ -910,12 +1144,8 @@ function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
     };
     document.addEventListener("pointerdown", onPointerDown, { capture: true });
 
-    const onKeyDown = (e) => {
-        if (e.key === "Escape") closeEditPop();
-    };
-    window.addEventListener("keydown", onKeyDown);
-
     syncCurrentModel();
+    syncUndoRedoUI();
     updateView();
 }
 

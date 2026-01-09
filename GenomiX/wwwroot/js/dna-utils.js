@@ -56,18 +56,6 @@ export function generateComplement(strand) {
         .join("");
 }
 
-export function checkComplementarity(s1 = "", s2 = "") {
-    const n = Math.min(s1.length, s2.length);
-    for (let i = 0; i < n; i++) {
-        const exp = COMPLEMENT[s1[i]] || "";
-        const got = s2[i];
-        if (exp !== got) {
-            return { ok: false, firstMismatch: i, expected: exp, got };
-        }
-    }
-    return { ok: s1.length === s2.length };
-}
-
 export function parseTextareaStrict(text = "") {
     const lines = String(text || "")
         .split(/\r?\n/)
@@ -115,15 +103,6 @@ export function parseTextareaStrict(text = "") {
     if (L1.compact.length !== L2.compact.length) {
         return {
             ok: false, error: `Strands must have equal lengths. Got ${L1.compact.length} and ${L2.compact.length}.`
-        };
-    }
-
-    const comp = checkComplementarity(L1.compact, L2.compact);
-
-    if (!comp.ok) {
-        return {
-            ok: false,
-            error: `Strands are not complementary at position ${comp.firstMismatch + 1}. Expected ${comp.expected} (complement of ${L1.compact[comp.firstMismatch]}), got ${comp.got}.`
         };
     }
 
@@ -198,15 +177,6 @@ export function parseFileStrict(content = "") {
                 };
             }
 
-            const comp = checkComplementarity(n1.compact, n2.compact);
-
-            if (!comp.ok) {
-                return {
-                    ok: false,
-                    error: `JSON strands not complementary at position ${comp.firstMismatch + 1}. Expected ${comp.expected}, got ${comp.got}.`
-                };
-            }
-
             return {
                 ok: true, s1: n1.compact, s2: n2.compact
             };
@@ -255,20 +225,10 @@ export function parseFileStrict(content = "") {
         };
     }
 
-    const comp = checkComplementarity(L1.compact, L2.compact);
-    if (!comp.ok) {
-        return {
-            ok: false,
-            error: `File strands not complementary at position ${comp.firstMismatch + 1}. Expected ${comp.expected}, got ${comp.got}.`
-        };
-    }
-
     return {
         ok: true, s1: L1.compact, s2: L2.compact
     };
 }
-
-// FIX
 
 export function countBases(s = "") {
     const c = { A: 0, C: 0, G: 0, T: 0 };

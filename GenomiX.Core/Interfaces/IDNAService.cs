@@ -41,6 +41,11 @@ namespace GenomiX.Core.Interfaces
         Task<IReadOnlyList<DNAModel>> GetAllForUserAsync(Guid userId);
 
         /// <summary>
+        /// Update all model sequences.
+        /// </summary>
+        Task UpdateModelSequencesAsync(Guid userId, Guid modelId, string s1, string s2);
+
+        /// <summary>
         /// Retrieves one DNA model owned by a specific user, including its sequences.
         /// Used for "/dna/builder/{id}" to load the two strands.
         /// </summary>

@@ -1314,3 +1314,389 @@
   border-radius:12px;
   font-size:.9rem;
 }
+
+.gx-dna__vieweractions{
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.gx-action{
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,.12);
+  background: rgba(255,255,255,.06);
+  color: rgba(255,255,255,.92);
+  cursor: pointer;
+  user-select: none;
+  transition: transform .12s ease, background .12s ease, border-color .12s ease, opacity .12s ease;
+}
+
+.gx-action:hover{
+  background: rgba(255,255,255,.10);
+  border-color: rgba(255,255,255,.20);
+  transform: translateY(-1px);
+}
+
+.gx-action:active{
+  transform: translateY(0);
+}
+
+.gx-action:disabled{
+  opacity: .45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.gx-action__icon{
+  font-size: 18px;
+  line-height: 1;
+}
+
+.gx-action__text{
+  font-weight: 650;
+  font-size: 14px;
+  letter-spacing: .2px;
+}
+
+.gx-dna__viewerbar{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.gx-dna-page .gx-dna {
+    display: grid;
+    gap: 14px;
+}
+
+.gx-dna-page .gx-dna__header {
+    margin-bottom: 0 !important;
+    padding-bottom: 8px;
+    border-bottom: 1px solid color-mix(in srgb, var(--stroke) 40%, transparent);
+}
+
+.gx-dna-page .gx-dna__title {
+    margin-top: 8px;
+    line-height: 1.06;
+}
+
+.gx-dna-page .gx-dna__subtitle {
+    margin-top: 8px;
+    max-width: none;
+}
+
+.gx-dna-page .gx-dna__topbar {
+    margin: 0 !important;
+    padding: 10px 12px;
+    border-radius: 16px;
+    border: 1px solid color-mix(in srgb, var(--stroke) 55%, transparent);
+    background: linear-gradient(180deg, rgba(255,255,255,0.028), rgba(255,255,255,0.012));
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.gx-dna-page .gx-dna__modes {
+    gap: 10px;
+}
+
+.gx-dna-page .gx-dna__hintbar {
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.gx-dna-page .gx-pill {
+    height: 32px;
+    padding: 0 12px;
+    font-size: .84rem;
+    opacity: .92;
+}
+
+.gx-dna-page #save-btn {
+    justify-self: start;
+    margin: 6px 0 2px;
+}
+
+.gx-dna-page .gx-dna__viewer {
+    padding: 12px;
+    border-radius: 18px;
+    border: 1px solid color-mix(in srgb, var(--stroke) 65%, transparent);
+    background: linear-gradient(180deg, rgba(255,255,255,0.028), rgba(255,255,255,0.012));
+    box-shadow: 0 26px 70px rgba(0,0,0,.28);
+}
+
+.gx-dna-page .gx-dna__viewerbar {
+    margin-bottom: 12px !important;
+    padding: 10px 10px;
+    border-radius: 16px;
+    border: 1px solid color-mix(in srgb, var(--stroke) 55%, transparent);
+    background: rgba(0,0,0,.10);
+    gap: 12px;
+}
+
+.gx-dna-page .gx-dna__viewerhint {
+    flex: 1;
+    text-align: center;
+    font-weight: 650;
+    font-size: .92rem;
+    opacity: .9;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.gx-dna-page .gx-dna__viewerbar .btn.btn--lg {
+    padding: 10px 14px;
+    border-radius: 14px;
+}
+
+.gx-dna-page .gx-dna__vieweractions {
+    gap: 8px;
+}
+
+.gx-dna-page .gx-action {
+    padding: 9px 12px;
+    border-radius: 14px;
+}
+
+.gx-dna-page .gx-action__icon {
+    font-size: 16px;
+}
+
+.gx-dna-page .gx-action__text {
+    font-size: 13px;
+}
+
+.gx-dna-page #dna-visual.gx-dna__canvas {
+    min-height: 520px !important;
+    border-radius: 18px !important;
+    padding: 12px !important;
+    border: 1px solid color-mix(in srgb, var(--stroke) 65%, transparent) !important;
+    box-shadow: 0 30px 80px rgba(0,0,0,.34) !important;
+}
+
+.gx-dna-page #dna-visual .dna-nav {
+    width: 44px;
+    height: 44px;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.14);
+    backdrop-filter: blur(8px);
+}
+
+.gx-dna-page #dna-visual .dna-nav:hover {
+    background: rgba(255,255,255,0.18);
+    transform: translateY(-50%) scale(1.08);
+}
+
+.gx-dna-page #dna-visual .progress-container {
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(760px, 82%);
+    bottom: 18px;
+}
+
+@media (max-width: 820px) {
+    .gx-dna-page .gx-dna__topbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .gx-dna-page .gx-dna__hintbar {
+        justify-content: flex-start;
+    }
+}
+
+.gx-dna-page .gx-dna__viewerbar{
+  display: grid !important;
+  grid-template-columns: auto auto 1fr auto;
+  align-items: center;
+  gap: 12px;
+}
+
+.gx-dna-page .gx-dna__viewerhint{
+  justify-self: center;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.gx-dna-page .gx-btn{
+  appearance: none;
+  border: 1px solid rgba(120,180,255,.35);
+  background:
+    linear-gradient(180deg,
+      rgba(80,140,255,.35),
+      rgba(40,90,200,.35)
+    );
+  color: #eaf2ff;
+  font-weight: 650;
+  padding: 10px 16px;
+  border-radius: 14px;
+  cursor: pointer;
+  box-shadow:
+    0 10px 30px rgba(40,90,200,.25),
+    inset 0 1px 0 rgba(255,255,255,.15);
+  backdrop-filter: blur(6px);
+  transition:
+    transform .18s cubic-bezier(.22,1,.36,1),
+    box-shadow .18s ease,
+    background .18s ease,
+    border-color .18s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  user-select: none;
+}
+
+.gx-dna-page .gx-btn:hover{
+  transform: translateY(-1px);
+  box-shadow:
+    0 14px 40px rgba(80,140,255,.35),
+    inset 0 1px 0 rgba(255,255,255,.25);
+  background:
+    linear-gradient(180deg,
+      rgba(100,160,255,.45),
+      rgba(60,110,220,.45)
+    );
+}
+
+.gx-dna-page .gx-btn:active{
+  transform: translateY(0);
+  box-shadow:
+    0 8px 20px rgba(40,90,200,.25),
+    inset 0 2px 6px rgba(0,0,0,.25);
+}
+
+.gx-dna-page .gx-btn:focus-visible{
+  outline: none;
+  box-shadow:
+    0 0 0 2px rgba(120,180,255,.45),
+    0 14px 40px rgba(80,140,255,.35);
+}
+
+.gx-dna-page .gx-btn:disabled{
+  opacity: .45;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow:
+    0 8px 20px rgba(40,90,200,.18),
+    inset 0 1px 0 rgba(255,255,255,.10);
+}
+
+.gx-dna-page .gx-action{
+  all: unset;
+}
+
+.gx-dna-page .gx-action__icon{
+  font-size: 16px;
+  line-height: 1;
+}
+.gx-dna-page .gx-action__text{
+  font-size: 14px;
+  letter-spacing: .2px;
+}
+
+.gx-dna-page .gx-dna__vieweractions{
+  display: inline-flex;
+  gap: 10px;
+  justify-self: end;
+}
+
+@media (max-width: 780px){
+  .gx-dna-page .gx-dna__viewerbar{
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      "exit save"
+      "hint hint"
+      "actions actions";
+  }
+
+  .gx-dna-page .gx-dna__viewerbar a.btn{ grid-area: exit; justify-self: start; }
+  .gx-dna-page #save-btn{ grid-area: save; justify-self: end; }
+  .gx-dna-page .gx-dna__viewerhint{ grid-area: hint; justify-self: center; }
+  .gx-dna-page .gx-dna__vieweractions{ grid-area: actions; justify-self: center; }
+}
+
+.gx-dna-page .gx-dna__viewerbar .gx-btn,
+.gx-dna-page .gx-dna__viewerbar #save-btn,
+.gx-dna-page .gx-dna__viewerbar #undo-btn,
+.gx-dna-page .gx-dna__viewerbar #redo-btn {
+    appearance: none !important;
+    border: 1px solid rgba(120,180,255,.35) !important;
+    background: linear-gradient(180deg, rgba(80,140,255,.35), rgba(40,90,200,.35) ) !important;
+    color: #eaf2ff !important;
+    font-weight: 650 !important;
+    padding: 10px 16px !important;
+    border-radius: 14px !important;
+    cursor: pointer !important;
+    box-shadow: 0 10px 30px rgba(40,90,200,.25), inset 0 1px 0 rgba(255,255,255,.15) !important;
+    backdrop-filter: blur(6px) !important;
+    transition: transform .18s cubic-bezier(.22,1,.36,1), box-shadow .18s ease, background .18s ease, border-color .18s ease !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    text-decoration: none !important; 
+    user-select: none !important;
+}
+
+.gx-dna-page .gx-dna__viewerbar .gx-btn:hover,
+.gx-dna-page .gx-dna__viewerbar #save-btn:hover,
+.gx-dna-page .gx-dna__viewerbar #undo-btn:hover,
+.gx-dna-page .gx-dna__viewerbar #redo-btn:hover{
+  transform: translateY(-1px) !important;
+  box-shadow:
+    0 14px 40px rgba(80,140,255,.35),
+    inset 0 1px 0 rgba(255,255,255,.25) !important;
+  background:
+    linear-gradient(180deg,
+      rgba(100,160,255,.45),
+      rgba(60,110,220,.45)
+    ) !important;
+}
+
+.gx-dna-page .gx-dna__viewerbar .gx-btn:active,
+.gx-dna-page .gx-dna__viewerbar #save-btn:active,
+.gx-dna-page .gx-dna__viewerbar #undo-btn:active,
+.gx-dna-page .gx-dna__viewerbar #redo-btn:active{
+  transform: translateY(0) !important;
+  box-shadow:
+    0 8px 20px rgba(40,90,200,.25),
+    inset 0 2px 6px rgba(0,0,0,.25) !important;
+}
+
+.gx-dna-page .gx-dna__viewerbar .gx-btn:focus-visible,
+.gx-dna-page .gx-dna__viewerbar #save-btn:focus-visible,
+.gx-dna-page .gx-dna__viewerbar #undo-btn:focus-visible,
+.gx-dna-page .gx-dna__viewerbar #redo-btn:focus-visible{
+  outline:none !important;
+  box-shadow:
+    0 0 0 2px rgba(120,180,255,.45),
+    0 14px 40px rgba(80,140,255,.35) !important;
+}
+
+.gx-dna-page .gx-dna__viewerbar button.gx-btn:disabled,
+.gx-dna-page .gx-dna__viewerbar #undo-btn:disabled,
+.gx-dna-page .gx-dna__viewerbar #redo-btn:disabled{
+  opacity:.45 !important;
+  cursor:not-allowed !important;
+  transform:none !important;
+}
+
+.gx-dna-page .gx-dna__viewerbar .gx-action{
+  all: unset !important;
+}
+.gx-dna-page .gx-dna__viewerbar .gx-action__icon{
+  font-size:16px !important;
+  line-height:1 !important;
+}
+.gx-dna-page .gx-dna__viewerbar .gx-action__text{
+  font-size:14px !important;
+  letter-spacing:.2px !important;
+}

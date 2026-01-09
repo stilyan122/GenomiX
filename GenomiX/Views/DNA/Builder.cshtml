@@ -40,8 +40,6 @@
                 <span class="gx-pill">Inspector</span>
             </div>
         </div>
-        
-        <button id="save-btn" type="button">Save model</button>
 
         <section id="dna-input-section" class="gx-hidden">
             <textarea id="sequence" class="gx-hidden" spellcheck="false"></textarea>
@@ -52,15 +50,37 @@
 
         <section id="dna-visualizer-section" class="gx-dna__viewer">
             <div class="gx-dna__viewerbar">
-                <a class="btn ghost btn--lg" href="/dna/models">Exit</a>
-                <div class="gx-dna__viewerhint">Use ⟨ ⟩ to move base, click the progress bar to jump.</div>
+                <a class="gx-btn gx-btn--primary" href="/dna/models">Exit</a>
+
+                <button id="save-btn" type="button" class="gx-btn gx-btn--primary">
+                    Save model
+                </button>
+
+                <div class="gx-dna__viewerhint">
+                    Use ⟨ ⟩ to move base, click the progress bar to jump.
+                </div>
+
+                <div class="gx-dna__vieweractions">
+                    <button id="undo-btn" class="gx-btn gx-btn--primary" type="button" aria-label="Undo" title="Undo">
+                        <span class="gx-action__icon">↶</span>
+                        <span class="gx-action__text">Undo</span>
+                    </button>
+
+                    <button id="redo-btn" class="gx-btn gx-btn--primary" type="button" aria-label="Redo" title="Redo">
+                        <span class="gx-action__icon">↷</span>
+                        <span class="gx-action__text">Redo</span>
+                    </button>
+                </div>
             </div>
 
-            <div id="dnaMount"
-                 data-s1="@Model.Strand1"
-                 data-s2="@Model.Strand2"></div>
+          <div id="dnaMount"
+               data-s1="@Model.Strand1"
+               data-s2="@Model.Strand2">
+          </div>
 
-            <div id="dna-visual" class="gx-dna__canvas"></div>
+          <input type="hidden" id="gx-model-id" value="@Model.ModelId" />
+
+          <div id="dna-visual" class="gx-dna__canvas"></div>
         </section>
     </div>
 </section>
@@ -82,42 +102,6 @@
             
             const mode = document.getElementById("basicMode");
             mode?.dispatchEvent(new Event("change", { bubbles: true }));
-
-            const saveBtn = document.getElementById("save-btn");
-
-            saveBtn?.addEventListener("click", () => {
-              if (!currentModel) {
-                const res = parseTextareaStrict(dnaSequenceInput.value);
-                if (!res.ok) { alert("Nothing to save yet."); return; }
-                currentModel = {
-                  version: 1,
-                  createdAt: new Date().toISOString(),
-                  updatedAt: new Date().toISOString(),
-                  s1: res.s1,
-                  s2: res.s2,
-                };
-              }
-
-              const payload = {
-                app: "GenomiX",
-                type: "dna-model",
-                ...currentModel,
-              };
-
-              const json = JSON.stringify(payload, null, 2);
-              const blob = new Blob([json], { type: "application/json" });
-
-              const a = document.createElement("a");
-              const ts = new Date().toISOString().replace(/[:.]/g, "-");
-              a.href = URL.createObjectURL(blob);
-              a.download = `genomix-model-${ts}.json`;
-              document.body.appendChild(a);
-              a.click();
-              a.remove();
-
-              setTimeout(() => URL.revokeObjectURL(a.href), 250);
-            });
         });
     </script>
-
 }

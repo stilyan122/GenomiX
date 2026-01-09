@@ -73,5 +73,28 @@ namespace GenomiX.Core.Services
                 .Include(m => m.Sequences)
                 .FirstOrDefaultAsync();
         }
+
+        /// <inheritdoc />
+        public async Task UpdateModelSequencesAsync(Guid userId, Guid modelId, string s1, string s2)
+        {
+            var model = await _repository.
+                GetAll()
+                .Include(m => m.Sequences)
+                .FirstOrDefaultAsync(m => m.Id == modelId && m.UserId == userId);
+
+            if (model == null) throw new InvalidOperationException("Model not found.");
+
+            var seq1 = model.Sequences.FirstOrDefault(x => x.Strand == 1);
+            var seq2 = model.Sequences.FirstOrDefault(x => x.Strand == 2);
+
+            if (seq1 == null || seq2 == null) throw new InvalidOperationException("Sequences missing.");
+
+            seq1.Sequence = s1;
+            seq2.Sequence = s2;
+
+            model.UpdatedAt = DateTimeOffset.UtcNow;
+
+            await _repository.UpdateAsync(model);
+        }
     }
 }

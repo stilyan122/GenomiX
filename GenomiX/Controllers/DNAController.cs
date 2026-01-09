@@ -209,6 +209,29 @@ namespace GenomiX.Controllers
             return RedirectToAction(nameof(Builder), new { id = model.Id });
         }
 
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("/dna/builder/save")]
+        public async Task<IActionResult> SaveBuilder([FromBody] SaveModelRequest req)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Challenge();
+
+            if (req.ModelId == Guid.Empty) return BadRequest("Missing model id.");
+            var s1 = Normalize(req.Strand1);
+            var s2 = Normalize(req.Strand2);
+
+            if (s1.Length == 0 || s2.Length == 0) return BadRequest("Empty strands.");
+            if (s1.Length != s2.Length) return BadRequest("Strands must have equal length.");
+
+            bool IsValid(string s) => s.All(ch => ch is 'A' or 'C' or 'G' or 'T');
+            if (!IsValid(s1) || !IsValid(s2)) return BadRequest("Invalid characters. Allowed: A,C,G,T.");;
+
+            await _DNAService.UpdateModelSequencesAsync(user.Id, req.ModelId, s1, s2);
+            return Ok(new { ok = true });
+        }
+
         private static (bool Ok, string Error, string S1, string S2) ParseStrictServer(string raw)
         {
             var lines = (raw ?? "")
