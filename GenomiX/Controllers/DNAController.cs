@@ -34,7 +34,9 @@ namespace GenomiX.Controllers
         public async Task<IActionResult> Models()
         {
             var user = await _userManager.GetUserAsync(User);
-            if (user == null) return Challenge();
+
+            if (user == null) 
+                return Challenge();
 
             var models = await _DNAService.GetAllForUserAsync(user.Id);
 
@@ -54,10 +56,14 @@ namespace GenomiX.Controllers
         public async Task<IActionResult> Builder(Guid id)
         {
             var user = await _userManager.GetUserAsync(User);
-            if (user == null) return Challenge();
+
+            if (user == null) 
+                return Challenge();
 
             var model = await _DNAService.GetModelForUserWithSequencesAsync(user.Id, id);
-            if (model == null) return NotFound();
+
+            if (model == null) 
+                return NotFound();
 
             var s1 = model.Sequences.FirstOrDefault(x => x.Strand == 1)?.Sequence ?? "";
             var s2 = model.Sequences.FirstOrDefault(x => x.Strand == 2)?.Sequence ?? "";
@@ -96,13 +102,19 @@ namespace GenomiX.Controllers
         public async Task<IActionResult> CreateFromReference(Guid referenceId, CreateCustomModelInputModel input)
         {
             var name = (input.Name ?? "").Trim();
-            if (name.Length == 0) return BadRequest("Name is required.");
+
+            if (name.Length == 0) 
+                return BadRequest("Name is required.");
 
             var user = await _userManager.GetUserAsync(User);
-            if (user == null) return Challenge();
+
+            if (user == null) 
+                return Challenge();
 
             var reference = await _sequenceService.GetReferenceSequenceByIdAsync(referenceId);
-            if (reference == null) return NotFound();
+
+            if (reference == null) 
+                return NotFound();
 
             var now = DateTimeOffset.UtcNow;
 
@@ -159,6 +171,7 @@ namespace GenomiX.Controllers
             }
 
             var name = (input.Name ?? "").Trim();
+
             if (name.Length == 0)
                 return BadRequest("Name is required.");
 
@@ -216,17 +229,26 @@ namespace GenomiX.Controllers
         public async Task<IActionResult> SaveBuilder([FromBody] SaveModelRequest req)
         {
             var user = await _userManager.GetUserAsync(User);
-            if (user == null) return Challenge();
 
-            if (req.ModelId == Guid.Empty) return BadRequest("Missing model id.");
+            if (user == null) 
+                return Challenge();
+
+            if (req.ModelId == Guid.Empty) 
+                return BadRequest("Missing model id.");
+
             var s1 = Normalize(req.Strand1);
             var s2 = Normalize(req.Strand2);
 
-            if (s1.Length == 0 || s2.Length == 0) return BadRequest("Empty strands.");
-            if (s1.Length != s2.Length) return BadRequest("Strands must have equal length.");
+            if (s1.Length == 0 || s2.Length == 0) 
+                return BadRequest("Empty strands.");
+
+            if (s1.Length != s2.Length) 
+                return BadRequest("Strands must have equal length.");
 
             bool IsValid(string s) => s.All(ch => ch is 'A' or 'C' or 'G' or 'T');
-            if (!IsValid(s1) || !IsValid(s2)) return BadRequest("Invalid characters. Allowed: A,C,G,T.");;
+
+            if (!IsValid(s1) || !IsValid(s2)) 
+                return BadRequest("Invalid characters. Allowed: A,C,G,T.");;
 
             await _DNAService.UpdateModelSequencesAsync(user.Id, req.ModelId, s1, s2);
             return Ok(new { ok = true });
@@ -240,13 +262,18 @@ namespace GenomiX.Controllers
                 .Where(l => l.Length > 0)
                 .ToList();
 
-            if (lines.Count == 0) return (false, "No sequence provided.", "", "");
-            if (lines.Count > 2) return (false, "Provide one strand or two strands on two lines.", "", "");
+            if (lines.Count == 0) 
+                return (false, "No sequence provided.", "", "");
+
+            if (lines.Count > 2) 
+                return (false, "Provide one strand or two strands on two lines.", "", "");
 
             bool IsValid(string s) => s.All(ch => ch is 'A' or 'C' or 'G' or 'T');          
 
             var s1 = Normalize(lines[0]);
-            if (!IsValid(s1)) return (false, "Invalid characters in strand 1. Allowed: A, C, G, T.", "", "");
+
+            if (!IsValid(s1)) 
+                return (false, "Invalid characters in strand 1. Allowed: A, C, G, T.", "", "");
 
             if (lines.Count == 1)
                 return (true, "", s1, Complement(s1));
@@ -254,12 +281,17 @@ namespace GenomiX.Controllers
             char ComplementBase(char b) => b switch { 'A' => 'T', 'T' => 'A', 'C' => 'G', 'G' => 'C', _ => '?' };
 
             var s2 = Normalize(lines[1]);
-            if (!IsValid(s2)) return (false, "Invalid characters in strand 2. Allowed: A, C, G, T.", "", "");
-            if (s1.Length != s2.Length) return (false, $"Strands must have equal lengths. Got {s1.Length} and {s2.Length}.", "", "");
+
+            if (!IsValid(s2)) 
+                return (false, "Invalid characters in strand 2. Allowed: A, C, G, T.", "", "");
+
+            if (s1.Length != s2.Length) 
+                return (false, $"Strands must have equal lengths. Got {s1.Length} and {s2.Length}.", "", "");
 
             for (int i = 0; i < s1.Length; i++)
             {
                 var expected = Complement(s1[i].ToString())[0];
+
                 if (s2[i] != ComplementBase(s1[i]))
                     return (false, $"Strands are not complementary at position {i + 1}.", "", "");
             }
@@ -270,12 +302,14 @@ namespace GenomiX.Controllers
         private static string Normalize(string s)
         {
             var raw = (s ?? "").Trim().ToUpperInvariant();
+
             return new string(raw.Where(c => !char.IsWhiteSpace(c)).ToArray());
         }
 
         private static string Complement(string s)
         {
             var arr = s.ToCharArray();
+
             for (int i = 0; i < arr.Length; i++)
             {
                 arr[i] = arr[i] switch

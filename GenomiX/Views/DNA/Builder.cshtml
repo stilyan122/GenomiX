@@ -56,6 +56,10 @@
                     Save model
                 </button>
 
+                <button id="history-btn" class="gx-btn gx-btn--primary" type="button">
+                    History
+                </button>
+
                 <div class="gx-dna__viewerhint">
                     Use ⟨ ⟩ to move base, click the progress bar to jump.
                 </div>
@@ -86,7 +90,7 @@
 </section>
 
 @section Scripts {
-    <script type="module" src="~/js/dna-builder.js" asp-append-version="true"></script>
+    <script type="module" src="~/js/dna/dna-page.js" asp-append-version="true"></script>
 
     <script type="module">
         document.addEventListener("DOMContentLoaded", () => {
