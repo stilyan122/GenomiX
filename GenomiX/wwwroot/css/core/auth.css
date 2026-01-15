@@ -867,6 +867,19 @@ form#loginForm {
   color: #ffd1d1;
 }
 
+select.auth-input{
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  padding-right: 44px;
+  cursor: pointer;
+
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02)),
+    radial-gradient(12px 12px at calc(100% - 18px) 50%, rgba(255,255,255,.08), transparent 70%);
+}
+
 select.auth-input::-ms-expand { display: none; } 
 
 select.auth-input{

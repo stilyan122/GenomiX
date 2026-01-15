@@ -1,7 +1,7 @@
 ﻿export function createEditPopController({
     getPairEl, getBases, getCurrentIndex, setCurrentIndex, getSelectedStrand,      
     setSelectedStrand, setSelectedBaseEl, positionAtIndex, updateView,             
-    mutateAt, insertPairAt, deletePairAt, movePair,               
+    mutateAt, insertPairAt, deletePairAt, movePair, repairAt           
 }) {
     let pop = null;
     let open = false;
@@ -13,6 +13,7 @@
     let mutBox = null;
     let moveBox = null;
     let pickHint = null;
+    let repairBtn = null;
 
     function ensure() {
         if (pop) return pop;
@@ -36,6 +37,8 @@
             <button class="gx-editpop__pill" type="button" data-act="insert">Insert</button>
             <button class="gx-editpop__pill" type="button" data-act="delete">Delete</button>
             <button class="gx-editpop__pill" type="button" data-act="move">Move</button>
+            <button class="gx-editpop__pill gx-editpop__pill--repair is-hidden"
+                type="button" data-act="repair">Repair</button>
           </div>
 
           <div class="gx-mutate is-hidden" data-role="mutbox">
@@ -112,6 +115,15 @@
             if (mutBox?.classList.contains("is-open")) closePicker();
             else openPicker();
         });
+
+        repairBtn = pop.querySelector('[data-act="repair"]');
+
+        repairBtn?.addEventListener("click", () => {
+            const idx = getCurrentIndex();
+            repairAt?.(idx);     
+            updateView();
+        });
+
 
         pop.querySelector('[data-act="delete"]')?.addEventListener("click", () => {
             const idx = getCurrentIndex();
@@ -200,6 +212,10 @@
 
         const mismatch = (COMP[b1] || "") !== b2;
         if (badge) badge.hidden = !mismatch;
+
+        if (repairBtn) {
+            repairBtn.classList.toggle("is-hidden", !mismatch);
+        }
     }
 
     function openAt(i, strandClicked = 1) {

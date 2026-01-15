@@ -1,6 +1,9 @@
-﻿@import url("./dna-predef.css");
 @import url("./dna-core.css");
+@import url("./dna-ladder.css");
 @import url("./dna-editpop.css");
 @import url("./dna-history.css");
-@import url("./dna-science.css");
-@import url("./dna-misc.css");
+@import url("./dna-science-panel.css");
+@import url("./dna-helix3d.css");
+@import url("./dna-animations.css");
+@import url("./dna-responsive.css");
+@import url("./dna-nanobot.css");

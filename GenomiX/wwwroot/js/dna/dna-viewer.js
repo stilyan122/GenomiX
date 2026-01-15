@@ -2,6 +2,7 @@
 import { mountHelix3D } from "./dna-helix3d.js";
 import { createHistoryController } from "./dna-history.js";
 import { createEditPopController } from "./dna-editpop.js";
+import { createNanobotCinematicRepair } from "./dna-nanobot.js";
 
 let gxHistoryIdSeed = 0;
 
@@ -51,6 +52,15 @@ export function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
 
     const undoBtn = document.getElementById("undo-btn");
     const redoBtn = document.getElementById("redo-btn");
+
+    const nanobot = createNanobotCinematicRepair({
+        getPairEl: (i) => pairs[i],
+        isMismatch: (i) => (COMP[s1[i]] || "") !== s2[i],
+        repairAt,
+        focusIndex: (i) => { current = i; updateView(); },
+        getCurrentIndex: () => current,
+        setCurrentIndex: (i) => { current = i; }
+    });
 
     function clamp(v, min, max)
     {
@@ -134,6 +144,20 @@ export function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
         const b1 = s1[i], b2 = s2[i];
         const mismatch = (COMP[b1] || "") !== b2;
         pair.classList.toggle("is-mismatch", mismatch);
+    }
+
+    function animateBaseSwap(i, strandNum) {
+        const pair = pairs[i];
+        if (!pair) return;
+
+        const baseEl = pair.querySelector(`.base[data-strand="${strandNum}"]`);
+        if (!baseEl) return;
+
+        baseEl.classList.remove("gx-swap");
+        void baseEl.offsetWidth;
+        baseEl.classList.add("gx-swap");
+
+        setTimeout(() => baseEl.classList.remove("gx-swap"), 420);
     }
 
     function refreshAllMismatch() {
@@ -373,6 +397,46 @@ export function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
         record({ type: "move", uid, from, to, index: to });
     }
 
+    function repairAt(i, { silent = false } = {}) {
+        if (i < 0 || i >= pairs.length) return;
+
+        const b1 = s1[i];
+        const b2 = s2[i];
+
+        const want2 = COMP[b1];
+        const want1 = COMP[b2];
+
+        if (want2 === b2) return;
+
+        if (want2) {
+            const uid = uidOfIndex(i);
+            const prev = s2[i];
+            s2[i] = want2;
+
+            setPairDom(i);
+            setMismatchDom(i);
+            animateBaseSwap(i, 2);
+            syncCurrentModel();
+            updateView();
+
+            if (!silent) record({ type: "mutate", uid, index: i, strand: 2, from: prev, to: want2, reason: "repair" });
+            return;
+        }
+
+        if (want1) {
+            const uid = uidOfIndex(i);
+            const prev = s1[i];
+            s1[i] = want1;
+
+            setPairDom(i);
+            setMismatchDom(i);
+            animateBaseSwap(i, 1);
+            syncCurrentModel();
+            updateView();
+
+            if (!silent) record({ type: "mutate", uid, index: i, strand: 1, from: prev, to: want1, reason: "repair" });
+        }
+    }
     function buildCommonOverlay(targetMount) {
         const overlay = document.createElement("div");
         overlay.className = "dna-overlay";
@@ -408,6 +472,25 @@ export function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
 
         return { overlay, progCont, prevBtn, nextBtn };
     }
+
+    const repairAllBtn = document.getElementById("repair-dna-btn");
+
+    function updateRepairAllButton() {
+        if (!repairAllBtn) return;
+        let count = 0;
+        for (let i = 0; i < pairs.length; i++) {
+            const b1 = s1[i], b2 = s2[i];
+            if ((COMP[b1] || "") !== b2) count++;
+        }
+        repairAllBtn.disabled = count === 0;
+        repairAllBtn.textContent = count ? `Repair DNA (${count})` : "Repair DNA";
+    }
+
+    repairAllBtn.addEventListener("click", async () => {
+        closeEditPop();
+        await nanobot.run();
+        updateView();
+    });
 
     let overlayRefs = null;
 
@@ -671,6 +754,7 @@ export function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
         insertPairAt,
         deletePairAt,
         movePair,
+        repairAt
     });
 
     function closeEditPop() { edit.close(); }
@@ -770,6 +854,8 @@ export function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
             edit.syncMeta(current);
             scheduleEditPopPosition(current);
         }
+
+        updateRepairAllButton();
     }
 
     function afterLadderSettles(glideMs, cb) {
@@ -845,6 +931,10 @@ export function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
         edit.dispose();
 
         history.dispose();
+
+        if (nanobot ?? false) {
+            nanobot?.dispose();
+        }
 
         disposeTabs?.();
         threeApi?.dispose?.();

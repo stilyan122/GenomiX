@@ -85,36 +85,16 @@
 }
 
 .gx-hitem--undoable{ }
+
 .gx-hitem--redoable{ opacity: .55; }
 
 .gx-hitem--mutate .gx-hitem__tag{ background: rgba(120,160,255,.14); border-color: rgba(120,160,255,.22); }
+
 .gx-hitem--insert .gx-hitem__tag{ background: rgba(75,255,136,.14); border-color: rgba(75,255,136,.22); }
+
 .gx-hitem--delete .gx-hitem__tag{ background: rgba(255,80,80,.14); border-color: rgba(255,80,80,.22); }
+
 .gx-hitem--move   .gx-hitem__tag{ background: rgba(255,213,75,.14); border-color: rgba(255,213,75,.22); }
-
-
-.gx-hdock{
-  position: relative;
-  border: 1px solid rgba(255,255,255,0.08);
-  background: rgba(10,12,18,0.55);
-  backdrop-filter: blur(10px);
-  border-radius: 16px;
-  overflow: hidden;
-  min-width: 260px;
-}
-
-.mode--sci .gx-hdock{
-  margin-top: 12px;
-}
-
-#dna-visual:not(.mode--sci) .gx-hdock{
-  position: fixed;
-  right: 18px;
-  bottom: 18px;
-  width: 320px;
-  max-height: 52vh;
-  z-index: 50;
-}
 
 .gx-hpop{
   width: min(460px, calc(100vw - 24px));
@@ -137,14 +117,18 @@
   padding: 12px 14px;
   border-bottom: 1px solid rgba(255,255,255,0.08);
 }
+
 .gx-hpop__title{ font-weight: 800; }
+
 .gx-hpop__meta{ margin-left:auto; opacity:.75; font-size:.9rem; }
+
 .gx-hpop__x{
   border:0; background:transparent; color:inherit;
   font-size: 22px; line-height: 1;
   opacity:.75; cursor:pointer;
   padding: 4px 8px; border-radius: 10px;
 }
+
 .gx-hpop__x:hover{ opacity:1; background: rgba(255,255,255,0.06); }
 
 .gx-hpop__sub{

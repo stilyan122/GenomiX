@@ -1,0 +1,44 @@
+@keyframes gxSelectedPulse{
+  0%,100%{ transform: translateY(0) scale(1); }
+  50%{ transform: translateY(-3px) scale(1.2); }
+}
+
+@keyframes gxMismatchJitter {
+    0%,92%,100% {
+        transform: translateZ(0);
+    }
+
+    94% {
+        transform: translateX(-1px);
+    }
+
+    96% {
+        transform: translateX(1px);
+    }
+
+    98% {
+        transform: translateX(0);
+    }
+}
+
+@keyframes gxMismatchPulse {
+    0%,100% {
+        transform: translateZ(0);
+        filter: saturate(1);
+    }
+
+    50% {
+        transform: translateY(-5px);
+        filter: saturate(1.15);
+    }
+}
+
+@keyframes gx-soft-breathe {
+    0%, 100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-1px);
+    }
+}

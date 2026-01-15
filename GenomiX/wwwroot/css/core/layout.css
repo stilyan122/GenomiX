@@ -1,4 +1,4 @@
-.wrap {
+﻿.wrap {
     position: sticky;
     top: 0;
     z-index: 9999;
@@ -95,6 +95,11 @@
     align-items: center;
     gap: 18px;
     margin: 0 auto;
+}
+
+.site-footer{
+   padding: 16px 0 28px;
+  margin-top: 14px;
 }
 
 .home-cta-strip {
