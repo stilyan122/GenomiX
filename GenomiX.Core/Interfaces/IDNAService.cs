@@ -53,5 +53,22 @@ namespace GenomiX.Core.Interfaces
         /// <param name="modelId">The DNA model identifier.</param>
         /// <returns>The model with sequences if found and owned by the user; otherwise null.</returns>
         Task<DNAModel?> GetModelForUserWithSequencesAsync(Guid userId, Guid modelId);
+
+        /// <summary>
+        /// Asynchronously renames the specified model for a given user.
+        /// </summary>
+        /// <param name="userId">The unique identifier of the user who owns the model.</param>
+        /// <param name="modelId">The unique identifier of the model to rename.</param>
+        /// <param name="name">The new name to assign to the model. Cannot be null or empty.</param>
+        /// <returns>A task that represents the asynchronous rename operation.</returns>
+        Task RenameAsync(Guid userId, Guid modelId, string name);
+
+        /// <summary>
+        /// Asynchronously deletes the specified model for the given user.
+        /// </summary>
+        /// <param name="userId">The unique identifier of the user for whom the model will be deleted.</param>
+        /// <param name="modelId">The unique identifier of the model to delete.</param>
+        /// <returns>A task that represents the asynchronous delete operation.</returns>
+        Task DeleteForUserAsync(Guid userId, Guid modelId);
     }
 }

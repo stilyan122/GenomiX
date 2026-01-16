@@ -254,6 +254,48 @@ namespace GenomiX.Controllers
             return Ok(new { ok = true });
         }
 
+        [Route("/dna/models/edit/{id:guid}")]
+        public async Task<IActionResult> Edit(Guid id)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Challenge();
+
+            var model = await _DNAService.GetModelForUserWithSequencesAsync(user.Id, id);
+            if (model == null) return NotFound();
+
+            return View(new EditDNAModelInputModel { Id = model.Id, Name = model.Name });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("/dna/models/edit")]
+        public async Task<IActionResult> Edit(EditDNAModelInputModel input)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Challenge();
+
+            var name = (input.Name ?? "").Trim();
+            if (name.Length == 0) ModelState.AddModelError(nameof(input.Name), "Name is required.");
+            if (name.Length > 60) ModelState.AddModelError(nameof(input.Name), "Max 60 characters.");
+
+            if (!ModelState.IsValid)
+                return View(input);
+
+            await _DNAService.RenameAsync(user.Id, input.Id, name);
+            return RedirectToAction(nameof(Models));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("/dna/models/delete/{id:guid}")]
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Challenge();
+
+            await _DNAService.DeleteForUserAsync(user.Id, id);
+            return RedirectToAction(nameof(Models));
+        }
         private static (bool Ok, string Error, string S1, string S2) ParseStrictServer(string raw)
         {
             var lines = (raw ?? "")

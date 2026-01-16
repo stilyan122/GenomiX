@@ -5,6 +5,9 @@ let lastS1 = null;
 let lastS2 = null;
 let currentModel = null;
 
+let viewerApi = null;
+let currentModeSci = null;  
+
 document.addEventListener("DOMContentLoaded", () => {
     const dnaSequenceInput = document.getElementById("sequence");
     const importBtn = document.getElementById("import-btn");
@@ -17,6 +20,56 @@ document.addEventListener("DOMContentLoaded", () => {
     const saveBtn = document.getElementById("save-btn");
     const modelIdEl = document.getElementById("gx-model-id");
     const tokenEl = document.querySelector('input[name="__RequestVerificationToken"]');
+
+    function setModeUI(isSci) {
+        currentModeSci = !!isSci;
+        document.documentElement.classList.toggle("mode-scientific", currentModeSci);
+    }
+
+    function attachModelChanged(api) {
+        api.onModelChanged = (m) => {
+            currentModel = m;
+            lastS1 = m.s1;
+            lastS2 = m.s2;
+
+            api?.setInspectorData?.(m);
+        };
+    }
+
+    function ensureViewer(s1, s2) {
+        if (!viewerApi) {
+            viewerApi = visualizeDNA(s1, s2, { scientific: currentModeSci });
+            attachModelChanged(viewerApi);
+            return viewerApi;
+        }
+
+        viewerApi.setModel?.(s1, s2);
+        viewerApi.setScientific?.(currentModeSci);
+        return viewerApi;
+    }
+
+    function rerenderForMode() {
+        const isSci = !!modeSci?.checked;
+        setModeUI(isSci);
+
+        if (viewerApi) {
+            viewerApi.setScientific?.(isSci); 
+            return;
+        }
+    }
+
+    function runVisualize() {
+        const res = parseTextareaStrict(dnaSequenceInput.value);
+        if (!res.ok) { alert(res.error); return; }
+
+        dnaInputSection.style.display = "none";
+        dnaVisualizerSection.style.display = "block";
+
+        lastS1 = res.s1;
+        lastS2 = res.s2;
+
+        ensureViewer(res.s1, res.s2);
+    }
 
     saveBtn?.addEventListener("click", async () => {
         try {
@@ -69,6 +122,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 const res = parseFileStrict(String(ev.target?.result || ""));
                 if (!res.ok) { alert(res.error); return; }
                 dnaSequenceInput.value = `${res.s1}\n${res.s2}`;
+                lastS1 = res.s1; lastS2 = res.s2;
+                if (viewerApi) ensureViewer(res.s1, res.s2);
             };
             r.readAsText(file);
         };
@@ -108,6 +163,10 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+
+    visualizeBtn?.addEventListener("click", runVisualize);
     modeBasic?.addEventListener("change", rerenderForMode);
     modeSci?.addEventListener("change", rerenderForMode);
+
+    setModeUI(!!modeSci?.checked);
 });

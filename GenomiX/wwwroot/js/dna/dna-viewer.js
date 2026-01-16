@@ -3,6 +3,7 @@ import { mountHelix3D } from "./dna-helix3d.js";
 import { createHistoryController } from "./dna-history.js";
 import { createEditPopController } from "./dna-editpop.js";
 import { createNanobotCinematicRepair } from "./dna-nanobot.js";
+import { openMoleculePopup } from "./dna-molpopup.js";
 
 let gxHistoryIdSeed = 0;
 
@@ -17,6 +18,26 @@ export function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
 
     visualizer.innerHTML = "";
     visualizer.classList.toggle("mode--sci", scientific);
+
+    let inspectorEl = null;
+
+    inspectorEl = document.createElement("div");
+    inspectorEl.className = "gx-inspector is-hidden";
+    inspectorEl.innerHTML = `
+      <div class="gx-inspector__hd">
+        <div class="gx-inspector__title">Inspector</div>
+        <div class="gx-inspector__chip" id="gxPairState">—</div>
+      </div>
+      <div class="gx-inspector__bd">
+        <div class="gx-inspector__row"><span class="gx-inspector__k">Index</span><span class="gx-inspector__v" id="gxI">—</span></div>
+        <div class="gx-inspector__row"><span class="gx-inspector__k">Base 1</span><span class="gx-inspector__v" id="gxB1">—</span></div>
+        <div class="gx-inspector__row"><span class="gx-inspector__k">Base 2</span><span class="gx-inspector__v" id="gxB2">—</span></div>
+        <div class="gx-inspector__row"><span class="gx-inspector__k">Pair</span><span class="gx-inspector__v" id="gxPair">—</span></div>
+        <div class="gx-inspector__row"><span class="gx-inspector__k">H-bonds</span><span class="gx-inspector__v" id="gxHB">—</span></div>
+      </div>
+    `;
+
+    visualizer.appendChild(inspectorEl);
 
     const undoStack = [];
     const redoStack = [];
@@ -575,8 +596,132 @@ export function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
         overlayRefs = buildCommonOverlay(ladderWrap);
 
         function ensure3D(idx) {
-            if (!threeApi) threeApi = mountHelix3D(strand1, strand2, threeWrap, idx ?? current);
+            if (!threeApi) {
+                threeApi = mountHelix3D(s1.join(""), s2.join(""), threeWrap, idx ?? current);
+            }
+
+            threeApi.onPick((seqIndex) => {
+                const b1 = s1[seqIndex];
+                const b2 = s2[seqIndex];
+
+                openMoleculePopup({
+                    title: `Base pair ${seqIndex + 1}: ${b1} – ${b2}`,
+                    build: ({ THREE, group, atom, bond }) => {
+
+                        const z = new THREE.Vector3(0, 0, 1);
+                        const x = new THREE.Vector3(1, 0, 0);
+                        const y = new THREE.Vector3(0, 1, 0);
+
+                        const left = new THREE.Vector3(-0.55, 0, 0);
+                        const right = new THREE.Vector3(0.55, 0, 0);
+
+                        function phosphate(center) {
+                            const P = atom("P"); P.position.copy(center); group.add(P);
+                            const O1 = atom("O"); O1.position.copy(center).addScaledVector(x, 0.22); group.add(O1);
+                            const O2 = atom("O"); O2.position.copy(center).addScaledVector(x, -0.10).addScaledVector(y, 0.20); group.add(O2);
+                            const O3 = atom("O"); O3.position.copy(center).addScaledVector(x, -0.10).addScaledVector(y, -0.20); group.add(O3);
+                            const O4 = atom("O"); O4.position.copy(center).addScaledVector(z, 0.20); group.add(O4);
+                            group.add(bond(P.position, O1.position, 0.020, 0xb7c0cc));
+                            group.add(bond(P.position, O2.position, 0.020, 0xb7c0cc));
+                            group.add(bond(P.position, O3.position, 0.020, 0xb7c0cc));
+                            group.add(bond(P.position, O4.position, 0.020, 0xb7c0cc));
+                            return P.position.clone();
+                        }
+
+                        function sugar(center) {
+                            const pts = [];
+                            for (let i = 0; i < 5; i++) {
+                                const ang = (Math.PI * 2 * i) / 5;
+                                const p = center.clone().addScaledVector(y, Math.cos(ang) * 0.18).addScaledVector(z, Math.sin(ang) * 0.14);
+                                pts.push(p);
+                                const C = atom("C"); C.position.copy(p); group.add(C);
+                            }
+                            const O = atom("O"); O.position.copy(pts[2].clone().addScaledVector(z, 0.10)); group.add(O);
+                            for (let i = 0; i < 5; i++) group.add(bond(pts[i], pts[(i + 1) % 5], 0.024, 0x7f8bb0));
+                            return pts[0].clone(); 
+                        }
+
+                        function base(letter, center) {
+                            const ring = [];
+                            for (let i = 0; i < 6; i++) {
+                                const ang = (Math.PI * 2 * i) / 6;
+                                ring.push(center.clone().addScaledVector(y, Math.cos(ang) * 0.24).addScaledVector(z, Math.sin(ang) * 0.24));
+                            }
+                            const nIdx =
+                                (letter === "A") ? [0, 2] :
+                                    (letter === "G") ? [1, 3] :
+                                        (letter === "C") ? [2] :
+                                            (letter === "T") ? [1] : [];
+                            for (let i = 0; i < 6; i++) {
+                                const el = nIdx.includes(i) ? "N" : "C";
+                                const A = atom(el); A.position.copy(ring[i]); group.add(A);
+                            }
+                            for (let i = 0; i < 6; i++) group.add(bond(ring[i], ring[(i + 1) % 6], 0.022, 0xeaf1ff));
+
+                            if (letter === "T" || letter === "G") {
+                                const O = atom("O"); O.position.copy(ring[4].clone().addScaledVector(z, 0.18)); group.add(O);
+                                group.add(bond(ring[4], O.position, 0.020, 0xeaf1ff));
+                            }
+                            if (letter === "A" || letter === "C") {
+                                const N = atom("N"); N.position.copy(ring[5].clone().addScaledVector(z, -0.18)); group.add(N);
+                                group.add(bond(ring[5], N.position, 0.020, 0xeaf1ff));
+                            }
+
+                            return ring[0].clone(); 
+                        }
+
+                        const pLeft = phosphate(new THREE.Vector3(-1.15, 0, 0));
+                        const sLeftAttach = sugar(new THREE.Vector3(-0.85, 0, 0));
+                        group.add(bond(pLeft, sLeftAttach, 0.026, 0x7f8bb0));
+                        const bLeftAttach = base(b1, left);
+                        group.add(bond(sLeftAttach, bLeftAttach, 0.026, 0xeaf1ff));
+
+                        const pRight = phosphate(new THREE.Vector3(1.15, 0, 0));
+                        const sRightAttach = sugar(new THREE.Vector3(0.85, 0, 0));
+                        group.add(bond(pRight, sRightAttach, 0.026, 0x7f8bb0));
+                        const bRightAttach = base(b2, right);
+                        group.add(bond(sRightAttach, bRightAttach, 0.026, 0xeaf1ff));
+
+                        group.add(bond(left, right, 0.010, 0xffffff));
+                    }
+                });
+            });
         }
+
+        const fsBtn = document.getElementById("helix-fullscreen-btn");
+
+        function requestFs(el) {
+            if (document.fullscreenElement) return document.exitFullscreen();
+            return el.requestFullscreen?.();
+        }
+
+        fsBtn?.addEventListener("click", async () => {
+            if (threeWrap.classList.contains("hidden")) onTab3D();
+
+            threeWrap.classList.toggle("gx-fs", !document.fullscreenElement);
+
+            let bar = threeWrap.querySelector(".gx-fs__bar");
+            if (!bar) {
+                bar = document.createElement("div");
+                bar.className = "gx-fs__bar";
+                bar.innerHTML = `
+      <button type="button" class="gx-btn gx-btn--primary" id="gx-fs-exit">Exit fullscreen</button>
+    `;
+                threeWrap.appendChild(bar);
+                bar.querySelector("#gx-fs-exit")?.addEventListener("click", async () => {
+                    if (document.fullscreenElement) await document.exitFullscreen();
+                });
+            }
+
+            await requestFs(threeWrap);
+
+            setTimeout(() => threeApi?.refresh?.(), 50);
+        });
+
+        document.addEventListener("fullscreenchange", () => {
+            if (!document.fullscreenElement) threeWrap.classList.remove("gx-fs");
+            setTimeout(() => threeApi?.refresh?.(), 50);
+        });
 
         const [tab2d, tab3d] = toggle.querySelectorAll(".sci-tab");
 
@@ -798,7 +943,7 @@ export function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
         if (!ladderEl) return;
 
         if (threeApi && typeof threeApi.toIndex === "function") {
-            threeApi.toIndex(current);
+            threeApi.toIndex(current, { zoom: true });
         }
 
         const targetTx = edgeTranslateX(current);
@@ -820,10 +965,6 @@ export function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
             edit.reposition(current);
             edit.show();
         });
-
-        ladderEl.style.transition = `transform ${glideMs}ms cubic-bezier(.22,1,.36,1)`;
-        ladderEl.style.transform = `translateX(${targetTx}px) translateY(-50%)`;
-        lastTx = targetTx;
 
         pairs.forEach(p => p.classList.remove("active"));
         const active = pairs[current];
@@ -948,6 +1089,76 @@ export function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
     syncUndoRedoButtons();
     history.renderHistory();
     updateView();
+
+    api.getModel = () => ({ s1: s1.join(""), s2: s2.join(""), current });
+
+    api.setScientific = (on) => {
+        const wantSci = !!on;
+        if (wantSci === scientific) return;
+
+        const keepS1 = s1.join("");
+        const keepS2 = s2.join("");
+        const keepIndex = current;
+
+        visualizer._disposeAll?.();
+
+        const newApi = visualizeDNA(keepS1, keepS2, { scientific: wantSci });
+        newApi.onModelChanged = api.onModelChanged;
+
+        return newApi;
+    };
+
+    api.setModel = (newS1, newS2) => {
+        if (!newS1 || !newS2) return;
+
+        s1 = String(newS1).split("");
+        s2 = String(newS2).split("");
+
+        ladderEl.innerHTML = "";
+        pairs.length = 0;
+
+        for (let i = 0; i < s1.length; i++) {
+            const pair = document.createElement("div");
+            pair.className = "base-pair";
+            pair.dataset.i = String(i);
+            pair.dataset.uid = crypto.randomUUID?.() ?? (String(Math.random()).slice(2) + "-" + Date.now() + "-" + i);
+
+            const top = document.createElement("div");
+            top.className = `base ${s1[i]}`;
+            top.textContent = s1[i];
+            top.dataset.strand = "1";
+
+            const bot = document.createElement("div");
+            bot.className = `base ${s2[i]}`;
+            bot.textContent = s2[i];
+            bot.dataset.strand = "2";
+
+            pair.appendChild(top);
+            pair.appendChild(bot);
+
+            ladderEl.appendChild(pair);
+            pairs.push(pair);
+
+            bindPairClick(pair);
+            setPairDom(i);
+            setMismatchDom(i);
+        }
+
+        current = Math.max(0, Math.min(current, pairs.length - 1));
+        lastTx = null;
+
+        if (threeApi) {
+            threeApi.dispose?.();
+            threeApi = null;
+        }
+
+        syncCurrentModel();
+        syncUndoRedoButtons();
+        history.renderHistory();
+        updateView();
+    };
+
+    api.dispose = () => visualizer._disposeAll?.();
 
     return api;
 }

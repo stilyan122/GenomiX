@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection.Emit;
 namespace GenomiX.Infrastructure
 {
     /// <summary>
@@ -36,6 +37,12 @@ namespace GenomiX.Infrastructure
         protected override void OnModelCreating(ModelBuilder builder)
         {
             builder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
+
+            builder.Entity<DNAModel>()
+                .HasMany(m => m.Sequences)
+                .WithOne(s => s.Model)
+                .HasForeignKey(s => s.ModelId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             base.OnModelCreating(builder);
         }

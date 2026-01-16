@@ -34,7 +34,18 @@
                 <article class="glass-card">
                     <h3>@m.Name</h3>
                     <p>@m.Length bp • Updated @m.UpdatedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</p>
-                    <a class="card-link" href="/dna/builder/@m.Id">Continue →</a>
+
+                    <div class="gx-card-actions">
+                        <a class="btn link" href="/dna/builder/@m.Id">Continue →</a>
+                        <a class="btn ghost btn--sm" href="/dna/models/edit/@m.Id">Edit</a>
+                        <form method="post" action="/dna/models/delete/@m.Id">
+                            @Html.AntiForgeryToken()
+                            <button class="btn danger btn--sm" type="submit"
+                                    onclick="return confirm('Delete this model? This cannot be undone.');">
+                                Delete
+                            </button>
+                        </form>
+                    </div>
                 </article>
             }
         </div>

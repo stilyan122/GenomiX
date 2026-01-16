@@ -1,0 +1,85 @@
+﻿@model EditDNAModelInputModel
+@{
+    ViewData["Title"] = "Edit DNA Model";
+    ViewData["ActiveNav"] = "dna";
+}
+
+<div class="container gx-edit">
+    <div class="gx-edit__head">
+        <div>
+            <div class="gx-edit__kicker">DNA Models</div>
+            <h1 class="gx-edit__title">Edit model</h1>
+            <p class="gx-edit__sub">Rename your model and keep your library organized.</p>
+        </div>
+
+        <a class="btn ghost btn--sm" href="/dna/models">← Back</a>
+    </div>
+
+    <div class="gx-edit__grid">
+        <section class="gx-card gx-card--form">
+            <form method="post" action="/dna/models/edit" class="gx-form">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="Id" />
+
+                <div class="gx-field">
+                    <label class="gx-label" asp-for="Name">Model name</label>
+
+                    <div class="gx-inputwrap">
+                        <input asp-for="Name"
+                               class="gx-input"
+                               maxlength="60"
+                               autocomplete="off"
+                               placeholder="e.g. Human demo – BRCA region" />
+                        <div class="gx-inputglow"></div>
+                    </div>
+
+                    <div class="gx-hint">
+                        Keep it short and descriptive (max 60 chars).
+                    </div>
+                    <span asp-validation-for="Name" class="gx-error"></span>
+                </div>
+
+                <div class="gx-divider"></div>
+
+                <div class="gx-actions">
+                    <button class="btn btn--lg" type="submit">Save changes</button>
+                    <a class="btn ghost btn--lg" href="/dna/models">Cancel</a>
+                </div>
+            </form>
+        </section>
+
+        <aside class="gx-card gx-card--tips">
+            <div class="gx-tips">
+                <div class="gx-tips__title">Tips</div>
+
+                <div class="gx-tip">
+                    <div class="gx-dot"></div>
+                    <div>
+                        <div class="gx-tip__h">Use species + purpose</div>
+                        <div class="gx-tip__p">Example: “Mouse – UV mutation test”.</div>
+                    </div>
+                </div>
+
+                <div class="gx-tip">
+                    <div class="gx-dot"></div>
+                    <div>
+                        <div class="gx-tip__h">Keep versions clear</div>
+                        <div class="gx-tip__p">Add “v1 / v2” when you experiment with edits.</div>
+                    </div>
+                </div>
+
+                <div class="gx-tip">
+                    <div class="gx-dot"></div>
+                    <div>
+                        <div class="gx-tip__h">Avoid super long names</div>
+                        <div class="gx-tip__p">Short names look better on the models grid.</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

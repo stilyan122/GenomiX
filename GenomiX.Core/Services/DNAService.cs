@@ -96,5 +96,34 @@ namespace GenomiX.Core.Services
 
             await _repository.UpdateAsync(model);
         }
+
+        /// <inheritdoc />
+        public async Task RenameAsync(Guid userId, Guid modelId, string name)
+        {
+            var model = await _repository
+                .GetAll()
+                .FirstOrDefaultAsync(m => m.Id == modelId && m.UserId == userId);
+
+            if (model == null) 
+                throw new InvalidOperationException("Model not found.");
+
+            model.Name = name.Trim();
+            model.UpdatedAt = DateTimeOffset.UtcNow;
+
+            await _repository.UpdateAsync(model);
+        }
+
+        /// <inheritdoc />
+        public async Task DeleteForUserAsync(Guid userId, Guid modelId)
+        {
+            var model = await _repository
+                .GetAll()
+                .FirstOrDefaultAsync(m => m.Id == modelId && m.UserId == userId);
+
+            if (model == null) 
+                throw new InvalidOperationException("Model not found.");
+
+            await _repository.DeleteAsync(modelId);
+        }
     }
 }
