@@ -53,7 +53,8 @@ namespace Genomix.Common.Extensions
                 .AddScoped(typeof(IRepository<>), typeof(Repository<>))
                 .AddScoped<IDNAService, DNAService>()
                 .AddScoped<IOrganismService, OrganismService>()
-                .AddScoped<ISequenceService, SequenceService>();
+                .AddScoped<ISequenceService, SequenceService>()
+                .AddScoped<ISimulationService, SimulationService>();
 
             var emailSection = configuration.GetSection(emailSectionName);
 

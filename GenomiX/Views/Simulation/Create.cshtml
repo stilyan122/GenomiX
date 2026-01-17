@@ -1,0 +1,142 @@
+﻿@model CreatePopulationViewModel
+
+@{
+    ViewData["Title"] = "Create simulation";
+    ViewData["ActiveNav"] = "simulations";
+}
+
+<section class="gx-sim-page">
+    <div class="container container--wide gx-sim">
+        <header class="gx-sim__header gx-sim__header--index">
+            <div class="gx-sim__head-left">
+                <div class="gx-sim__kicker">Simulations</div>
+                <h1 class="gx-sim__title">Create population</h1>
+                <p class="gx-sim__subtitle">Pick a base DNA model, set size, and start a live evolution run.</p>
+            </div>
+
+            <div class="gx-sim__head-right gx-sim__head-right--index">
+                <a class="gx-btn gx-btn--ghost" href="/simulations">Back</a>
+            </div>
+        </header>
+
+        <div class="gx-simcreate">
+            <form method="post" class="gx-form gx-card gx-simform">
+                @Html.AntiForgeryToken()
+
+                <div class="gx-simform__glow"></div>
+
+                <div class="gx-simform__grid">
+                    <div class="gx-field">
+                        <label class="gx-label" asp-for="Name">Simulation name</label>
+                        <input class="gx-input" asp-for="Name" placeholder="e.g. Arctic radiation test" />
+                        <span class="gx-val" asp-validation-for="Name"></span>
+                    </div>
+
+                    <div class="gx-field">
+                        <label class="gx-label" for="BaseModelId">Base DNA model</label>
+                        <select class="gx-select" name="BaseModelId" id="BaseModelId">
+                            <option value="">— choose model —</option>
+                            @foreach (var m in (Model.Models ?? new List<CreatePopulationViewModel.ModelOption>()))
+                            {
+                                <option value="@m.Id" selected="@(Model?.BaseModelId == m.Id)">
+                                    @m.Name (@m.Length bp)
+                                </option>
+                            }
+                        </select>
+                        <span class="gx-val" asp-validation-for="BaseModelId"></span>
+                    </div>
+
+                    <div class="gx-field">
+                        <label class="gx-label" asp-for="Size">Population size</label>
+                        <input class="gx-input" asp-for="Size" type="number" min="2" max="5000" step="1" />
+                        <div class="gx-help">2-5000 organisms (bigger = heavier)</div>
+                        <span class="gx-val" asp-validation-for="Size"></span>
+                    </div>
+                </div>
+
+                <div class="gx-divider"></div>
+
+                <div class="gx-simform__section">
+                    <div class="gx-simform__sectionTitle">Initial environment</div>
+                    <div class="gx-simsliders">
+                        <div class="gx-slider">
+                            <div class="gx-slider__top">
+                                <label class="gx-label" asp-for="Temperature">Temperature</label>
+                                <div class="gx-chip mono"><span id="vTemp">@Model.Temperature</span>°C</div>
+                            </div>
+                            <input class="gx-range" asp-for="Temperature" type="range" min="-20" max="60" step="1" id="tempRange" />
+                        </div>
+
+                        <div class="gx-slider">
+                            <div class="gx-slider__top">
+                                <label class="gx-label" asp-for="Radiation">Radiation</label>
+                                <div class="gx-chip mono" id="vRad">@Model.Radiation</div>
+                            </div>
+                            <input class="gx-range" asp-for="Radiation" type="range" min="0" max="1" step="0.01" id="radRange" />
+                        </div>
+
+                        <div class="gx-slider">
+                            <div class="gx-slider__top">
+                                <label class="gx-label" asp-for="DiseasePressure">Disease pressure</label>
+                                <div class="gx-chip mono" id="vDis">@Model.DiseasePressure</div>
+                            </div>
+                            <input class="gx-range" asp-for="DiseasePressure" type="range" min="0" max="1" step="0.01" id="disRange" />
+                        </div>
+
+                        <div class="gx-slider">
+                            <div class="gx-slider__top">
+                                <label class="gx-label" asp-for="Resources">Resources</label>
+                                <div class="gx-chip mono" id="vRes">@Model.Resources</div>
+                            </div>
+                            <input class="gx-range" asp-for="Resources" type="range" min="0" max="1" step="0.01" id="resRange" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="gx-simform__actions">
+                    <button class="gx-btn gx-btn--primary gx-btn--lg" type="submit">
+                        Start simulation
+                    </button>
+                    <div class="gx-muted">You can change the environment live after creation.</div>
+                </div>
+            </form>
+
+            <aside class="gx-card gx-simside">
+                <div class="gx-simside__hd">
+                    <div class="gx-simside__kicker">Tip</div>
+                    <div class="gx-simside__title">How to choose options?</div>
+                </div>
+
+                <div class="gx-simside__body">
+                    <ul class="gx-ul">
+                        <li><strong>High radiation</strong> + low resources → fast population collapse</li>
+                        <li><strong>Warm</strong> + high resources → rapid growth bursts</li>
+                        <li><strong>Disease pressure</strong> creates visible selection shifts</li>
+                    </ul>
+                    <div class="gx-note">
+                        Keep runs around 200-800 organisms for smooth live visuals.
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        (function(){
+          const bind = (id, out, fmt) => {
+            const el = document.getElementById(id);
+            const o = document.getElementById(out);
+            if(!el || !o) return;
+            const render = ()=> o.textContent = fmt ? fmt(el.value) : el.value;
+            el.addEventListener("input", render);
+            render();
+          };
+          bind("tempRange","vTemp", v=>String(v));
+          bind("radRange","vRad", v=>Number(v).toFixed(2));
+          bind("disRange","vDis", v=>Number(v).toFixed(2));
+          bind("resRange","vRes", v=>Number(v).toFixed(2));
+        })();
+    </script>
+}

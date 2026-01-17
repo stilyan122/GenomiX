@@ -1501,3 +1501,105 @@
 }
 
 .gx-fs__bar .gx-btn{ pointer-events:auto; }
+
+.gx-helix3d-ui {
+    position: absolute;
+    right: 14px;
+    top: 14px;
+    z-index: 50;
+    display: flex;
+    gap: 10px;
+}
+
+.dna-3dwrap {
+    position: relative;
+}
+
+.gx-helix3d-fsbtn {
+    padding: 10px 14px;
+    border-radius: 14px;
+}
+
+.gx-scanmode {
+  position: relative;
+}
+
+.gx-scanmode .base-pair:not(.active) {
+  opacity: 0.55;
+  filter: saturate(0.85);
+  transition: opacity .25s ease, filter .25s ease;
+}
+
+.gx-scanmode .base-pair.active {
+  opacity: 1;
+  filter: saturate(1.15);
+}
+
+.base-pair.gx-scan-warn {
+  animation: gxScanWarn .52s ease-out;
+}
+
+.base-pair.gx-scan-hit {
+  animation: gxScanHit .52s ease-out;
+}
+
+@keyframes gxScanWarn {
+  0%   { transform: translateY(0) scale(1); box-shadow: 0 0 0 rgba(255,255,255,0); }
+  35%  { transform: translateY(-2px) scale(1.03); box-shadow: 0 0 18px rgba(255,255,255,.20); }
+  100% { transform: translateY(0) scale(1); box-shadow: 0 0 0 rgba(255,255,255,0); }
+}
+
+@keyframes gxScanHit {
+  0%   { transform: translateY(0) scale(1); box-shadow: 0 0 0 rgba(255, 60, 60, 0); }
+  40%  { transform: translateY(-2px) scale(1.05); box-shadow: 0 0 24px rgba(255, 60, 60, .40); }
+  100% { transform: translateY(0) scale(1); box-shadow: 0 0 0 rgba(255, 60, 60, 0); }
+}
+
+.gx-scanner {
+  pointer-events: none;
+  position: fixed;
+  transform: translate(-50%, -50%);
+  z-index: 50;
+}
+
+.gx-scanner.is-hidden { display: none; }
+
+.gx-scanner__ring{
+  width: 56px;
+  height: 56px;
+  border-radius: 999px;
+  border: 2px solid rgba(255,255,255,.55);
+  box-shadow: 0 0 18px rgba(120,200,255,.25);
+  animation: gxScanRing 0.9s ease-in-out infinite;
+}
+
+.gx-scanner__beam{
+  position:absolute;
+  left: 50%;
+  bottom: 100%;
+  width: 3px;
+  height: 74px;
+  transform: translateX(-50%);
+  background: linear-gradient(to top,
+    rgba(120,200,255,.0),
+    rgba(120,200,255,.35),
+    rgba(255,255,255,.65));
+  filter: blur(.2px);
+  animation: gxScanBeam 0.7s ease-in-out infinite;
+}
+
+@keyframes gxScanRing{
+  0% { transform: translate(-50%,-50%) scale(1); opacity: .85; }
+  50%{ transform: translate(-50%,-50%) scale(1.12); opacity: 1; }
+  100%{ transform: translate(-50%,-50%) scale(1); opacity: .85; }
+}
+
+@keyframes gxScanBeam{
+  0%,100% { opacity: .45; height: 70px; }
+  50%     { opacity: .95; height: 82px; }
+}
+
+.base-pair.gx-scan-active {
+    filter: saturate(1.2);
+    box-shadow: 0 0 22px rgba(120,200,255,.22);
+}

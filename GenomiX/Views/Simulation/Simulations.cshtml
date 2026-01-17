@@ -1,0 +1,100 @@
+﻿@model IEnumerable<PopulationViewModel>
+
+@{
+    ViewData["Title"] = "Simulations";
+    ViewData["ActiveNav"] = "simulations";
+}
+
+<section class="gx-sim-page">
+    <div class="container container--wide gx-sim">
+
+        <header class="gx-sim__header gx-sim__header--index">
+            <div class="gx-sim__head-left">
+                <div class="gx-sim__kicker">Simulations</div>
+                <h1 class="gx-sim__title">Population lab</h1>
+                <p class="gx-sim__subtitle">
+                    Live evolution runs with real-time environment control.
+                </p>
+            </div>
+
+            <div class="gx-sim__head-right gx-sim__head-right--index">
+                <a class="gx-btn gx-btn--primary gx-sim__cta" href="/simulations/create">
+                    <span class="gx-cta__plus">＋</span>
+                    Create simulation
+                </a>
+            </div>
+        </header>
+
+        @if (Model == null || Model.Count() == 0)
+        {
+            <div class="gx-empty gx-empty--sim">
+                <div class="gx-empty__badge">New</div>
+                <div class="gx-empty__title">No simulations yet</div>
+                <div class="gx-empty__text">
+                    Create your first population and start changing the environment while it evolves.
+                </div>
+                <a class="gx-btn gx-btn--primary" href="/simulations/create">Create simulation</a>
+            </div>
+        }
+        else
+        {
+            <div class="gx-sim__toolbar">
+                <div class="gx-sim__count">
+                    <span class="gx-dot"></span>
+                    <strong>@Model?.Count()</strong> runs
+                </div>
+
+                <div class="gx-sim__legend">
+                    <span class="gx-pill gx-pill--soft">Organisms</span>
+                    <span class="gx-pill gx-pill--soft">Environment</span>
+                    <span class="gx-pill gx-pill--soft">Ticks</span>
+                </div>
+            </div>
+
+            <div class="gx-simgrid">
+                @foreach (var p in Model)
+                {
+                    var orgCount = p.Organisms?.Count ?? 0;
+                    var shortModel = p.BaseModelId?.ToString().Substring(0, 8) ?? "—";
+
+                    <article class="gx-simtile">
+                        <div class="gx-simtile__glow"></div>
+
+                        <header class="gx-simtile__top">
+                            <div class="gx-simtile__title">@p.Name</div>
+                            <div class="gx-simtile__meta">
+                                <span class="gx-meta__k">Created</span>
+                                <span class="gx-meta__v mono">@p.CreatedAt</span>
+                            </div>
+                        </header>
+
+                        <div class="gx-simtile__stats">
+                            <div class="gx-stat">
+                                <div class="gx-stat__k">Organisms</div>
+                                <div class="gx-stat__v mono">@orgCount</div>
+                                <div class="gx-stat__bar">
+                                    <div class="gx-stat__fill" style="width:@(Math.Min(100, 12 + orgCount / 50.0 * 88)).ToString(" 0")%"></div>
+                                </div>
+                            </div>
+
+                            <div class="gx-stat">
+                                <div class="gx-stat__k">Base model</div>
+                                <div class="gx-stat__v mono">@shortModel</div>
+                                <div class="gx-stat__hint">DNA snapshot for this run</div>
+                            </div>
+                        </div>
+
+                        <div class="gx-simtile__actions">
+                            <a class="gx-btn gx-btn--primary gx-simtile__open" href="/simulations/run/@p.Id">
+                                Open lab
+                            </a>
+                            <a class="gx-btn gx-btn--ghost gx-simtile__secondary" href="/dna/builder/@(p.BaseModelId ?? Guid.Empty)">
+                                View DNA
+                            </a>
+                        </div>
+                    </article>
+                }
+            </div>
+        }
+    </div>
+</section>

@@ -212,6 +212,7 @@ export function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
     function bindPairClick(pairEl) {
         pairEl.addEventListener("click", (e) => {
             e.preventDefault();
+            onUserNavigate();
 
             let baseEl = e.target.closest(".base");
             if (!baseEl) baseEl = pairEl.querySelector('.base[data-strand="1"]');
@@ -494,6 +495,152 @@ export function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
         return { overlay, progCont, prevBtn, nextBtn };
     }
 
+    function ensureFullscreenBtn() {
+        const host =
+            document.getElementById("gx-helix-actions") ||
+            threeWrap.querySelector(".gx-helix3d-ui") ||
+            threeWrap;
+
+        let btn = host.querySelector("#helix-fullscreen-btn");
+
+        if (!btn) {
+            btn = document.createElement("button");
+            btn.type = "button";
+            btn.id = "helix-fullscreen-btn";
+            btn.className = "gx-btn gx-btn--primary";
+            btn.textContent = "Fullscreen 3D";
+
+            btn.addEventListener("click", async () => {
+                if (document.fullscreenElement) await document.exitFullscreen();
+                else {
+                    threeWrap.classList.add("gx-fs");
+                    ensureFsBar();
+                    await threeWrap.requestFullscreen?.();
+                    setTimeout(() => threeApi?.refresh?.(), 60);
+                }
+            });
+
+            host.appendChild(btn);
+        }
+
+        btn.style.display = "";
+    }
+
+    function hideFullscreenBtn() {
+        const host = document.getElementById("gx-helix-actions") || document;
+        host.querySelector("#helix-fullscreen-btn")?.remove();
+    }
+
+    const scanBtn = document.getElementById("scan-dna-btn");
+
+    function countMismatches() {
+        let c = 0;
+        for (let i = 0; i < pairs.length; i++) {
+            const b1 = s1[i], b2 = s2[i];
+            if ((COMP[b1] || "") !== b2) c++;
+        }
+        return c;
+    }
+
+    function setScanUi(on) {
+        // dim background + make it feel like a “mode”
+        (containerForLadder || visualizer)?.classList.toggle("gx-scanmode", !!on);
+
+        // disable UI buttons while scanning
+        if (scanBtn) scanBtn.disabled = !!on;
+        if (repairAllBtn) repairAllBtn.disabled = !!on || countMismatches() === 0;
+        if (undoBtn) undoBtn.disabled = !!on || undoStack.length === 0;
+        if (redoBtn) redoBtn.disabled = !!on || redoStack.length === 0;
+    }
+
+    function pulsePair(i, kind = "warn") {
+        const el = pairs[i];
+        if (!el) return;
+        el.classList.remove("gx-scan-hit", "gx-scan-warn");
+        void el.offsetWidth;
+
+        el.classList.add(kind === "hit" ? "gx-scan-hit" : "gx-scan-warn");
+        setTimeout(() => el.classList.remove("gx-scan-hit", "gx-scan-warn"), 520);
+    }
+
+    function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+    let scanRunning = false;
+    let scanAbort = false;
+
+    let stickyTip = null;      
+    let stickyTipActive = false;
+
+    function setStickyTip(text) {
+        stickyTip = text;
+        stickyTipActive = true;
+        if (tooltipEl) tooltipEl.textContent = text;
+    }
+
+    function renderNormalTipNow() {
+        const b1 = s1[current], b2 = s2[current];
+        const h =
+            (b1 === "A" && b2 === "T") || (b1 === "T" && b2 === "A") ? 2 :
+                (b1 === "C" && b2 === "G") || (b1 === "G" && b2 === "C") ? 3 : "-";
+
+        const normalTip = `Base ${current + 1}: ${b1}-${b2} (${h} H)`;
+        if (tooltipEl) tooltipEl.textContent = normalTip;
+    }
+
+    function clearStickyTip() {
+        stickyTip = null;
+        stickyTipActive = false;
+        renderNormalTipNow(); 
+    }
+
+    function onUserNavigate() {
+        clearStickyTip();
+        hideScanner?.();
+    }
+
+    async function runScanMode() {
+        showScanner();
+
+        setStickyTip("Scanning DNA…");
+
+        for (let i = 0; i < pairs.length; i++) {
+            if (scanAbort) break;
+
+            current = i;
+            updateView();                 
+            positionScannerAtIndex(i);   
+
+            pairs[current]?.classList.add("gx-scan-active");
+            pairs[current-1]?.classList.remove("gx-scan-active");
+
+            const isMis = (COMP[s1[i]] || "") !== s2[i];
+
+            if (isMis) {
+                pulsePair(i, "hit");
+                setStickyTip(`Scan alert: anomaly at base ${i + 1} (${s1[i]}–${s2[i]})`);
+                await sleep(260);
+            } else {
+                if (i % 6 === 0) pulsePair(i, "warn");
+                await sleep(110);
+            }
+        }
+
+        if (!scanAbort) {
+            const left = countMismatches();
+            setStickyTip(
+                left === 0
+                    ? "Scan complete ✓ DNA is stable (press ⟨ ⟩ to continue)"
+                    : `Scan complete ✓ ${left} anomaly${left === 1 ? "" : "ies"} found (press ⟨ ⟩ to review)`
+            );
+        }
+
+        hideScanner();
+    }
+
+    scanBtn?.addEventListener("click", async () => {
+        await runScanMode();
+    });
+
     const repairAllBtn = document.getElementById("repair-dna-btn");
 
     function updateRepairAllButton() {
@@ -534,6 +681,8 @@ export function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
 
         threeWrap = document.createElement("div");
         threeWrap.className = "dna-3dwrap hidden";
+
+        threeWrap.innerHTML = `<div class="gx-helix3d-ui"></div>`;
 
         left.appendChild(toggle);
         left.appendChild(ladderWrap);
@@ -690,37 +839,64 @@ export function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
 
         const fsBtn = document.getElementById("helix-fullscreen-btn");
 
-        function requestFs(el) {
-            if (document.fullscreenElement) return document.exitFullscreen();
-            return el.requestFullscreen?.();
+        function ensureFsBar() {
+            let bar = threeWrap.querySelector(".gx-fs__bar");
+            if (bar) return bar;
+
+            bar = document.createElement("div");
+            bar.className = "gx-fs__bar";
+            bar.innerHTML = `
+    <button type="button" class="gx-btn gx-btn--primary" id="gx-fs-exit">
+      Exit fullscreen
+    </button>
+  `;
+            threeWrap.appendChild(bar);
+
+            bar.querySelector("#gx-fs-exit")?.addEventListener("click", async () => {
+                if (document.fullscreenElement) await document.exitFullscreen();
+            });
+
+            return bar;
+        }
+
+        function removeFsBar() {
+            threeWrap.querySelector(".gx-fs__bar")?.remove();
+        }
+
+        async function enterFullscreen() {
+            if (threeWrap.classList.contains("hidden")) onTab3D();
+
+            threeWrap.classList.add("gx-fs");
+            ensureFsBar();
+
+            await threeWrap.requestFullscreen?.();
+
+            setTimeout(() => threeApi?.refresh?.(), 60);
+        }
+
+        async function exitFullscreen() {
+            if (document.fullscreenElement) await document.exitFullscreen();
         }
 
         fsBtn?.addEventListener("click", async () => {
-            if (threeWrap.classList.contains("hidden")) onTab3D();
-
-            threeWrap.classList.toggle("gx-fs", !document.fullscreenElement);
-
-            let bar = threeWrap.querySelector(".gx-fs__bar");
-            if (!bar) {
-                bar = document.createElement("div");
-                bar.className = "gx-fs__bar";
-                bar.innerHTML = `
-      <button type="button" class="gx-btn gx-btn--primary" id="gx-fs-exit">Exit fullscreen</button>
-    `;
-                threeWrap.appendChild(bar);
-                bar.querySelector("#gx-fs-exit")?.addEventListener("click", async () => {
-                    if (document.fullscreenElement) await document.exitFullscreen();
-                });
-            }
-
-            await requestFs(threeWrap);
-
-            setTimeout(() => threeApi?.refresh?.(), 50);
+            if (document.fullscreenElement) await exitFullscreen();
+            else await enterFullscreen();
         });
 
         document.addEventListener("fullscreenchange", () => {
-            if (!document.fullscreenElement) threeWrap.classList.remove("gx-fs");
-            setTimeout(() => threeApi?.refresh?.(), 50);
+            const isFs = !!document.fullscreenElement;
+
+            if (!isFs) {
+                threeWrap.classList.remove("gx-fs");
+                removeFsBar();
+            } else {
+                if (document.fullscreenElement === threeWrap) {
+                    threeWrap.classList.add("gx-fs");
+                    ensureFsBar();
+                }
+            }
+
+            setTimeout(() => threeApi?.refresh?.(), 60);
         });
 
         const [tab2d, tab3d] = toggle.querySelectorAll(".sci-tab");
@@ -738,6 +914,10 @@ export function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
             ladderWrap.appendChild(overlayRefs.prevBtn);
             ladderWrap.appendChild(overlayRefs.nextBtn);
 
+            if (scanOverlay)
+                (containerForLadder || visualizer).appendChild(scanOverlay);
+
+            hideFullscreenBtn();
             updateView();
         };
 
@@ -755,10 +935,15 @@ export function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
             threeWrap.appendChild(overlayRefs.prevBtn);
             threeWrap.appendChild(overlayRefs.nextBtn);
 
+            if (scanOverlay)
+                (containerForLadder || visualizer).appendChild(scanOverlay);
+
+
             threeApi?.refresh?.();
             threeApi?.frameAll?.();
             threeApi?.snapToIndex?.(current);
 
+            ensureFullscreenBtn();
             updateView();
         };
 
@@ -876,6 +1061,49 @@ export function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
         popEl.style.top = `${pos.top}px`;
     }
 
+    let scanOverlay = null;
+    let scanBeam = null;
+    let scanRing = null;
+
+    function ensureScannerOverlay() {
+        if (scanOverlay) return;
+
+        scanOverlay = document.createElement("div");
+        scanOverlay.className = "gx-scanner is-hidden";
+        scanOverlay.innerHTML = `
+      <div class="gx-scanner__beam"></div>
+      <div class="gx-scanner__ring"></div>
+    `;
+
+        scanBeam = scanOverlay.querySelector(".gx-scanner__beam");
+        scanRing = scanOverlay.querySelector(".gx-scanner__ring");
+
+        (containerForLadder || visualizer).appendChild(scanOverlay);
+    }
+
+    function showScanner() {
+        ensureScannerOverlay();
+        scanOverlay.classList.remove("is-hidden");
+    }
+
+    function hideScanner() {
+        scanOverlay?.classList.add("is-hidden");
+    }
+
+    function positionScannerAtIndex(i) {
+        ensureScannerOverlay();
+        const pair = pairs[i];
+        if (!pair) return;
+
+        const r = pair.getBoundingClientRect();
+        const cx = Math.round(r.left + r.width / 2);
+        const cy = Math.round(r.top + r.height / 2);
+
+        scanOverlay.style.position = "fixed";
+        scanOverlay.style.left = `${cx}px`;
+        scanOverlay.style.top = `${cy}px`;
+    }
+
     function scheduleEditPopPosition(i) {
         if (!edit.isOpen()) return;
         cancelAnimationFrame(posRAF1);
@@ -939,11 +1167,33 @@ export function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
         return tx;
     }
 
+    function onNext() {
+        onUserNavigate();
+        if (current < pairs.length - 1) current++;
+        closeEditPop();
+        updateView();
+    }
+
+    function onPrev() {
+        onUserNavigate();
+        if (current > 0) current--;
+        closeEditPop();
+        updateView();
+    }
+
+    function onProgressClick(e) {
+        onUserNavigate();
+        const rect = progressContainerEl.getBoundingClientRect();
+        current = Math.round(((e.clientX - rect.left) / rect.width) * (pairs.length - 1));
+        closeEditPop();
+        updateView();
+    }
+
     function updateView() {
         if (!ladderEl) return;
 
         if (threeApi && typeof threeApi.toIndex === "function") {
-            threeApi.toIndex(current, { zoom: true });
+            threeApi.toIndex(current, { zoom: false });
         }
 
         const targetTx = edgeTranslateX(current);
@@ -976,7 +1226,10 @@ export function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
                 (b1 === "A" && b2 === "T") || (b1 === "T" && b2 === "A") ? 2 :
                     (b1 === "C" && b2 === "G") || (b1 === "G" && b2 === "C") ? 3 : "-";
 
-            if (tooltipEl) tooltipEl.textContent = `Base ${current + 1}: ${b1}-${b2} (${h} H)`;
+            const normalTip = `Base ${current + 1}: ${b1}-${b2} (${h} H)`;
+            if (tooltipEl)
+                tooltipEl.textContent = stickyTipActive ?
+                    stickyTip : normalTip;
 
             if (panelRefs) {
                 panelRefs.s_idx.textContent = String(current + 1);
@@ -995,6 +1248,9 @@ export function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
             edit.syncMeta(current);
             scheduleEditPopPosition(current);
         }
+
+        if (scanRunning)
+            positionScannerAtIndex(current);
 
         updateRepairAllButton();
     }
@@ -1023,22 +1279,6 @@ export function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
         setTimeout(finish, glideMs + 60);
     }
 
-    function onNext() {
-        if (current < pairs.length - 1) current++;
-        closeEditPop();
-        updateView();
-    }
-    function onPrev() {
-        if (current > 0) current--;
-        closeEditPop();
-        updateView();
-    }
-    function onProgressClick(e) {
-        const rect = progressContainerEl.getBoundingClientRect();
-        current = Math.round(((e.clientX - rect.left) / rect.width) * (pairs.length - 1));
-        closeEditPop();
-        updateView();
-    }
     function onResize() { updateView(); }
 
     nextEl?.addEventListener("click", onNext);
@@ -1080,6 +1320,8 @@ export function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
         disposeTabs?.();
         threeApi?.dispose?.();
         threeApi = null;
+
+        scanAbort = true;
 
         cancelAnimationFrame(posRAF1);
         cancelAnimationFrame(posRAF2);
