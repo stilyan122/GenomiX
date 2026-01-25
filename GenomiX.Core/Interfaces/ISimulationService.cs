@@ -52,5 +52,20 @@ namespace GenomiX.Core.Interfaces
         /// <param name="populationId">The unique identifier of the population associated with the user.</param>
         /// <param name="isRunning">A value indicating whether the user is running. Specify <see langword="true"/> to set the user as running;
         Task SetRunningAsync(Guid userId, Guid populationId, bool isRunning);
+
+        /// <summary>
+        /// Asynchronously renames the specified population for the given user.
+        /// </summary>
+        /// <param name="userId">The unique identifier of the user who owns the population.</param>
+        /// <param name="populationId">The unique identifier of the population to rename.</param>
+        /// <param name="name">The new name to assign to the population. Cannot be null or empty.</param>
+        Task RenameAsync(Guid userId, Guid populationId, string name);
+
+        /// <summary>
+        /// Asynchronously deletes the specified population for the given user.
+        /// </summary>
+        /// <param name="userId">The unique identifier of the user for whom the population will be deleted.</param>
+        /// <param name="populationId">The unique identifier of the population to delete.</param>
+        Task DeleteForUserAsync(Guid userId, Guid populationId);
     }
 }

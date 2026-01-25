@@ -7,6 +7,7 @@ using GenomiX.ViewModels.Simulation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using GenomiX.Core.ServiceHelpers;
 
 namespace GenomiX.Controllers
 {
@@ -38,6 +39,7 @@ namespace GenomiX.Controllers
                 Name = p.Name,
                 CreatedAt = p.CreatedAt.ToString("yyyy-MM-dd HH:mm"),
                 BaseModelId = p.BaseModelId,
+                BaseModelName = p.BaseModel?.Name,
                 Organisms = p.Organisms.Select(o => new OrganismViewModel
                 {
                     Id = o.Id,
@@ -86,8 +88,8 @@ namespace GenomiX.Controllers
                 var models = await _dna.GetAllForUserAsync(user.Id);
                 return View(new CreatePopulationViewModel
                 {
-                    Name = input.Name,
-                    Size = input.Size,
+                    Name = input?.Name ?? "New Population",
+                    Size = input?.Size ?? 50,
                     BaseModelId = input.BaseModelId,
                     Temperature = input.Temperature,
                     Radiation = input.Radiation,
@@ -117,6 +119,63 @@ namespace GenomiX.Controllers
             return RedirectToAction(nameof(Run), new { id });
         }
 
+        [Route("/simulations/edit/{id:guid}")]
+        public async Task<IActionResult> Edit(Guid id)
+        {
+            var user = await _users.GetUserAsync(User);
+            if (user == null) 
+                return Challenge();
+
+            var pop = await _sim.GetForUserAsync(user.Id, id);
+            if (pop == null) 
+                return NotFound();
+
+            return View(new EditPopulationInputModel 
+            { 
+                Id = pop.Id, 
+                Name = pop.Name }
+            );
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("/simulations/edit")]
+        public async Task<IActionResult> Edit(EditPopulationInputModel input)
+        {
+            var user = await _users.GetUserAsync(User);
+            if (user == null) 
+                return Challenge();
+
+            var name = (input.Name ?? "").Trim();
+
+            if (name.Length == 0) 
+                ModelState.AddModelError(nameof(input.Name), "Name is required.");
+
+            if (name.Length > 60) 
+                ModelState.AddModelError(nameof(input.Name), "Max 60 characters.");
+
+            if (!ModelState.IsValid) 
+                return View(input);
+
+            await _sim.RenameAsync(user.Id, input.Id, name);
+
+            return RedirectToAction(nameof(Simulations));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("/simulations/delete/{id:guid}")]
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            var user = await _users.GetUserAsync(User);
+
+            if (user == null) 
+                return Challenge();
+
+            await _sim.DeleteForUserAsync(user.Id, id);
+            return RedirectToAction(nameof(Simulations));
+        }
+
         [Route("/simulations/run/{id:guid}")]
         public async Task<IActionResult> Run(Guid id)
         {
@@ -126,16 +185,21 @@ namespace GenomiX.Controllers
             var pop = await _sim.GetForUserAsync(user.Id, id);
             if (pop == null) return NotFound();
 
+            var f = SimFactorsJsonHelper.Read(pop.Factors);
+
             var vm = new PopulationViewModel
             {
                 Id = pop.Id,
                 Name = pop.Name,
                 CreatedAt = pop.CreatedAt.ToString("yyyy-MM-dd HH:mm"),
                 BaseModelId = pop.BaseModelId,
-                Organisms = pop.Organisms.Select(o => new OrganismViewModel
-                {
-                    Id = o.Id,
-                }).ToList()
+                BaseModelName = pop.BaseModel.Name,
+                Temperature = f.Temperature,
+                Radiation = f.Radiation,
+                DiseasePressure = f.DiseasePressure,
+                Resources = f.Resources,
+                Speed = f.Speed,
+                Organisms = pop.Organisms.Select(o => new OrganismViewModel { Id = o.Id }).ToList()
             };
 
             return View(vm);

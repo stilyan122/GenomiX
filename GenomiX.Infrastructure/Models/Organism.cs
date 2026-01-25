@@ -19,6 +19,12 @@ namespace GenomiX.Infrastructure.Models
         [MaxLength(OrganismPropertyConstraints.SimpleName_MaxLength)]
         public string SimpleName { get; set; } = "";
 
+        /// <summary> Organism type. </summary>
+        [Comment("Organism type.")]
+        [Required]
+        [MaxLength(OrganismPropertyConstraints.Type_MaxLength)]
+        public string Type { get; set; } = "";
+
         /// <summary> Scientific-like identifier. </summary>
         [Comment("Scientific-like identifier.")]
         [Required]
@@ -59,5 +65,17 @@ namespace GenomiX.Infrastructure.Models
 
         /// <summary> Population navigation property. </summary>
         public Population? Population { get; set; }
+
+        /// <summary> X coordinate property. </summary>
+        [Comment("X coordinate property.")]
+        public float X { get; set; }
+
+        /// <summary> Y coordinate property. </summary>
+        [Comment("Y coordinate property.")]
+        public float Y { get; set; }
+
+        /// <summary> Fitness property. </summary>
+        [Comment("Fitness property.")]
+        public double Fitness { get; set; }
     }
 }

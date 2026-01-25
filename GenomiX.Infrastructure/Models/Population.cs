@@ -26,9 +26,12 @@ namespace GenomiX.Infrastructure.Models
         [MaxLength(PopulationPropertyConstraints.Factors_MaxLength)]
         public string Factors { get; set; } = "{}";
 
-        /// <summary> Optional link to the base DNAModel used to derive this population. </summary>
-        [Comment("Optional link to the base DNAModel used to derive this population.")]
+        /// <summary> Link to the base DNAModel used to derive this population. </summary>
+        [Comment("Link to the base DNAModel used to derive this population.")]
         public Guid? BaseModelId { get; set; }
+
+        /// <summary> Navigation property for DNA model table. </summary>
+        public DNAModel? BaseModel { get; set; }
 
         /// <summary> User who created the population. </summary>
         [Comment("User who created the population.")]

@@ -4,6 +4,7 @@ using GenomiX.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GenomiX.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260119111550_OrganismEntityChangesMigration")]
+    partial class OrganismEntityChangesMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -786,12 +789,6 @@ namespace GenomiX.Infrastructure.Migrations
                         .HasColumnType("float")
                         .HasComment("Continuous survival/fitness score (nullable).");
 
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)")
-                        .HasComment("Organism type.");
-
                     b.Property<float>("X")
                         .HasColumnType("real")
                         .HasComment("X coordinate property.");
@@ -821,7 +818,6 @@ namespace GenomiX.Infrastructure.Migrations
                             SimpleName = "Human A",
                             Status = "alive",
                             SurvivalScore = 0.84999999999999998,
-                            Type = "",
                             X = 0f,
                             Y = 0f
                         },
@@ -837,7 +833,6 @@ namespace GenomiX.Infrastructure.Migrations
                             SimpleName = "Lab Mouse 1",
                             Status = "alive",
                             SurvivalScore = 0.92000000000000004,
-                            Type = "",
                             X = 0f,
                             Y = 0f
                         },
@@ -853,7 +848,6 @@ namespace GenomiX.Infrastructure.Migrations
                             SimpleName = "Dog Alpha",
                             Status = "alive",
                             SurvivalScore = 0.65000000000000002,
-                            Type = "",
                             X = 0f,
                             Y = 0f
                         });
@@ -868,7 +862,7 @@ namespace GenomiX.Infrastructure.Migrations
 
                     b.Property<Guid?>("BaseModelId")
                         .HasColumnType("uniqueidentifier")
-                        .HasComment("Link to the base DNAModel used to derive this population.");
+                        .HasComment("Optional link to the base DNAModel used to derive this population.");
 
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("datetimeoffset")
@@ -891,8 +885,6 @@ namespace GenomiX.Infrastructure.Migrations
                         .HasComment("User who created the population.");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("BaseModelId");
 
                     b.HasIndex("UserId");
 
@@ -1514,15 +1506,9 @@ namespace GenomiX.Infrastructure.Migrations
 
             modelBuilder.Entity("GenomiX.Infrastructure.Models.Population", b =>
                 {
-                    b.HasOne("GenomiX.Infrastructure.Models.DNAModel", "BaseModel")
-                        .WithMany()
-                        .HasForeignKey("BaseModelId");
-
                     b.HasOne("GenomiX.Infrastructure.Models.GenUser", "User")
                         .WithMany("Populations")
                         .HasForeignKey("UserId");
-
-                    b.Navigation("BaseModel");
 
                     b.Navigation("User");
                 });

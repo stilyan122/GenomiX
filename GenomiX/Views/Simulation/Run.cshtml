@@ -13,7 +13,9 @@
                 <div class="gx-sim__kicker">Simulation</div>
                 <h1 class="gx-runhdr__title">@Model.Name</h1>
                 <div class="gx-runhdr__sub">
-                    Live environment control • <span class="mono">Run</span> <span class="mono">@Model.Id.ToString().Substring(0, 8)</span>
+                    Live environment control • <span class="mono">DNA</span>
+                    <span class="mono">@((Model.BaseModelName ?? Model.BaseModelId?.ToString().Substring(0, 8)) ?? "—")</span>
+                    • <span class="mono">Run</span> <span class="mono">@Model.Id.ToString().Substring(0, 8)</span>
                 </div>
             </div>
 
@@ -64,11 +66,25 @@
 
                 <div class="gx-runmain__body">
                     <div class="gx-popcanvas" id="gx-pop-canvas">
-                        <div class="gx-popcanvas__hint">
-                            Population field
-                            <div class="gx-popcanvas__sub">Render organisms here (dots / cells / grid).</div>
-                        </div>
+                        <canvas id="sim-canvas"></canvas>
+
+                        <button type="button" class="gx-canvasfs" id="gx-canvasfs">
+                            Fullscreen
+                        </button>
                     </div>
+
+                    <script id="sim-seed" type="application/json">
+                        @Html.Raw(System.Text.Json.JsonSerializer.Serialize(new {
+                          organisms = Model.Organisms.Select(o => new {
+                            id = o.Id,
+                            name = o.SimpleName,
+                            sci = o.ScientificName,
+                            status = o.Status,
+                            fitness = o.SurvivalScore,
+                            species = o.Species
+                          })
+                        }))
+                    </script>
 
                     <div class="gx-runlog" id="gx-run-log">
                         <div class="gx-runlog__title">Live log</div>
@@ -84,8 +100,14 @@
 
                 <div class="gx-runside__hd">
                     <div class="gx-sim__kicker">Environment</div>
-                    <div class="gx-runside__title">Control panel</div>
-                    <div class="gx-muted">Changes apply live (no reload).</div>
+
+                    <div class="gx-runside__hdrow">
+                        <div>
+                            <div class="gx-runside__title">Control panel</div>
+                            <div class="gx-muted">Changes apply live (no reload).</div>
+                        </div>
+                        <button type="button" class="gx-envtoggle" id="gx-envtoggle" aria-label="Toggle environment panel">⇤</button>
+                    </div>
                 </div>
 
                 <div class="gx-runside__scroll">
@@ -95,7 +117,7 @@
                                 <div class="gx-label">Temperature</div>
                                 <div class="gx-chip mono"><span id="out-temp">0</span>°C</div>
                             </div>
-                            <input class="gx-range" id="f-temp" type="range" min="-20" max="60" step="1" value="0" />
+                            <input class="gx-range" id="f-temp" type="range" min="-20" max="60" step="1" value="@Model.Temperature" />
                         </div>
 
                         <div class="gx-slider">
@@ -103,7 +125,7 @@
                                 <div class="gx-label">Radiation</div>
                                 <div class="gx-chip mono" id="out-rad">0.00</div>
                             </div>
-                            <input class="gx-range" id="f-rad" type="range" min="0" max="1" step="0.01" value="0" />
+                            <input class="gx-range" id="f-rad" type="range" min="0" max="1" step="0.01" value="@Model.Radiation" />
                         </div>
 
                         <div class="gx-slider">
@@ -111,7 +133,7 @@
                                 <div class="gx-label">Disease pressure</div>
                                 <div class="gx-chip mono" id="out-dis">0.00</div>
                             </div>
-                            <input class="gx-range" id="f-dis" type="range" min="0" max="1" step="0.01" value="0" />
+                            <input class="gx-range" id="f-dis" type="range" min="0" max="1" step="0.01" value="@Model.DiseasePressure" />
                         </div>
 
                         <div class="gx-slider">
@@ -119,7 +141,7 @@
                                 <div class="gx-label">Resources</div>
                                 <div class="gx-chip mono" id="out-res">0.00</div>
                             </div>
-                            <input class="gx-range" id="f-res" type="range" min="0" max="1" step="0.01" value="0" />
+                            <input class="gx-range" id="f-res" type="range" min="0" max="1" step="0.01" value="@Model.Resources" />
                         </div>
 
                         <div class="gx-slider">
@@ -127,7 +149,7 @@
                                 <div class="gx-label">Speed</div>
                                 <div class="gx-chip mono" id="out-speed">1</div>
                             </div>
-                            <input class="gx-range" id="f-speed" type="range" min="1" max="50" step="1" value="1" />
+                            <input class="gx-range" id="f-speed" type="range" min="1" max="50" step="1" value="@Model.Speed" />
                         </div>
                     </div>
                 </div>

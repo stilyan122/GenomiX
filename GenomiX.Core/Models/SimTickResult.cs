@@ -7,5 +7,7 @@
         public int Dead { get; set; }
         public int Reproduced { get; set; }
         public double AvgFitness { get; set; }
+
+        public List<SimOrgDto> Organisms { get; set; } = new();
     }
 }

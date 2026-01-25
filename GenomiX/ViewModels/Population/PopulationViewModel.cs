@@ -13,5 +13,13 @@ namespace GenomiX.ViewModels.Population
         public string CreatedAt { get; set; } = null!;
 
         public Guid? BaseModelId { get; set; }
+
+        public string? BaseModelName { get; set; }
+
+        public double Temperature { get; set; }
+        public double Radiation { get; set; }
+        public double DiseasePressure { get; set; }
+        public double Resources { get; set; }
+        public int Speed { get; set; }
     }
 }

@@ -55,7 +55,6 @@
                 @foreach (var p in Model)
                 {
                     var orgCount = p.Organisms?.Count ?? 0;
-                    var shortModel = p.BaseModelId?.ToString().Substring(0, 8) ?? "—";
 
                     <article class="gx-simtile">
                         <div class="gx-simtile__glow"></div>
@@ -79,19 +78,24 @@
 
                             <div class="gx-stat">
                                 <div class="gx-stat__k">Base model</div>
-                                <div class="gx-stat__v mono">@shortModel</div>
+                                <div class="gx-stat__v mono">@p.BaseModelName</div>
                                 <div class="gx-stat__hint">DNA snapshot for this run</div>
                             </div>
                         </div>
 
-                        <div class="gx-simtile__actions">
-                            <a class="gx-btn gx-btn--primary gx-simtile__open" href="/simulations/run/@p.Id">
-                                Open lab
-                            </a>
-                            <a class="gx-btn gx-btn--ghost gx-simtile__secondary" href="/dna/builder/@(p.BaseModelId ?? Guid.Empty)">
-                                View DNA
-                            </a>
+                        <div class="gx-simcard__actions">
+                            <a class="gx-btn gx-btn--primary gx-btn--block" href="/simulations/run/@p.Id">Open lab</a>
+                            <a class="gx-btn gx-btn--block" href="/dna/builder/@p.BaseModelId">View DNA</a>
+
+                            <a class="gx-btn gx-btn--ghost gx-btn--block" href="/simulations/edit/@p.Id">Edit</a>
+
+                            <form method="post" action="/simulations/delete/@p.Id" class="gx-inlineform gx-inlineform--block"
+                                  onsubmit="return confirm('Delete this simulation? This cannot be undone.');">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="gx-btn gx-btn--danger gx-btn--block">Delete</button>
+                            </form>
                         </div>
+
                     </article>
                 }
             </div>

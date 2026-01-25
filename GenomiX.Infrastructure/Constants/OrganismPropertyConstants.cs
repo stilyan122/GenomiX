@@ -24,5 +24,10 @@
         /// The maximum length allowed for the Status property (e.g., "alive", "dead", "reproduced").
         /// </summary>
         public const int Status_MaxLength = 32;
+
+        /// <summary>
+        /// The maximum length allowed for the Type property.
+        /// </summary>
+        public const int Type_MaxLength = 50;
     }
 }

@@ -29,6 +29,7 @@ namespace GenomiX.Core.Services
             => await _pops.GetAll()
                 .Where(p => p.UserId == userId)
                 .Include(p => p.Organisms)
+                .Include(p => p.BaseModel)
                 .OrderByDescending(p => p.CreatedAt)
                 .ToListAsync();
 
@@ -37,6 +38,7 @@ namespace GenomiX.Core.Services
             => await _pops.GetAll()
                 .Where(p => p.UserId == userId && p.Id == populationId)
                 .Include(p => p.Organisms)
+                .Include(p => p.BaseModel)
                 .FirstOrDefaultAsync();
 
         /// <inheritdoc />
@@ -63,9 +65,14 @@ namespace GenomiX.Core.Services
                     CreatedAt = now,
                     Status = "alive",
                     SurvivalScore = 1.0,
-                    DNA_Model_Id = baseModelId,  
+                    Fitness = 1.0,
+
+                    DNA_Model_Id = baseModelId,
                     SimpleName = $"Org {i + 1}",
-                    ScientificName = $"GX-{i + 1:0000}"
+                    ScientificName = $"GX-{i + 1:0000}",
+
+                    X = (float)Random.Shared.NextDouble(),
+                    Y = (float)Random.Shared.NextDouble(),
                 });
             }
 
@@ -131,24 +138,22 @@ namespace GenomiX.Core.Services
 
                     stress = Math.Clamp(stress, 0, 2);
 
+                    var drift = 0.004 + stress * 0.006;
+                    o.X = Math.Clamp(o.X + (float)((Random.Shared.NextDouble() - 0.5) * drift), 0f, 1f);
+                    o.Y = Math.Clamp(o.Y + (float)((Random.Shared.NextDouble() - 0.5) * drift), 0f, 1f);
+
                     var survivalProb = Math.Clamp(0.85 - stress, 0.02, 0.98);
-                    var reproProb = Math.Clamp(0.12 + f.Resources * 0.25 - stress * 0.2, 0.0, 0.6);
 
-                    var r = Random.Shared.NextDouble();
-
-                    if (r > survivalProb)
+                    if (Random.Shared.NextDouble() > survivalProb)
                     {
                         o.Status = "dead";
                         o.SurvivalScore = 0;
+                        o.Fitness = 0;
                         continue;
                     }
 
                     o.SurvivalScore = survivalProb;
-
-                    if (Random.Shared.NextDouble() < reproProb)
-                        o.Status = "reproduced";
-                    else
-                        o.Status = "alive";
+                    o.Fitness = survivalProb;
                 }
             }
 
@@ -160,7 +165,56 @@ namespace GenomiX.Core.Services
             var rep = pop.Organisms.Count(x => x.Status == "reproduced");
             var avg = pop.Organisms.Where(x => x.Status != "dead").Select(x => x.SurvivalScore ?? 0).DefaultIfEmpty(0).Average();
 
-            return new SimTickResult { Tick = f.Tick, Alive = alive, Dead = dead, Reproduced = rep, AvgFitness = avg };
+            return new SimTickResult
+            {
+                Tick = f.Tick,
+                Alive = alive,
+                Dead = dead,
+                Reproduced = rep,
+                AvgFitness = avg,
+                Organisms = pop.Organisms.Select(o => new SimOrgDto
+                {
+                    Id = o.Id,
+                    Status = o.Status,
+                    Fitness = o.Fitness,
+                    X = o.X,
+                    Y = o.Y
+                }).ToList()
+            };
+        }
+
+        /// <inheritdoc />
+        public async Task RenameAsync(Guid userId, Guid populationId, string name)
+        {
+            var pop = await _pops
+                .GetAll()
+                .FirstOrDefaultAsync(p => p.Id == populationId && p.UserId == userId);
+
+            if (pop == null) throw new InvalidOperationException("Population not found.");
+
+            pop.Name = (name ?? "").Trim();
+            if (pop.Name.Length == 0) throw new InvalidOperationException("Name is required.");
+
+            await _pops.UpdateAsync(pop);
+        }
+
+        /// <inheritdoc />
+        public async Task DeleteForUserAsync(Guid userId, Guid populationId)
+        {
+            var pop = await _pops.GetAll()
+                .FirstOrDefaultAsync(p => p.Id == populationId && p.UserId == userId);
+
+            if (pop == null) 
+                throw new InvalidOperationException("Population not found.");
+
+            var orgs = await _orgs.GetAll()
+                .Where(o => o.PopulationId == populationId)
+                .ToListAsync();
+
+            foreach (var o in orgs)
+                await _orgs.DeleteAsync(o.Id);
+
+            await _pops.DeleteAsync(populationId);
         }
     }
 

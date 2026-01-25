@@ -1,0 +1,44 @@
+﻿@model GenomiX.ViewModels.Population.EditPopulationInputModel
+
+@{
+    ViewData["Title"] = "Edit simulation";
+    ViewData["ActiveNav"] = "simulations";
+}
+
+<section class="gx-sim-page">
+    <div class="container container--wide gx-sim">
+        <header class="gx-sim__header">
+            <div class="gx-sim__head-left">
+                <div class="gx-sim__kicker">Simulations</div>
+                <h1 class="gx-sim__title">Edit simulation</h1>
+                <p class="gx-sim__subtitle">Rename your population run.</p>
+            </div>
+
+            <div class="gx-sim__head-right">
+                <a class="gx-btn gx-btn--ghost" href="/simulations">Back</a>
+            </div>
+        </header>
+
+        <article class="gx-card gx-formcard">
+            <form method="post" action="/simulations/edit">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="Id" />
+
+                <div class="gx-field">
+                    <label class="gx-label" asp-for="Name">Name</label>
+                    <input class="gx-input" asp-for="Name" maxlength="60" autocomplete="off" />
+                    <span class="gx-val" asp-validation-for="Name"></span>
+                </div>
+
+                <div class="gx-formactions">
+                    <button type="submit" class="gx-btn gx-btn--primary">Save</button>
+                    <a class="gx-btn" href="/simulations">Cancel</a>
+                </div>
+            </form>
+        </article>
+    </div>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
