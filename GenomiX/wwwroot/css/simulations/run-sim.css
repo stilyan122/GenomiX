@@ -440,3 +440,15 @@
 #gx-pop-canvas:fullscreen{
   border-radius: 0;
 }
+
+.gx-runhdr__scenario {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.gx-select--sm {
+    height: 38px;
+    border-radius: 12px;
+    padding: 0 12px;
+}
