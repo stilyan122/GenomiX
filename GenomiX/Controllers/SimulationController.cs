@@ -79,13 +79,20 @@ namespace GenomiX.Controllers
             if (user == null) return Challenge();
 
             var name = (input.Name ?? "").Trim();
-            if (name.Length == 0) ModelState.AddModelError(nameof(input.Name), "Name is required.");
-            if (input.Size < 2 || input.Size > 5000) ModelState.AddModelError(nameof(input.Size), "Size must be 2..5000.");
-            if (input.BaseModelId == Guid.Empty) ModelState.AddModelError(nameof(input.BaseModelId), "Choose a base DNA model.");
+            if (name.Length == 0) 
+                ModelState.AddModelError(nameof(input.Name), "Name is required.");
+
+            if (input.Size < 2 || input.Size > 5000) 
+                ModelState.AddModelError(nameof(input.Size), "Size must be 2-5000.");
+
+            if (input.BaseModelId == Guid.Empty) 
+                ModelState.AddModelError(nameof(input.BaseModelId), 
+                    "Choose a base DNA model.");
 
             if (!ModelState.IsValid)
             {
                 var models = await _dna.GetAllForUserAsync(user.Id);
+
                 return View(new CreatePopulationViewModel
                 {
                     Name = input?.Name ?? "New Population",
@@ -94,6 +101,7 @@ namespace GenomiX.Controllers
                     Temperature = input.Temperature,
                     Radiation = input.Radiation,
                     DiseasePressure = input.DiseasePressure,
+                    Species = input.Species,
                     Resources = input.Resources,
                     Models = models.Select(m => new CreatePopulationViewModel.ModelOption
                     {
@@ -115,7 +123,9 @@ namespace GenomiX.Controllers
                 Speed = 1
             };
 
-            var id = await _sim.CreateAsync(user.Id, name, input.BaseModelId, input.Size, factors);
+            var species = (input.Species ?? "mouse").Trim().ToLowerInvariant();
+
+            var id = await _sim.CreateAsync(user.Id, name, input.BaseModelId, input.Size, species, factors);
             return RedirectToAction(nameof(Run), new { id });
         }
 
@@ -193,13 +203,21 @@ namespace GenomiX.Controllers
                 Name = pop.Name,
                 CreatedAt = pop.CreatedAt.ToString("yyyy-MM-dd HH:mm"),
                 BaseModelId = pop.BaseModelId,
-                BaseModelName = pop.BaseModel.Name,
+                BaseModelName = pop?.BaseModel?.Name,
                 Temperature = f.Temperature,
                 Radiation = f.Radiation,
                 DiseasePressure = f.DiseasePressure,
                 Resources = f.Resources,
                 Speed = f.Speed,
-                Organisms = pop.Organisms.Select(o => new OrganismViewModel { Id = o.Id }).ToList()
+                Organisms = pop?.Organisms?.Select(o => new OrganismViewModel 
+                { 
+                    Id = o.Id,
+                    Species = o.Type, 
+                    ScientificName = o.ScientificName,
+                    SimpleName = o.SimpleName,
+                    Status = o.Status,
+                    SurvivalScore = o.SurvivalScore ?? 0
+                })?.ToList() ?? new()
             };
 
             return View(vm);

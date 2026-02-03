@@ -42,7 +42,7 @@ namespace GenomiX.Core.Services
                 .FirstOrDefaultAsync();
 
         /// <inheritdoc />
-        public async Task<Guid> CreateAsync(Guid userId, string name, Guid baseModelId, int size, SimFactors factors)
+        public async Task<Guid> CreateAsync(Guid userId, string name, Guid baseModelId, int size, string species, SimFactors factors)
         {
             var now = DateTimeOffset.UtcNow;
 
@@ -56,8 +56,15 @@ namespace GenomiX.Core.Services
                 Factors = SimFactorsJsonHelper.Write(factors)
             };
 
+            string PickSpecies(int i) =>
+                species == "mixed"
+                    ? new[] { "mouse", "pig", "cow", "rabbit", "fox", "bird" }[i % 6]
+                    : species;
+
             for (int i = 0; i < size; i++)
             {
+                var sp = PickSpecies(i);
+
                 pop.Organisms.Add(new Organism
                 {
                     Id = Guid.NewGuid(),
@@ -65,14 +72,12 @@ namespace GenomiX.Core.Services
                     CreatedAt = now,
                     Status = "alive",
                     SurvivalScore = 1.0,
-                    Fitness = 1.0,
+                
+                    Type = sp,
+                    SimpleName = $"{char.ToUpper(sp[0]) + sp.Substring(1)} {i + 1}",
+                    ScientificName = $"GX-{sp.ToUpperInvariant()}-{i + 1:0000}",
 
-                    DNA_Model_Id = baseModelId,
-                    SimpleName = $"Org {i + 1}",
-                    ScientificName = $"GX-{i + 1:0000}",
-
-                    X = (float)Random.Shared.NextDouble(),
-                    Y = (float)Random.Shared.NextDouble(),
+                    DNA_Model_Id = baseModelId
                 });
             }
 
@@ -142,7 +147,7 @@ namespace GenomiX.Core.Services
                     o.X = Math.Clamp(o.X + (float)((Random.Shared.NextDouble() - 0.5) * drift), 0f, 1f);
                     o.Y = Math.Clamp(o.Y + (float)((Random.Shared.NextDouble() - 0.5) * drift), 0f, 1f);
 
-                    var survivalProb = Math.Clamp(0.85 - stress, 0.02, 0.98);
+                    var survivalProb = Math.Clamp(0.97 - stress * 0.55 + f.Resources * 0.06, 0.05, 0.995);
 
                     if (Random.Shared.NextDouble() > survivalProb)
                     {

@@ -19,15 +19,15 @@ namespace GenomiX.Core.Interfaces
         Task<Population?> GetForUserAsync(Guid userId, Guid populationId);
 
         /// <summary>
-        /// Asynchronously creates a new simulation instance for the specified user using the provided parameters.
+        /// Asynchronously creates a new simulation instance with the specified parameters.
         /// </summary>
-        /// <param name="userId">The unique identifier of the user for whom the simulation is being created.</param>
-        /// <param name="name">The name to assign to the new simulation instance. Cannot be null or empty.</param>
+        /// <param name="userId">The unique identifier of the user who owns the simulation.</param>
+        /// <param name="name">The name to assign to the new simulation. Cannot be null or empty.</param>
         /// <param name="baseModelId">The unique identifier of the base model to use for the simulation.</param>
-        /// <param name="size">The size of the simulation, typically representing the number of entities or scale. Must be a positive
-        /// integer.</param>
-        /// <param name="factors">The simulation factors to apply, which configure specific parameters or behaviors for the simulation.</param>
-        Task<Guid> CreateAsync(Guid userId, string name, Guid baseModelId, int size, SimFactors factors);
+        /// <param name="size">The size of the simulation. Must be a positive integer.</param>
+        /// <param name="species">The species to associate with the simulation.</param>
+        /// <param name="factors">The simulation factors to apply when creating the simulation. Cannot be null.</param>
+        Task<Guid> CreateAsync(Guid userId, string name, Guid baseModelId, int size, string species, SimFactors factors);
 
         /// <summary>
         /// Asynchronously updates the simulation factors for the specified user and population.

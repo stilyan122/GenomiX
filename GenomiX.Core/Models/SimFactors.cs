@@ -8,6 +8,8 @@
         public double Resources { get; set; } = 0.7;        
         public int Tick { get; set; } = 0;
         public bool IsRunning { get; set; } = false;
-        public int Speed { get; set; } = 1;                 
+        public int Speed { get; set; } = 1;
+
+        public string Species { get; set; } = "mouse";
     }
 }

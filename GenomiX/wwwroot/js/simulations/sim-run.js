@@ -23,6 +23,54 @@ function debounce(fn, ms = 200) {
     };
 }
 
+const cam = { x: 0, y: 0, zoom: 1, dragging: false, lx: 0, ly: 0 };
+function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+
+function bindPanZoom(host) {
+    if (!host) return () => { };
+
+    const onDown = (e) => {
+        cam.dragging = true;
+        cam.lx = e.clientX;
+        cam.ly = e.clientY;
+        host.setPointerCapture?.(e.pointerId);
+    };
+
+    const onMove = (e) => {
+        if (!cam.dragging) return;
+        const dx = e.clientX - cam.lx;
+        const dy = e.clientY - cam.ly;
+        cam.lx = e.clientX;
+        cam.ly = e.clientY;
+
+        cam.x += dx / cam.zoom;
+        cam.y += dy / cam.zoom;
+
+        cam.x = clamp(cam.x, -900, 900);
+        cam.y = clamp(cam.y, -520, 520);
+    };
+
+    const onUp = () => { cam.dragging = false; };
+
+    const onWheel = (e) => {
+        e.preventDefault();
+        const z = cam.zoom * (e.deltaY < 0 ? 1.08 : (1 / 1.08));
+        cam.zoom = clamp(z, 0.75, 2.4);
+    };
+
+    host.addEventListener("pointerdown", onDown);
+    host.addEventListener("pointermove", onMove);
+    window.addEventListener("pointerup", onUp);
+    host.addEventListener("wheel", onWheel, { passive: false });
+
+    return () => {
+        host.removeEventListener("pointerdown", onDown);
+        host.removeEventListener("pointermove", onMove);
+        window.removeEventListener("pointerup", onUp);
+        host.removeEventListener("wheel", onWheel);
+    };
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     const root = document.getElementById("sim-root");
     if (!root) return;
@@ -49,9 +97,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const grid = document.querySelector(".gx-rungrid");
     const envBtn = document.getElementById("gx-envtoggle");
-    envBtn?.addEventListener("click", () => {
-        grid?.classList.toggle("is-env-collapsed");
-    });
+    envBtn?.addEventListener("click", () => grid?.classList.toggle("is-env-collapsed"));
 
     const logBody = document.getElementById("gx-run-logBody");
     function log(line) {
@@ -65,17 +111,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function factorsPayload() {
         return {
-            temperature: Number(sTemp.value),
-            radiation: Number(sRad.value),
-            diseasePressure: Number(sDis.value),
-            resources: Number(sRes.value),
-            speed: Number(sSpeed.value)
+            temperature: Number(sTemp?.value ?? 22),
+            radiation: Number(sRad?.value ?? 0.1),
+            diseasePressure: Number(sDis?.value ?? 0.1),
+            resources: Number(sRes?.value ?? 0.7),
+            speed: Number(sSpeed?.value ?? 1)
         };
     }
 
     let running = false;
     let inFlight = false;
     let loopTimer = 0;
+
+    let prevDead = 0;
+    let prevRep = 0;
 
     function setUiRunning(on) {
         running = !!on;
@@ -86,103 +135,121 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function applyTickResult(r) {
-        if (typeof r.tick === "number") vTick.textContent = String(r.tick);
-        if (typeof r.alive === "number") vAlive.textContent = String(r.alive);
-        if (typeof r.dead === "number") vDead.textContent = String(r.dead);
-        if (typeof r.reproduced === "number") vRep.textContent = String(r.reproduced);
-        if (typeof r.avgFitness === "number") vAvg.textContent = r.avgFitness.toFixed(3);
+        if (typeof r.tick === "number" && vTick) vTick.textContent = String(r.tick);
+        if (typeof r.alive === "number" && vAlive) vAlive.textContent = String(r.alive);
+        if (typeof r.dead === "number" && vDead) vDead.textContent = String(r.dead);
+        if (typeof r.reproduced === "number" && vRep) vRep.textContent = String(r.reproduced);
+        if (typeof r.avgFitness === "number" && vAvg) vAvg.textContent = r.avgFitness.toFixed(3);
     }
 
-    const canvas = document.getElementById("sim-canvas");
     const host = document.getElementById("gx-pop-canvas");
+    const canvas = document.getElementById("sim-canvas");
     const fsBtn = document.getElementById("gx-canvasfs");
+
+    const disposePan = bindPanZoom(host);
+    const ctx = canvas?.getContext("2d", { alpha: true }) ?? null;
 
     const seedEl = document.getElementById("sim-seed");
     const seed = seedEl ? JSON.parse(seedEl.textContent || "{}") : {};
     const seedOrgs = Array.isArray(seed.organisms) ? seed.organisms : [];
 
-    const ctx = canvas?.getContext("2d", { alpha: true }) ?? null;
+    const speciesEmoji = { mouse: "🐭", pig: "🐷", cow: "🐮", rabbit: "🐰", fox: "🦊", bird: "🐦" };
 
-    const speciesEmoji = {
-        mouse: "🐭",
-        pig: "🐷",
-        cow: "🐮",
-        rabbit: "🐰",
-        fox: "🦊",
-        bird: "🐦"
-    };
+    function hashStr(s) {
+        let h = 2166136261;
+        for (let i = 0; i < s.length; i++) {
+            h ^= s.charCodeAt(i);
+            h = Math.imul(h, 16777619);
+        }
+        return (h >>> 0);
+    }
 
     const agents = seedOrgs.map((o, idx) => {
-        const sp = o.species || ["mouse", "pig", "cow", "rabbit", "fox", "bird"][idx % 6];
+        const sp = (o.species || "").toString().toLowerCase() || ["mouse", "pig", "cow", "rabbit", "fox", "bird"][idx % 6];
+        const id = (o.id || `${idx}`).toString();
+        const st = (o.status || "alive").toString().toLowerCase();
+        const dead = st === "dead";
         return {
-            id: o.id,
+            id,
+            ord: hashStr(id),
             name: o.name || `Org ${idx + 1}`,
-            sci: o.sci || "",
             species: sp,
-            status: o.status || "alive",
-            fitness: Number(o.fitness ?? 1),
+            dead: dead,
+            reproFx: 0,
             x: Math.random(),
-            y: 0.35 + Math.random() * 0.55,
+            y: 0.40 + Math.random() * 0.52,
             vx: (Math.random() * 2 - 1) * 0.04,
             vy: (Math.random() * 2 - 1) * 0.02,
-            wob: Math.random() * 10,
-            popFx: 0
+            wob: Math.random() * 10
         };
-    });
+    }).sort((a, b) => a.ord - b.ord);
 
     const foods = [];
     function spawnFood(n = 2) {
-        for (let i = 0; i < n; i++) {
-            foods.push({ x: Math.random(), y: 0.45 + Math.random() * 0.5, s: 1.0 });
-        }
+        for (let i = 0; i < n; i++) foods.push({ x: Math.random(), y: 0.46 + Math.random() * 0.48, s: 1.0 });
     }
 
     function resizeCanvas() {
-        if (!canvas || !host) return;
+        if (!canvas || !host || !ctx) return;
         const r = host.getBoundingClientRect();
         const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
         canvas.width = Math.floor(r.width * dpr);
         canvas.height = Math.floor(r.height * dpr);
         canvas.style.width = `${r.width}px`;
         canvas.style.height = `${r.height}px`;
-        if (ctx) ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    function drawHillLayer(w, h, horizon, parallax, amp, fill) {
+        const ox = -cam.x * parallax;
+        const oy = -cam.y * parallax;
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(0, h);
+
+        for (let x = 0; x <= w; x += 18) {
+            const t = (x + ox) * 0.004;
+            const y = horizon + oy + Math.sin(t) * amp + Math.sin(t * 1.7) * (amp * 0.35);
+            ctx.lineTo(x, y);
+        }
+
+        ctx.lineTo(w, h);
+        ctx.closePath();
+        ctx.fillStyle = fill;
+        ctx.fill();
+        ctx.restore();
     }
 
     function drawBackground(w, h) {
-        if (!ctx) return;
+        const horizon = h * 0.42;
 
-        const g1 = ctx.createLinearGradient(0, 0, 0, h);
-        g1.addColorStop(0, "rgba(50,90,150,.35)");
-        g1.addColorStop(0.55, "rgba(20,30,55,.15)");
-        g1.addColorStop(1, "rgba(10,12,18,0)");
-        ctx.fillStyle = g1;
-        ctx.fillRect(0, 0, w, h);
+        const sky = ctx.createLinearGradient(0, 0, 0, horizon);
+        sky.addColorStop(0, "rgba(8,12,24,1)");
+        sky.addColorStop(1, "rgba(6,10,18,1)");
+        ctx.fillStyle = sky;
+        ctx.fillRect(0, 0, w, horizon);
 
-        ctx.globalAlpha = 0.35;
-        ctx.fillStyle = "rgba(70,140,120,.35)";
-        ctx.beginPath();
-        ctx.moveTo(0, h * 0.62);
-        ctx.bezierCurveTo(w * 0.25, h * 0.52, w * 0.5, h * 0.72, w, h * 0.60);
-        ctx.lineTo(w, h);
-        ctx.lineTo(0, h);
-        ctx.closePath();
-        ctx.fill();
+        const ground = ctx.createLinearGradient(0, horizon, 0, h);
+        ground.addColorStop(0, "rgba(10,34,24,1)");
+        ground.addColorStop(1, "rgba(6,18,14,1)");
+        ctx.fillStyle = ground;
+        ctx.fillRect(0, horizon, w, h - horizon);
 
-        ctx.globalAlpha = 0.22;
-        ctx.fillStyle = "rgba(100,180,150,.35)";
-        ctx.beginPath();
-        ctx.moveTo(0, h * 0.72);
-        ctx.bezierCurveTo(w * 0.22, h * 0.78, w * 0.55, h * 0.62, w, h * 0.74);
-        ctx.lineTo(w, h);
-        ctx.lineTo(0, h);
-        ctx.closePath();
-        ctx.fill();
-
-        ctx.globalAlpha = 1;
+        drawHillLayer(w, h, horizon, 0.22, 42, "rgba(18,64,44,.26)");
+        drawHillLayer(w, h, horizon, 0.50, 28, "rgba(18,86,56,.30)");
+        drawHillLayer(w, h, horizon, 0.85, 18, "rgba(22,120,76,.34)");
     }
 
+    function beginWorld(w, h) {
+        ctx.save();
+        ctx.translate(w / 2, h / 2);
+        ctx.scale(cam.zoom, cam.zoom);
+        ctx.translate(-w / 2 + cam.x, -h / 2 + cam.y);
+    }
+    function endWorld() { ctx.restore(); }
+
     function drawFood(w, h) {
-        if (!ctx) return;
         for (const f of foods) {
             const x = f.x * w;
             const y = f.y * h;
@@ -196,8 +263,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function drawAgents(w, h) {
-        if (!ctx) return;
-
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
 
@@ -205,20 +270,16 @@ document.addEventListener("DOMContentLoaded", () => {
             const x = a.x * w;
             const y = a.y * h;
 
-            if (a.status === "dead") {
-                ctx.globalAlpha = 0.35;
-            } else {
-                ctx.globalAlpha = 1;
-            }
+            ctx.globalAlpha = a.dead ? 0.35 : 1;
 
             ctx.fillStyle = "rgba(0,0,0,.25)";
             ctx.beginPath();
             ctx.ellipse(x, y + 10, 10, 4, 0, 0, Math.PI * 2);
             ctx.fill();
 
-            if (a.popFx > 0) {
-                const r = 10 + (1 - a.popFx) * 28;
-                ctx.strokeStyle = `rgba(120,170,255,${0.35 * a.popFx})`;
+            if (a.reproFx > 0) {
+                const r = 12 + (1 - a.reproFx) * 34;
+                ctx.strokeStyle = `rgba(120,170,255,${0.38 * a.reproFx})`;
                 ctx.lineWidth = 2;
                 ctx.beginPath();
                 ctx.arc(x, y, r, 0, Math.PI * 2);
@@ -230,11 +291,7 @@ document.addEventListener("DOMContentLoaded", () => {
             ctx.fillStyle = "rgba(255,255,255,.95)";
             ctx.fillText(em, x, y - 2);
 
-            const col =
-                a.status === "alive" ? "rgba(120,255,180,.95)" :
-                    a.status === "reproduced" ? "rgba(120,170,255,.95)" :
-                        "rgba(255,120,120,.9)";
-
+            const col = a.dead ? "rgba(255,120,120,.9)" : (a.reproFx > 0 ? "rgba(120,170,255,.95)" : "rgba(120,255,180,.95)");
             ctx.fillStyle = col;
             ctx.beginPath();
             ctx.arc(x + 14, y - 12, 3.5, 0, Math.PI * 2);
@@ -245,19 +302,16 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function stepSim(dt) {
-        const w = canvas ? (canvas.clientWidth || 1) : 1;
-        const h = canvas ? (canvas.clientHeight || 1) : 1;
-
         const res = Math.max(0, Math.min(1, Number(sRes?.value ?? 0.7)));
+
         if (Math.random() < 0.02 + res * 0.06) spawnFood(1);
         if (foods.length > 240) foods.splice(0, foods.length - 240);
-
         for (const f of foods) f.s = Math.max(0.15, f.s - dt * 0.02);
 
         for (const a of agents) {
-            if (a.popFx > 0) a.popFx = Math.max(0, a.popFx - dt * 0.9);
+            if (a.reproFx > 0) a.reproFx = Math.max(0, a.reproFx - dt * 0.9);
 
-            if (a.status === "dead") {
+            if (a.dead) {
                 a.vx *= 0.98;
                 a.vy *= 0.98;
             } else {
@@ -266,7 +320,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 const woby = Math.cos(a.wob * 0.9) * 0.006;
 
                 let target = null;
-                if (foods.length && Math.random() < 0.12) {
+                if (foods.length) {
                     let bestD = 1e9;
                     for (const f of foods) {
                         const dx = f.x - a.x;
@@ -294,10 +348,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (a.x < 0.03) { a.x = 0.03; a.vx *= -0.7; }
             if (a.x > 0.97) { a.x = 0.97; a.vx *= -0.7; }
-            if (a.y < 0.35) { a.y = 0.35; a.vy *= -0.7; }
+            if (a.y < 0.40) { a.y = 0.40; a.vy *= -0.7; }
             if (a.y > 0.95) { a.y = 0.95; a.vy *= -0.7; }
 
-            if (a.status !== "dead") {
+            if (!a.dead) {
                 for (let i = foods.length - 1; i >= 0; i--) {
                     const f = foods[i];
                     const dx = f.x - a.x;
@@ -306,11 +360,37 @@ document.addEventListener("DOMContentLoaded", () => {
                         foods.splice(i, 1);
                         a.vx += (Math.random() * 2 - 1) * 0.03;
                         a.vy += (Math.random() * 2 - 1) * 0.02;
-                        if (Math.random() < 0.08) log(`${a.name} ate food 🌿`);
+                        if (Math.random() < 0.06) log(`${a.name} ate food 🌿`);
                         break;
                     }
                 }
             }
+        }
+    }
+
+    function syncDeaths(deadTotal) {
+        if (!Number.isFinite(deadTotal)) return;
+        const want = Math.max(0, Math.min(agents.length, Math.floor(deadTotal)));
+        let cur = 0;
+        for (const a of agents) if (a.dead) cur++;
+
+        if (want <= cur) return;
+
+        let need = want - cur;
+        for (const a of agents) {
+            if (need <= 0) break;
+            if (!a.dead) {
+                a.dead = true;
+                need--;
+            }
+        }
+    }
+
+    function flashRepro(n) {
+        const count = Math.max(0, Math.min(agents.length, Math.floor(n)));
+        for (let i = 0; i < Math.min(3, count); i++) {
+            const a = agents[Math.floor(Math.random() * agents.length)];
+            if (a && !a.dead) a.reproFx = 1;
         }
     }
 
@@ -328,51 +408,36 @@ document.addEventListener("DOMContentLoaded", () => {
         ctx.clearRect(0, 0, w, h);
         drawBackground(w, h);
 
+        beginWorld(w, h);
         if (running) {
             stepSim(dt);
             drawFood(w, h);
         } else {
             foods.length = 0;
         }
-
         drawAgents(w, h);
+        endWorld();
 
         requestAnimationFrame(frame);
     }
 
     requestAnimationFrame(frame);
 
-    fsBtn?.addEventListener("click", async () => {
-        if (!host) return;
-        if (document.fullscreenElement) await document.exitFullscreen();
-        else await host.requestFullscreen?.();
-    });
-
-    document.addEventListener("fullscreenchange", () => {
-        resizeCanvas();
-        log(document.fullscreenElement ? "Canvas fullscreen enabled." : "Canvas fullscreen exited.");
-    });
-
-    resizeCanvas();
-    window.addEventListener("resize", resizeCanvas, { passive: true });
-    spawnFood(16);
-    requestAnimationFrame(frame);
-
     const pushFactors = debounce(async () => {
         try {
             await postJson(`/simulations/${popId}/factors`, factorsPayload());
-            statusEl.textContent = "Environment updated ✓";
-            log(`Env: T=${sTemp.value}°C • rad=${Number(sRad.value).toFixed(2)} • dis=${Number(sDis.value).toFixed(2)} • res=${Number(sRes.value).toFixed(2)}`);
-            setTimeout(() => { if (!running) statusEl.textContent = "Ready."; }, 700);
+            if (statusEl) statusEl.textContent = "Environment updated ✓";
+            log(`Env: T=${sTemp?.value ?? 22}°C • rad=${Number(sRad?.value ?? 0).toFixed(2)} • dis=${Number(sDis?.value ?? 0).toFixed(2)} • res=${Number(sRes?.value ?? 0).toFixed(2)}`);
+            setTimeout(() => { if (!running && statusEl) statusEl.textContent = "Ready."; }, 700);
         } catch (e) {
-            statusEl.textContent = e?.message || "Factors update failed.";
+            if (statusEl) statusEl.textContent = e?.message || "Factors update failed.";
             log("Env update failed.");
         }
     }, 180);
 
     [sTemp, sRad, sDis, sRes, sSpeed].forEach(el => {
         el?.addEventListener("input", () => {
-            statusEl.textContent = "Adjusting…";
+            if (statusEl) statusEl.textContent = "Adjusting…";
             pushFactors();
         });
     });
@@ -384,28 +449,20 @@ document.addEventListener("DOMContentLoaded", () => {
             const r = await postJson(`/simulations/${popId}/tick`, { steps });
             applyTickResult(r);
 
-            if (typeof r.dead === "number" && r.dead > 0 && Math.random() < 0.35) log("Some organisms died ☠️");
-            if (typeof r.reproduced === "number" && r.reproduced > 0 && Math.random() < 0.35) log("Reproduction detected ✨");
+            const deadTotal = typeof r.dead === "number" ? r.dead : prevDead;
+            const repTotal = typeof r.reproduced === "number" ? r.reproduced : prevRep;
 
-            if (typeof r.dead === "number") {
-                const wantDead = r.dead;
-                let deadNow = agents.filter(a => a.status === "dead").length;
-                while (deadNow < wantDead && deadNow < agents.length) {
-                    const cand = agents.find(a => a.status !== "dead");
-                    if (!cand) break;
-                    cand.status = "dead";
-                    deadNow++;
-                }
-            }
-            if (typeof r.reproduced === "number") {
-                const reps = r.reproduced;
-                for (let k = 0; k < Math.min(3, reps); k++) {
-                    const a = agents[Math.floor(Math.random() * agents.length)];
-                    if (a && a.status !== "dead") { a.status = "reproduced"; a.popFx = 1; }
-                }
-            }
+            const newlyDead = Math.max(0, deadTotal - prevDead);
+            const newlyRep = Math.max(0, repTotal - prevRep);
+
+            prevDead = Math.max(prevDead, deadTotal);
+            prevRep = Math.max(prevRep, repTotal);
+
+            syncDeaths(prevDead);
+            if (newlyDead > 0) log(`Deaths +${newlyDead} ☠️`);
+            if (newlyRep > 0) { flashRepro(newlyRep); log(`Reproduced +${newlyRep} ✨`); }
         } catch (e) {
-            statusEl.textContent = e?.message || "Tick failed.";
+            if (statusEl) statusEl.textContent = e?.message || "Tick failed.";
             log("Tick failed.");
             setUiRunning(false);
             clearTimeout(loopTimer);
@@ -418,7 +475,7 @@ document.addEventListener("DOMContentLoaded", () => {
         clearTimeout(loopTimer);
         if (!running) return;
 
-        const speed = Math.max(1, Math.min(50, Number(sSpeed.value || 1)));
+        const speed = Math.max(1, Math.min(50, Number(sSpeed?.value || 1)));
         const steps = speed <= 10 ? speed : Math.round(10 + (speed - 10) * 2);
         const interval = Math.max(120, 520 - speed * 10);
 
@@ -434,7 +491,7 @@ document.addEventListener("DOMContentLoaded", () => {
             log("Simulation started ▶️");
             scheduleLoop();
         } catch (e) {
-            statusEl.textContent = e?.message || "Could not start.";
+            if (statusEl) statusEl.textContent = e?.message || "Could not start.";
             log("Could not start.");
         }
     });
@@ -446,19 +503,50 @@ document.addEventListener("DOMContentLoaded", () => {
             log("Simulation paused ⏸");
             clearTimeout(loopTimer);
         } catch (e) {
-            statusEl.textContent = e?.message || "Could not pause.";
+            if (statusEl) statusEl.textContent = e?.message || "Could not pause.";
             log("Could not pause.");
         }
     });
 
     btnStep?.addEventListener("click", async () => {
-        statusEl.textContent = "Step…";
+        if (statusEl) statusEl.textContent = "Step…";
         log("Tick ×10");
         await doTick(10);
-        statusEl.textContent = "Ready.";
+        if (statusEl) statusEl.textContent = "Ready.";
     });
 
-    window.addEventListener("beforeunload", () => clearTimeout(loopTimer));
+    async function toggleFullscreen() {
+        if (!host) return;
+        try {
+            if (document.fullscreenElement) await document.exitFullscreen();
+            else await host.requestFullscreen();
+        } catch {
+            log("Fullscreen blocked by browser.");
+        }
+    }
+
+    fsBtn?.addEventListener("click", (e) => {
+        e.preventDefault();
+        toggleFullscreen();
+    });
+
+    host?.addEventListener("dblclick", (e) => {
+        e.preventDefault();
+        toggleFullscreen();
+    });
+
+    document.addEventListener("fullscreenchange", () => {
+        resizeCanvas();
+        log(document.fullscreenElement ? "Canvas fullscreen enabled." : "Canvas fullscreen exited.");
+    });
+
+    resizeCanvas();
+    window.addEventListener("resize", resizeCanvas, { passive: true });
 
     log("Valley renderer online ✅");
+
+    window.addEventListener("beforeunload", () => {
+        clearTimeout(loopTimer);
+        disposePan?.();
+    });
 });
