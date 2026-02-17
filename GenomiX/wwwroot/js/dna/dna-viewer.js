@@ -130,6 +130,12 @@ export function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
         syncUndoRedoButtons();
     }
 
+    function setLegendVisible(is3D) {
+        const el = document.getElementById("gx-legend-3d");
+        if (!el) return;
+        el.classList.toggle("gx-hidden", !is3D);
+    }
+
     function record(op) {
         if (replaying) return;
         undoStack.push(withMeta(op));
@@ -333,6 +339,8 @@ export function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
     }
 
     function mutateAt(i, strandNum, newBase) {
+        (containerForLadder || visualizer)?.classList.remove("gx-scan-complete");
+
         if (!COMP[newBase]) return;
 
         const uid = uidOfIndex(i);
@@ -353,6 +361,8 @@ export function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
     }
 
     function insertPairAt(idx, b1, b2) {
+        (containerForLadder || visualizer)?.classList.remove("gx-scan-complete");
+
         const insertAt = Math.max(0, Math.min(idx, pairs.length));
 
         s1.splice(insertAt, 0, b1);
@@ -373,6 +383,8 @@ export function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
     }
 
     function deletePairAt(idx) {
+        (containerForLadder || visualizer)?.classList.remove("gx-scan-complete");
+
         if (pairs.length <= 1) return;
 
         const delAt = Math.max(0, Math.min(idx, pairs.length - 1));
@@ -395,6 +407,8 @@ export function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
     }
 
     function movePair(from, to) {
+        (containerForLadder || visualizer)?.classList.remove("gx-scan-complete");
+
         if (to < 0 || to >= pairs.length) return;
         if (from === to) return;
 
@@ -420,6 +434,7 @@ export function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
     }
 
     function repairAt(i, { silent = false } = {}) {
+
         if (i < 0 || i >= pairs.length) return;
 
         const b1 = s1[i];
@@ -524,6 +539,7 @@ export function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
         }
 
         btn.style.display = "";
+        return btn; 
     }
 
     function hideFullscreenBtn() {
@@ -543,10 +559,8 @@ export function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
     }
 
     function setScanUi(on) {
-        // dim background + make it feel like a “mode”
         (containerForLadder || visualizer)?.classList.toggle("gx-scanmode", !!on);
 
-        // disable UI buttons while scanning
         if (scanBtn) scanBtn.disabled = !!on;
         if (repairAllBtn) repairAllBtn.disabled = !!on || countMismatches() === 0;
         if (undoBtn) undoBtn.disabled = !!on || undoStack.length === 0;
@@ -566,6 +580,13 @@ export function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
     function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
     let scanRunning = false;
+    let scannedOnce = false;
+
+    function setRepairVisibility() {
+        if (!repairAllBtn) return;
+        repairAllBtn.classList.toggle("is-hidden", !scannedOnce);
+    }
+
     let scanAbort = false;
 
     let stickyTip = null;      
@@ -638,10 +659,31 @@ export function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
     }
 
     scanBtn?.addEventListener("click", async () => {
-        await runScanMode();
+        if (scanRunning) return;
+
+        scanRunning = true;
+        scanAbort = false;
+
+        setScanUi(true);
+
+        try {
+            await runScanMode();
+
+            if (!scanAbort) {
+                scannedOnce = true;
+                setRepairVisibility();
+
+                (containerForLadder || visualizer)?.classList.add("gx-scan-complete");
+            }
+        } finally {
+            scanRunning = false;
+            setScanUi(false);
+        }
     });
 
     const repairAllBtn = document.getElementById("repair-dna-btn");
+
+    setRepairVisibility();
 
     function updateRepairAllButton() {
         if (!repairAllBtn) return;
@@ -742,7 +784,10 @@ export function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
         ladderEl = ladder;
         containerForLadder = ladderWrap;
 
-        overlayRefs = buildCommonOverlay(ladderWrap);
+        const overlay2D = buildCommonOverlay(ladderWrap);
+        const overlay3D = buildCommonOverlay(threeWrap);
+
+        overlayRefs = overlay2D;
 
         function ensure3D(idx) {
             if (!threeApi) {
@@ -837,8 +882,6 @@ export function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
             });
         }
 
-        const fsBtn = document.getElementById("helix-fullscreen-btn");
-
         function ensureFsBar() {
             let bar = threeWrap.querySelector(".gx-fs__bar");
             if (bar) return bar;
@@ -874,6 +917,10 @@ export function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
             setTimeout(() => threeApi?.refresh?.(), 60);
         }
 
+        const fsBtn = ensureFullscreenBtn();
+        fsBtn.disabled = true;
+        fsBtn.style.opacity = "0.55";
+
         async function exitFullscreen() {
             if (document.fullscreenElement) await document.exitFullscreen();
         }
@@ -902,12 +949,17 @@ export function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
         const [tab2d, tab3d] = toggle.querySelectorAll(".sci-tab");
 
         const onTab2D = () => {
+            setLegendVisible(false);
             tab2d.classList.add("is-active");
             tab3d.classList.remove("is-active");
             threeWrap.classList.add("hidden");
             ladderWrap.classList.remove("hidden");
 
+            fsBtn.disabled = true;
+            fsBtn.style.opacity = "0.55";
+
             containerForLadder = ladderWrap;
+            progressContainerEl = overlay2D.progCont;
 
             ladderWrap.appendChild(overlayRefs.overlay);
             ladderWrap.appendChild(overlayRefs.progCont);
@@ -922,6 +974,7 @@ export function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
         };
 
         const onTab3D = () => {
+            setLegendVisible(true);
             tab3d.classList.add("is-active");
             tab2d.classList.remove("is-active");
             ladderWrap.classList.add("hidden");
@@ -938,10 +991,14 @@ export function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
             if (scanOverlay)
                 (containerForLadder || visualizer).appendChild(scanOverlay);
 
+            fsBtn.disabled = false;
+            fsBtn.style.opacity = "1";
+
+            progressContainerEl = overlay3D.progCont;
 
             threeApi?.refresh?.();
-            threeApi?.frameAll?.();
-            threeApi?.snapToIndex?.(current);
+            threeApi?.fit?.();
+            threeApi?.toIndex?.(current);
 
             ensureFullscreenBtn();
             updateView();

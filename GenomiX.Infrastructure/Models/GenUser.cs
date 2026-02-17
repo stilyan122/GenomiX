@@ -30,9 +30,6 @@ namespace GenomiX.Infrastructure.Models
         /// <summary> Gets or sets the collection of populations associated with this entity. </summary>
         public ICollection<Population> Populations { get; set; } = new List<Population>();
 
-        /// <summary> Gets or sets the collection of lessons associated with this entity. </summary>
-        public ICollection<Lesson> Lessons { get; set; } = new List<Lesson>();
-
         /// <summary> Gets or sets the collection of DNA models associated with this entity. </summary>
         public ICollection<DNAModel> DNAModels { get; set; } = new List<DNAModel>();
     }

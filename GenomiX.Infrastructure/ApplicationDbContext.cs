@@ -25,12 +25,6 @@ namespace GenomiX.Infrastructure
         public DbSet<Population> Populations => Set<Population>();
         public DbSet<Organism> Organisms => Set<Organism>();
 
-        // Education
-        public DbSet<Lesson> Lessons => Set<Lesson>();
-        public DbSet<Test> Tests => Set<Test>();
-        public DbSet<Answer> Answers => Set<Answer>();
-        public DbSet<Question> Questions => Set<Question>();
-
         // Authentication & Authorization
         public DbSet<RoleRequest> RoleRequests { get; set; } = null!;
 

@@ -161,3 +161,20 @@
     min-height: 360px;
     border: 1px solid var(--stroke);
 }
+
+.base-pair.is-mismatch {
+  outline: 1px solid rgba(255,80,80,.55);
+  outline-offset: 4px;
+  box-shadow: 0 0 0 1px rgba(0,0,0,.25) inset, 0 0 0 1px rgba(255,80,80,.18);
+}
+
+.gx-scan-complete .base-pair.is-mismatch {
+  outline: 2px solid rgba(255,60,60,.95);
+  outline-offset: 5px;
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,.25) inset,
+    0 0 0 1px rgba(255,60,60,.45),
+    0 0 18px rgba(255,60,60,.22);
+  transform: translateY(-1px) scale(1.045);
+  animation: gxMismatchPulse 1.15s ease-in-out infinite;
+}

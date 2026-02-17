@@ -155,3 +155,24 @@
     max-height: none !important;
   }
 }
+
+.gx-science-wrap,
+.gx-helix3d-wrap,
+.gx-dna__canvas {
+  border-radius: 18px;
+  overflow: hidden;
+}
+
+.gx-helix3d-wrap {
+  background: radial-gradient(1200px 600px at 50% 20%, rgba(120,200,255,.10), transparent 60%),
+              radial-gradient(900px 450px at 30% 90%, rgba(255,120,120,.06), transparent 55%),
+              rgba(8, 10, 16, 0.92);
+  border: 1px solid rgba(140,170,220,.18);
+  box-shadow: 0 20px 60px rgba(0,0,0,.45);
+}
+
+.gx-science-legend {
+  font-size: 12px;
+  opacity: .82;
+  letter-spacing: .2px;
+}

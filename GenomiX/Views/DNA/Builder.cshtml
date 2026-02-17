@@ -50,22 +50,14 @@
 
         <section id="dna-visualizer-section" class="gx-dna__viewer">
             <div class="gx-dna__viewerbar">
-                <a class="gx-btn gx-btn--primary" href="/dna/models">Exit</a>
+                <a id="exit-btn" class="gx-btn gx-btn--ghost gx-btn-exit" href="/dna/models">Exit</a>
 
-                <button id="save-btn" type="button" class="gx-btn gx-btn--primary">
+                <button id="save-btn" type="button" class="gx-btn gx-btn--accent">
                     Save model
                 </button>
 
-                <button id="history-btn" class="gx-btn gx-btn--primary" type="button">
+                <button id="history-btn" class="gx-btn gx-btn--ghost" type="button">
                     History
-                </button>
-
-                <button id="repair-dna-btn" type="button" class="gx-btn">
-                    Repair DNA
-                </button>
-
-                <button id="scan-dna-btn" type="button" class="gx-btn gx-btn--primary">
-                    Scan DNA
                 </button>
 
                 <div class="gx-dna__viewerhint">
@@ -73,12 +65,20 @@
                 </div>
 
                 <div class="gx-dna__vieweractions">
-                    <button id="undo-btn" class="gx-btn gx-btn--primary" type="button" aria-label="Undo" title="Undo">
+                    <button id="scan-dna-btn" type="button" class="gx-btn gx-btn--accent">
+                        Scan DNA
+                    </button>
+
+                    <button id="repair-dna-btn" type="button" class="gx-btn gx-btn--danger is-hidden">
+                        Repair DNA
+                    </button>
+
+                    <button id="undo-btn" class="gx-btn gx-btn--soft" type="button" aria-label="Undo" title="Undo">
                         <span class="gx-action__icon">↶</span>
                         <span class="gx-action__text">Undo</span>
                     </button>
 
-                    <button id="redo-btn" class="gx-btn gx-btn--primary" type="button" aria-label="Redo" title="Redo">
+                    <button id="redo-btn" class="gx-btn gx-btn--soft" type="button" aria-label="Redo" title="Redo">
                         <span class="gx-action__icon">↷</span>
                         <span class="gx-action__text">Redo</span>
                     </button>
@@ -93,6 +93,17 @@
           </div>
 
           <input type="hidden" id="gx-model-id" value="@Model.ModelId" />
+
+            <div id="dna-visual" class="gx-dna__canvas gx-helix-wrap">
+                <div id="gx-legend-3d" class="gx-dna-legend gx-hidden">
+                    <div class="row"><span class="dot c"></span><span>C</span></div>
+                    <div class="row"><span class="dot n"></span><span>N</span></div>
+                    <div class="row"><span class="dot o"></span><span>O</span></div>
+                    <div class="row"><span class="dot p"></span><span>P</span></div>
+                    <div class="row"><span class="dot h"></span><span>H</span></div>
+                    <div class="row"><span class="hbond"></span><span>H-bond</span></div>
+                </div>
+            </div>
 
           <div id="dna-visual" class="gx-dna__canvas"></div>
         </section>

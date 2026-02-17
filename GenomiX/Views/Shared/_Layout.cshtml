@@ -28,7 +28,6 @@
                 <div class="navlinks navlinks--primary">
                     <a class="navlink @(ViewData["ActiveNav"] as string == "dna" ? "is-active" : "")" href="/dna">DNA Builder</a>
                     <a class="navlink @(ViewData["ActiveNav"] as string == "sim" ? "is-active" : "")" href="/simulations">Simulations</a>
-                    <a class="navlink @(ViewData["ActiveNav"] as string == "ai" ? "is-active" : "")" href="/learning">AI Learning</a>
                 </div>
 
                 <div class="auth">
@@ -51,7 +50,6 @@
                 <nav class="footer-nav" aria-label="Footer">
                     <a href="/dna">DNA Builder</a>
                     <a href="/simulations">Simulations</a>
-                    <a href="/learning">AI Learning</a>
                 </nav>
 
                 <div class="footer-copy">© @DateTime.UtcNow.Year GenomiX - Built for learning genetics</div>

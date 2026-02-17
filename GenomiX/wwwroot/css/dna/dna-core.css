@@ -1229,9 +1229,6 @@
   min-width: 130px;
 }
 
-.gx-dna__viewerbar #undo-btn{ margin-right: 12px; }
-.gx-dna__viewerbar #redo-btn{ margin-left: 12px; }
-
 @media (max-width: 720px){
   .gx-dna__viewerbar{
     max-width: 100%;
@@ -1602,4 +1599,109 @@
 .base-pair.gx-scan-active {
     filter: saturate(1.2);
     box-shadow: 0 0 22px rgba(120,200,255,.22);
+}
+
+.gx-dna__viewerbar .gx-btn,
+.gx-dna__viewerbar a.gx-btn{
+  min-height: 44px;
+  padding: 10px 16px;
+  font-size: 15px;
+  line-height: 1;
+  border-radius: 14px;
+}
+
+.gx-dna__viewerbar .gx-btn .gx-action__icon{
+  font-size: 16px;
+  line-height: 1;
+}
+
+.gx-dna__viewerbar .gx-btn .gx-action__text{
+  line-height: 1;
+}
+
+.gx-btn--ghost{
+  background: rgba(255,255,255,.04);
+  border-color: rgba(140,170,220,.22);
+  box-shadow: none;
+}
+
+.gx-btn--accent{
+  border-color: rgba(120,200,255,.40);
+  background: linear-gradient(180deg, rgba(60,160,255,.45), rgba(25,95,220,.45));
+  box-shadow: 0 12px 30px rgba(30,120,255,.22), inset 0 1px 0 rgba(255,255,255,.12);
+}
+
+.gx-btn--danger{
+  border-color: rgba(255,110,110,.45);
+  background: linear-gradient(180deg, rgba(255,85,85,.22), rgba(190,40,40,.22));
+  box-shadow: 0 12px 30px rgba(255,70,70,.15), inset 0 1px 0 rgba(255,255,255,.10);
+}
+
+.gx-btn--soft{
+  border-color: rgba(140,170,220,.30);
+  background: linear-gradient(180deg, rgba(120,150,210,.16), rgba(70,95,150,.14));
+  box-shadow: none;
+}
+
+.gx-helix-wrap {
+    position: relative;
+}
+
+.gx-dna-legend {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 6px;
+    padding: 10px 10px;
+    border-radius: 12px;
+    background: rgba(12, 16, 30, 0.72);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+    color: #eaf1ff;
+    font-size: 12px;
+    line-height: 1;
+    pointer-events: none;
+}
+
+    .gx-dna-legend .row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        white-space: nowrap;
+    }
+
+    .gx-dna-legend .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 999px;
+        box-shadow: 0 0 0 2px rgba(255,255,255,0.06) inset;
+    }
+
+.dot.c {
+    background: #7f7f7f;
+}
+
+.dot.n {
+    background: #3a74ff;
+}
+
+.dot.o {
+    background: #ff3a3a;
+}
+
+.dot.p {
+    background: #ffa024;
+}
+
+.dot.h {
+    background: #ffffff;
+}
+
+.gx-dna-legend .hbond {
+    width: 18px;
+    border-top: 2px dashed rgba(255,255,255,0.65);
+    transform: translateY(-1px);
 }
