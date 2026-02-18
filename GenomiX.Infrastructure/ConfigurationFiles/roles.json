@@ -7,20 +7,14 @@
   },
   {
     "Id": "6e6f2c2a-7c3f-4e7d-9f84-2b3a4d9d1002",
-    "Name": "Student",
-    "NormalizedName": "STUDENT",
+    "Name": "User",
+    "NormalizedName": "USER",
     "ConcurrencyStamp": "b2222222-bbbb-bbbb-bbbb-bbbbbbbbbbbb"
   },
   {
     "Id": "6e6f2c2a-7c3f-4e7d-9f84-2b3a4d9d1003",
-    "Name": "Teacher",
-    "NormalizedName": "TEACHER",
-    "ConcurrencyStamp": "c3333333-cccc-cccc-cccc-cccccccccccc"
-  },
-  {
-    "Id": "6e6f2c2a-7c3f-4e7d-9f84-2b3a4d9d1004",
     "Name": "Scientist",
     "NormalizedName": "SCIENTIST",
-    "ConcurrencyStamp": "d4444444-dddd-dddd-dddd-dddddddddddd"
+    "ConcurrencyStamp": "d3333333-dddd-dddd-dddd-dddddddddddd"
   }
 ]

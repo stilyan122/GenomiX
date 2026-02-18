@@ -16,7 +16,11 @@ export function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
     visualizer._disposeAll?.();
     visualizer._disposeAll = null;
 
-    visualizer.innerHTML = "";
+    const legend3D = visualizer.querySelector("#gx-legend-3d");
+
+    visualizer.replaceChildren(); 
+    if (legend3D) legend3D.classList.add("gx-hidden");
+
     visualizer.classList.toggle("mode--sci", scientific);
 
     let inspectorEl = null;
@@ -92,6 +96,10 @@ export function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
         if (selectedBaseEl) selectedBaseEl.classList.remove("is-selected");
         selectedBaseEl = el;
         if (selectedBaseEl) selectedBaseEl.classList.add("is-selected");
+    }
+
+    function isHelixFullscreen() {
+        return document.fullscreenElement === threeWrap;
     }
 
     function withMeta(op) {
@@ -479,7 +487,7 @@ export function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
         overlay.className = "dna-overlay";
         const tip = document.createElement("div");
         tip.className = "dna-tooltip";
-        tip.textContent = "Ready.";
+        tip.textContent = "";
         overlay.appendChild(tip);
         targetMount.appendChild(overlay);
 
@@ -511,12 +519,15 @@ export function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
     }
 
     function ensureFullscreenBtn() {
+        const legend = document.getElementById("gx-legend-3d");
+
         const host =
+            legend?.parentElement ||
+            threeWrap?.querySelector(".gx-helix3d-ui") ||
             document.getElementById("gx-helix-actions") ||
-            threeWrap.querySelector(".gx-helix3d-ui") ||
             threeWrap;
 
-        let btn = host.querySelector("#helix-fullscreen-btn");
+        let btn = host?.querySelector("#helix-fullscreen-btn");
 
         if (!btn) {
             btn = document.createElement("button");
@@ -534,12 +545,17 @@ export function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
                     setTimeout(() => threeApi?.refresh?.(), 60);
                 }
             });
+        }
 
-            host.appendChild(btn);
+        if (legend && legend.parentElement) {
+            legend.insertAdjacentElement("afterend", btn);
+        } else {
+            host?.appendChild(btn);
         }
 
         btn.style.display = "";
-        return btn; 
+        return btn;
+
     }
 
     function hideFullscreenBtn() {
@@ -784,10 +800,9 @@ export function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
         ladderEl = ladder;
         containerForLadder = ladderWrap;
 
-        const overlay2D = buildCommonOverlay(ladderWrap);
-        const overlay3D = buildCommonOverlay(threeWrap);
+        overlayRefs = buildCommonOverlay(ladderWrap);;
 
-        overlayRefs = overlay2D;
+        let block3DPick = false;
 
         function ensure3D(idx) {
             if (!threeApi) {
@@ -795,6 +810,9 @@ export function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
             }
 
             threeApi.onPick((seqIndex) => {
+                if (block3DPick) return;
+                if (isHelixFullscreen()) return;
+
                 const b1 = s1[seqIndex];
                 const b2 = s2[seqIndex];
 
@@ -931,9 +949,10 @@ export function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
         });
 
         document.addEventListener("fullscreenchange", () => {
-            const isFs = !!document.fullscreenElement;
+            const isFs = (document.fullscreenElement === threeWrap);
+            block3DPick = isFs;
 
-            if (!isFs) {
+            if (!document.fullscreenElement) {
                 threeWrap.classList.remove("gx-fs");
                 removeFsBar();
             } else {
@@ -957,6 +976,9 @@ export function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
 
             fsBtn.disabled = true;
             fsBtn.style.opacity = "0.55";
+
+            const legend = document.getElementById("gx-legend-3d");
+            if (legend) visualizer.appendChild(legend);
 
             containerForLadder = ladderWrap;
             progressContainerEl = overlay2D.progCont;
@@ -983,6 +1005,9 @@ export function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
             ensure3D(current);
             containerForLadder = threeWrap;
 
+            const legend = document.getElementById("gx-legend-3d");
+            if (legend) threeWrap.appendChild(legend);
+
             threeWrap.appendChild(overlayRefs.overlay);
             threeWrap.appendChild(overlayRefs.progCont);
             threeWrap.appendChild(overlayRefs.prevBtn);
@@ -994,7 +1019,7 @@ export function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
             fsBtn.disabled = false;
             fsBtn.style.opacity = "1";
 
-            progressContainerEl = overlay3D.progCont;
+            progressContainerEl = overlayRefs.progCont;
 
             threeApi?.refresh?.();
             threeApi?.fit?.();

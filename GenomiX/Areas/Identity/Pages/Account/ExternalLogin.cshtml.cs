@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using System.Text;
@@ -230,7 +229,7 @@ namespace GenomiX.Areas.Identity.Pages.Account
                 return Page();
             }
 
-            const string DefaultRole = "Student";
+            const string DefaultRole = "User";
 
             if (!await _userManager.IsInRoleAsync(user, DefaultRole))
                 await _userManager.AddToRoleAsync(user, DefaultRole);

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GenomiX.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260119111550_OrganismEntityChangesMigration")]
-    partial class OrganismEntityChangesMigration
+    [Migration("20260218194421_InitialMigration")]
+    partial class InitialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,109 +24,6 @@ namespace GenomiX.Infrastructure.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("GenomiX.Infrastructure.Models.Answer", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasComment("Primary key (GUID).");
-
-                    b.Property<bool>("IsCorrect")
-                        .HasColumnType("bit")
-                        .HasComment("Indicates whether the answer is correct.");
-
-                    b.Property<Guid?>("QuestionId")
-                        .HasColumnType("uniqueidentifier")
-                        .HasComment("FK to Question.");
-
-                    b.Property<string>("Value")
-                        .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)")
-                        .HasComment("Answer text/value.");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("QuestionId");
-
-                    b.ToTable("Answers", t =>
-                        {
-                            t.HasComment("Answer option for a Test, with correctness flag.");
-                        });
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("b4f2f8a9-2a0a-4f67-9b2e-b7ac32af6242"),
-                            IsCorrect = true,
-                            QuestionId = new Guid("11111111-aaaa-2222-aaaa-aaaaaaaaaaaa"),
-                            Value = "A pairs with T, C pairs with G"
-                        },
-                        new
-                        {
-                            Id = new Guid("c5e7c6e1-1bfc-4f7d-9f2a-8d2c6e0e8d9c"),
-                            IsCorrect = false,
-                            QuestionId = new Guid("11111111-aaaa-2222-aaaa-aaaaaaaaaaaa"),
-                            Value = "A pairs with G, C pairs with T"
-                        },
-                        new
-                        {
-                            Id = new Guid("6a2f6f03-8a56-4a87-a2b9-33fc60a1b10f"),
-                            IsCorrect = true,
-                            QuestionId = new Guid("33333333-bbbb-4444-bbbb-bbbbbbbbbbbb"),
-                            Value = "Changing a single base from A to G"
-                        },
-                        new
-                        {
-                            Id = new Guid("3d78217b-fb4a-4f64-80d1-1b9f408a64b2"),
-                            IsCorrect = false,
-                            QuestionId = new Guid("33333333-bbbb-4444-bbbb-bbbbbbbbbbbb"),
-                            Value = "Removing a whole codon"
-                        },
-                        new
-                        {
-                            Id = new Guid("2d1c707f-43e9-43c2-8f20-dfb6c4140b1e"),
-                            IsCorrect = true,
-                            QuestionId = new Guid("55555555-cccc-6666-cccc-cccccccccccc"),
-                            Value = "DNA ligase"
-                        },
-                        new
-                        {
-                            Id = new Guid("b69d2b41-8f21-47f6-9436-d2fc0e2c23b6"),
-                            IsCorrect = false,
-                            QuestionId = new Guid("55555555-cccc-6666-cccc-cccccccccccc"),
-                            Value = "Amylase"
-                        },
-                        new
-                        {
-                            Id = new Guid("5b0c8cd4-9c26-46f0-94df-c36876ad6bc9"),
-                            IsCorrect = true,
-                            QuestionId = new Guid("77777777-dddd-8888-dddd-dddddddddddd"),
-                            Value = "50"
-                        },
-                        new
-                        {
-                            Id = new Guid("1a5f8449-62a3-42e6-97e3-7c30c676890a"),
-                            IsCorrect = false,
-                            QuestionId = new Guid("77777777-dddd-8888-dddd-dddddddddddd"),
-                            Value = "25"
-                        },
-                        new
-                        {
-                            Id = new Guid("14d6cb7b-44fa-40a6-a76f-657e7b9e8f95"),
-                            IsCorrect = true,
-                            QuestionId = new Guid("99999999-eeee-aaaa-eeee-eeeeeeeeeeee"),
-                            Value = "Mutation"
-                        },
-                        new
-                        {
-                            Id = new Guid("26f84cf2-b33a-46f8-b1df-10f0c50bb979"),
-                            IsCorrect = false,
-                            QuestionId = new Guid("99999999-eeee-aaaa-eeee-eeeeeeeeeeee"),
-                            Value = "Uniform environment"
-                        });
-                });
 
             modelBuilder.Entity("GenomiX.Infrastructure.Models.DNAModel", b =>
                 {
@@ -186,14 +83,6 @@ namespace GenomiX.Infrastructure.Migrations
                             Name = "Untitled model",
                             UpdatedAt = new DateTimeOffset(new DateTime(2024, 8, 25, 10, 45, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             UserId = new Guid("58a7c2b5-1347-4f0a-b3ad-912d4f098aaa")
-                        },
-                        new
-                        {
-                            Id = new Guid("44444444-0000-0000-0000-000000000004"),
-                            CreatedAt = new DateTimeOffset(new DateTime(2024, 7, 20, 9, 5, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
-                            Name = "Untitled model",
-                            UpdatedAt = new DateTimeOffset(new DateTime(2024, 7, 20, 9, 5, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
-                            UserId = new Guid("a7f9a7d5-56f5-4f3f-8a9f-8c2f0d3d7001")
                         },
                         new
                         {
@@ -610,28 +499,9 @@ namespace GenomiX.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("a7f9a7d5-56f5-4f3f-8a9f-8c2f0d3d7001"),
-                            AccessFailedCount = 0,
-                            ConcurrencyStamp = "44444444-4444-4444-4444-444444444444",
-                            CreatedAt = new DateTime(2024, 7, 20, 9, 0, 0, 0, DateTimeKind.Utc),
-                            Email = "maria.teacher@example.com",
-                            EmailConfirmed = true,
-                            FirstName = "Maria",
-                            LastName = "Dimitrova",
-                            LockoutEnabled = false,
-                            NormalizedEmail = "MARIA.TEACHER@EXAMPLE.COM",
-                            NormalizedUserName = "MARIA.TEACHER",
-                            PasswordHash = "AQAAAAIAAYagAAAAEJ8JpK5Cz9z9qzQ2z5y0r8Zc8n5o3g9p+uZkqB5x0Gz3/7jZK3Tj3f1xY2nG8j0q5g==",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "ddddddd4-dddd-dddd-dddd-dddddddddddd",
-                            TwoFactorEnabled = false,
-                            UserName = "maria.teacher"
-                        },
-                        new
-                        {
                             Id = new Guid("c2b3d8ae-2b6d-4c41-9b8e-b1c2a3d4e005"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "55555555-5555-5555-5555-555555555555",
+                            ConcurrencyStamp = "44444444-4444-4444-4444-4444444444444",
                             CreatedAt = new DateTime(2024, 9, 10, 11, 15, 0, 0, DateTimeKind.Utc),
                             Email = "georgi.scientist@example.com",
                             EmailConfirmed = true,
@@ -642,99 +512,9 @@ namespace GenomiX.Infrastructure.Migrations
                             NormalizedUserName = "GEORGI.SCIENTIST",
                             PasswordHash = "AQAAAAIAAYagAAAAEL6H2uXl7u0qg7c+W6ZQ2gk0q0zv2Qm8q6pA6xvYQ2n2eK1m8s0n1l5r3j0h2p4c6w==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "eeeeeee5-eeee-eeee-eeee-eeeeeeeeeeee",
+                            SecurityStamp = "ddddddd5-dddd-dddd-dddd-dddddddddddd",
                             TwoFactorEnabled = false,
                             UserName = "georgi.scientist"
-                        });
-                });
-
-            modelBuilder.Entity("GenomiX.Infrastructure.Models.Lesson", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasComment("Primary key (GUID).");
-
-                    b.Property<byte>("Difficulty")
-                        .HasColumnType("tinyint")
-                        .HasComment("Difficulty from 1 to 5.");
-
-                    b.Property<string>("Information")
-                        .IsRequired()
-                        .HasMaxLength(8000)
-                        .HasColumnType("nvarchar(max)")
-                        .HasComment("Markdown/HTML/plain content.");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)")
-                        .HasComment("Lesson title.");
-
-                    b.Property<string>("Topic")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)")
-                        .HasComment("Topic (mutations, repair, probability, ...).");
-
-                    b.Property<Guid?>("UserId")
-                        .HasColumnType("uniqueidentifier")
-                        .HasComment("User who created the lesson.");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Lessons", t =>
-                        {
-                            t.HasComment("Lesson content for Education panel.");
-                        });
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("aaaa1111-aaaa-1111-aaaa-aaaaaaaaaaaa"),
-                            Difficulty = (byte)1,
-                            Information = "DNA (Deoxyribonucleic acid) is a double helix composed of nucleotides: adenine (A), cytosine (C), guanine (G), and thymine (T). A pairs with T, and C pairs with G.",
-                            Title = "DNA Structure Basics",
-                            Topic = "DNA",
-                            UserId = new Guid("a7f9a7d5-56f5-4f3f-8a9f-8c2f0d3d7001")
-                        },
-                        new
-                        {
-                            Id = new Guid("bbbb2222-bbbb-2222-bbbb-bbbbbbbbbbbb"),
-                            Difficulty = (byte)2,
-                            Information = "Mutations are changes in DNA. **Substitution** replaces one base, **insertion** adds bases, and **deletion** removes bases. Mutations can be harmful, neutral, or beneficial.",
-                            Title = "Types of Mutations",
-                            Topic = "Mutations",
-                            UserId = new Guid("a7f9a7d5-56f5-4f3f-8a9f-8c2f0d3d7001")
-                        },
-                        new
-                        {
-                            Id = new Guid("cccc3333-cccc-3333-cccc-cccccccccccc"),
-                            Difficulty = (byte)3,
-                            Information = "Cells use repair mechanisms to fix DNA damage. Examples include mismatch repair, nucleotide excision repair, and double-strand break repair. Nanobot simulation in GenomiX demonstrates these concepts.",
-                            Title = "DNA Repair Mechanisms",
-                            Topic = "Repair",
-                            UserId = new Guid("a7f9a7d5-56f5-4f3f-8a9f-8c2f0d3d7001")
-                        },
-                        new
-                        {
-                            Id = new Guid("dddd4444-dddd-4444-dddd-dddddddddddd"),
-                            Difficulty = (byte)2,
-                            Information = "Probability is key in genetics. For example, Punnett squares can predict the likelihood of offspring inheriting traits. The law of independent assortment applies.",
-                            Title = "Probability in Genetics",
-                            Topic = "Probability",
-                            UserId = new Guid("a7f9a7d5-56f5-4f3f-8a9f-8c2f0d3d7001")
-                        },
-                        new
-                        {
-                            Id = new Guid("eeee5555-eeee-5555-eeee-eeeeeeeeeeee"),
-                            Difficulty = (byte)4,
-                            Information = "Populations evolve through natural selection, genetic drift, and gene flow. Environmental factors such as temperature or disease pressure influence survival.",
-                            Title = "Population Evolution",
-                            Topic = "Evolution",
-                            UserId = new Guid("a7f9a7d5-56f5-4f3f-8a9f-8c2f0d3d7001")
                         });
                 });
 
@@ -789,6 +569,12 @@ namespace GenomiX.Infrastructure.Migrations
                         .HasColumnType("float")
                         .HasComment("Continuous survival/fitness score (nullable).");
 
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
+                        .HasComment("Organism type.");
+
                     b.Property<float>("X")
                         .HasColumnType("real")
                         .HasComment("X coordinate property.");
@@ -818,6 +604,7 @@ namespace GenomiX.Infrastructure.Migrations
                             SimpleName = "Human A",
                             Status = "alive",
                             SurvivalScore = 0.84999999999999998,
+                            Type = "",
                             X = 0f,
                             Y = 0f
                         },
@@ -833,6 +620,7 @@ namespace GenomiX.Infrastructure.Migrations
                             SimpleName = "Lab Mouse 1",
                             Status = "alive",
                             SurvivalScore = 0.92000000000000004,
+                            Type = "",
                             X = 0f,
                             Y = 0f
                         },
@@ -848,6 +636,7 @@ namespace GenomiX.Infrastructure.Migrations
                             SimpleName = "Dog Alpha",
                             Status = "alive",
                             SurvivalScore = 0.65000000000000002,
+                            Type = "",
                             X = 0f,
                             Y = 0f
                         });
@@ -862,7 +651,7 @@ namespace GenomiX.Infrastructure.Migrations
 
                     b.Property<Guid?>("BaseModelId")
                         .HasColumnType("uniqueidentifier")
-                        .HasComment("Optional link to the base DNAModel used to derive this population.");
+                        .HasComment("Link to the base DNAModel used to derive this population.");
 
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("datetimeoffset")
@@ -885,6 +674,8 @@ namespace GenomiX.Infrastructure.Migrations
                         .HasComment("User who created the population.");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("BaseModelId");
 
                     b.HasIndex("UserId");
 
@@ -920,124 +711,6 @@ namespace GenomiX.Infrastructure.Migrations
                             Factors = "{ \"temperature\": 28, \"sunExposure\": \"high\", \"diseasePressure\": 0.5 }",
                             Name = "Dog Wild Pack",
                             UserId = new Guid("58a7c2b5-1347-4f0a-b3ad-912d4f098aaa")
-                        });
-                });
-
-            modelBuilder.Entity("GenomiX.Infrastructure.Models.Question", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasComment("Primary key (GUID).");
-
-                    b.Property<string>("Explanation")
-                        .HasMaxLength(1024)
-                        .HasColumnType("nvarchar(1024)")
-                        .HasComment("Optional explanation or hint for the question.");
-
-                    b.Property<string>("Prompt")
-                        .IsRequired()
-                        .HasMaxLength(512)
-                        .HasColumnType("nvarchar(512)")
-                        .HasComment("The question text/prompt.");
-
-                    b.Property<Guid?>("TestId")
-                        .HasColumnType("uniqueidentifier")
-                        .HasComment("FK to Test.");
-
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasMaxLength(32)
-                        .HasColumnType("nvarchar(32)")
-                        .HasComment("Question type: mcq | multi | open.");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TestId");
-
-                    b.ToTable("Questions", t =>
-                        {
-                            t.HasComment("Question belonging to a Test, with prompt and possible answers.");
-                        });
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("11111111-aaaa-2222-aaaa-aaaaaaaaaaaa"),
-                            Explanation = "Remember A pairs with T, and C pairs with G.",
-                            Prompt = "Which bases pair together in DNA?",
-                            TestId = new Guid("aaaa1111-aaaa-2222-aaaa-aaaaaaaaaaaa"),
-                            Type = "mcq"
-                        },
-                        new
-                        {
-                            Id = new Guid("22222222-aaaa-3333-aaaa-aaaaaaaaaaaa"),
-                            Explanation = "Think about the double structure.",
-                            Prompt = "What shape does the DNA molecule form?",
-                            TestId = new Guid("aaaa1111-aaaa-2222-aaaa-aaaaaaaaaaaa"),
-                            Type = "open"
-                        },
-                        new
-                        {
-                            Id = new Guid("33333333-bbbb-4444-bbbb-bbbbbbbbbbbb"),
-                            Prompt = "Which of the following is a substitution mutation?",
-                            TestId = new Guid("bbbb2222-bbbb-3333-bbbb-bbbbbbbbbbbb"),
-                            Type = "mcq"
-                        },
-                        new
-                        {
-                            Id = new Guid("44444444-bbbb-5555-bbbb-bbbbbbbbbbbb"),
-                            Explanation = "There are more than one correct answers.",
-                            Prompt = "Select all types of mutations.",
-                            TestId = new Guid("bbbb2222-bbbb-3333-bbbb-bbbbbbbbbbbb"),
-                            Type = "multi"
-                        },
-                        new
-                        {
-                            Id = new Guid("55555555-cccc-6666-cccc-cccccccccccc"),
-                            Explanation = "Think about DNA polymerase and ligase.",
-                            Prompt = "What enzyme is responsible for DNA repair?",
-                            TestId = new Guid("cccc3333-cccc-4444-cccc-cccccccccccc"),
-                            Type = "mcq"
-                        },
-                        new
-                        {
-                            Id = new Guid("66666666-cccc-7777-cccc-cccccccccccc"),
-                            Explanation = "Short answer expected.",
-                            Prompt = "Describe one method of DNA repair.",
-                            TestId = new Guid("cccc3333-cccc-4444-cccc-cccccccccccc"),
-                            Type = "open"
-                        },
-                        new
-                        {
-                            Id = new Guid("77777777-dddd-8888-dddd-dddddddddddd"),
-                            Prompt = "If a trait has a probability of 25%, how many individuals out of 200 are expected to show it?",
-                            TestId = new Guid("dddd4444-dddd-5555-dddd-dddddddddddd"),
-                            Type = "mcq"
-                        },
-                        new
-                        {
-                            Id = new Guid("88888888-dddd-9999-dddd-dddddddddddd"),
-                            Explanation = "Link probability rules to Punnett squares.",
-                            Prompt = "Explain how probability affects inheritance in genetics.",
-                            TestId = new Guid("dddd4444-dddd-5555-dddd-dddddddddddd"),
-                            Type = "open"
-                        },
-                        new
-                        {
-                            Id = new Guid("99999999-eeee-aaaa-eeee-eeeeeeeeeeee"),
-                            Explanation = "Think about recombination and mutation.",
-                            Prompt = "Which factor increases genetic diversity in a population?",
-                            TestId = new Guid("eeee5555-eeee-6666-eeee-eeeeeeeeeeee"),
-                            Type = "mcq"
-                        },
-                        new
-                        {
-                            Id = new Guid("00000000-eeee-bbbb-eeee-eeeeeeeeeeee"),
-                            Explanation = "Consider disease, climate, and mutation.",
-                            Prompt = "Select all factors that influence population survival.",
-                            TestId = new Guid("eeee5555-eeee-6666-eeee-eeeeeeeeeeee"),
-                            Type = "multi"
                         });
                 });
 
@@ -1176,65 +849,6 @@ namespace GenomiX.Infrastructure.Migrations
                     b.ToTable("RoleRequests");
                 });
 
-            modelBuilder.Entity("GenomiX.Infrastructure.Models.Test", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasComment("Primary key (GUID).");
-
-                    b.Property<Guid>("LessonId")
-                        .HasColumnType("uniqueidentifier")
-                        .HasComment("FK to Lesson.");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(512)
-                        .HasColumnType("nvarchar(512)")
-                        .HasComment("The title text.");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("LessonId");
-
-                    b.ToTable("Tests", t =>
-                        {
-                            t.HasComment("Test/quiz question associated with a Lesson.");
-                        });
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("aaaa1111-aaaa-2222-aaaa-aaaaaaaaaaaa"),
-                            LessonId = new Guid("aaaa1111-aaaa-1111-aaaa-aaaaaaaaaaaa"),
-                            Title = "Quiz: DNA Structure"
-                        },
-                        new
-                        {
-                            Id = new Guid("bbbb2222-bbbb-3333-bbbb-bbbbbbbbbbbb"),
-                            LessonId = new Guid("bbbb2222-bbbb-2222-bbbb-bbbbbbbbbbbb"),
-                            Title = "Quiz: Mutation Types"
-                        },
-                        new
-                        {
-                            Id = new Guid("cccc3333-cccc-4444-cccc-cccccccccccc"),
-                            LessonId = new Guid("cccc3333-cccc-3333-cccc-cccccccccccc"),
-                            Title = "Quiz: DNA Repair"
-                        },
-                        new
-                        {
-                            Id = new Guid("dddd4444-dddd-5555-dddd-dddddddddddd"),
-                            LessonId = new Guid("dddd4444-dddd-4444-dddd-dddddddddddd"),
-                            Title = "Quiz: Probability"
-                        },
-                        new
-                        {
-                            Id = new Guid("eeee5555-eeee-6666-eeee-eeeeeeeeeeee"),
-                            LessonId = new Guid("eeee5555-eeee-5555-eeee-eeeeeeeeeeee"),
-                            Title = "Quiz: Population Evolution"
-                        });
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1274,20 +888,13 @@ namespace GenomiX.Infrastructure.Migrations
                         {
                             Id = new Guid("6e6f2c2a-7c3f-4e7d-9f84-2b3a4d9d1002"),
                             ConcurrencyStamp = "b2222222-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
-                            Name = "Student",
-                            NormalizedName = "STUDENT"
+                            Name = "User",
+                            NormalizedName = "USER"
                         },
                         new
                         {
                             Id = new Guid("6e6f2c2a-7c3f-4e7d-9f84-2b3a4d9d1003"),
-                            ConcurrencyStamp = "c3333333-cccc-cccc-cccc-cccccccccccc",
-                            Name = "Teacher",
-                            NormalizedName = "TEACHER"
-                        },
-                        new
-                        {
-                            Id = new Guid("6e6f2c2a-7c3f-4e7d-9f84-2b3a4d9d1004"),
-                            ConcurrencyStamp = "d4444444-dddd-dddd-dddd-dddddddddddd",
+                            ConcurrencyStamp = "d3333333-dddd-dddd-dddd-dddddddddddd",
                             Name = "Scientist",
                             NormalizedName = "SCIENTIST"
                         });
@@ -1396,13 +1003,8 @@ namespace GenomiX.Infrastructure.Migrations
                         },
                         new
                         {
-                            UserId = new Guid("a7f9a7d5-56f5-4f3f-8a9f-8c2f0d3d7001"),
-                            RoleId = new Guid("6e6f2c2a-7c3f-4e7d-9f84-2b3a4d9d1003")
-                        },
-                        new
-                        {
                             UserId = new Guid("c2b3d8ae-2b6d-4c41-9b8e-b1c2a3d4e005"),
-                            RoleId = new Guid("6e6f2c2a-7c3f-4e7d-9f84-2b3a4d9d1004")
+                            RoleId = new Guid("6e6f2c2a-7c3f-4e7d-9f84-2b3a4d9d1003")
                         });
                 });
 
@@ -1425,15 +1027,6 @@ namespace GenomiX.Infrastructure.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
-                });
-
-            modelBuilder.Entity("GenomiX.Infrastructure.Models.Answer", b =>
-                {
-                    b.HasOne("GenomiX.Infrastructure.Models.Question", "Question")
-                        .WithMany("Answers")
-                        .HasForeignKey("QuestionId");
-
-                    b.Navigation("Question");
                 });
 
             modelBuilder.Entity("GenomiX.Infrastructure.Models.DNAModel", b =>
@@ -1480,15 +1073,6 @@ namespace GenomiX.Infrastructure.Migrations
                     b.Navigation("Model");
                 });
 
-            modelBuilder.Entity("GenomiX.Infrastructure.Models.Lesson", b =>
-                {
-                    b.HasOne("GenomiX.Infrastructure.Models.GenUser", "User")
-                        .WithMany("Lessons")
-                        .HasForeignKey("UserId");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("GenomiX.Infrastructure.Models.Organism", b =>
                 {
                     b.HasOne("GenomiX.Infrastructure.Models.DNAModel", "DNAModel")
@@ -1506,20 +1090,17 @@ namespace GenomiX.Infrastructure.Migrations
 
             modelBuilder.Entity("GenomiX.Infrastructure.Models.Population", b =>
                 {
+                    b.HasOne("GenomiX.Infrastructure.Models.DNAModel", "BaseModel")
+                        .WithMany()
+                        .HasForeignKey("BaseModelId");
+
                     b.HasOne("GenomiX.Infrastructure.Models.GenUser", "User")
                         .WithMany("Populations")
                         .HasForeignKey("UserId");
 
+                    b.Navigation("BaseModel");
+
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("GenomiX.Infrastructure.Models.Question", b =>
-                {
-                    b.HasOne("GenomiX.Infrastructure.Models.Test", "Test")
-                        .WithMany("Questions")
-                        .HasForeignKey("TestId");
-
-                    b.Navigation("Test");
                 });
 
             modelBuilder.Entity("GenomiX.Infrastructure.Models.RoleRequest", b =>
@@ -1537,15 +1118,6 @@ namespace GenomiX.Infrastructure.Migrations
                     b.Navigation("DecidedByUser");
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("GenomiX.Infrastructure.Models.Test", b =>
-                {
-                    b.HasOne("GenomiX.Infrastructure.Models.Lesson", null)
-                        .WithMany("Tests")
-                        .HasForeignKey("LessonId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
@@ -1617,29 +1189,12 @@ namespace GenomiX.Infrastructure.Migrations
                 {
                     b.Navigation("DNAModels");
 
-                    b.Navigation("Lessons");
-
                     b.Navigation("Populations");
-                });
-
-            modelBuilder.Entity("GenomiX.Infrastructure.Models.Lesson", b =>
-                {
-                    b.Navigation("Tests");
                 });
 
             modelBuilder.Entity("GenomiX.Infrastructure.Models.Population", b =>
                 {
                     b.Navigation("Organisms");
-                });
-
-            modelBuilder.Entity("GenomiX.Infrastructure.Models.Question", b =>
-                {
-                    b.Navigation("Answers");
-                });
-
-            modelBuilder.Entity("GenomiX.Infrastructure.Models.Test", b =>
-                {
-                    b.Navigation("Questions");
                 });
 #pragma warning restore 612, 618
         }

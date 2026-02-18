@@ -24,14 +24,6 @@
     "UpdatedAt": "2024-08-25T10:45:00Z"
   },
   {
-    "Id": "44444444-0000-0000-0000-000000000004",
-    "UserId": "a7f9a7d5-56f5-4f3f-8a9f-8c2f0d3d7001",
-    "CurrentIndex": 0,
-    "DisplayMode": 1,
-    "CreatedAt": "2024-07-20T09:05:00Z",
-    "UpdatedAt": "2024-07-20T09:05:00Z"
-  },
-  {
     "Id": "44444444-0000-0000-0000-000000000005",
     "UserId": "c2b3d8ae-2b6d-4c41-9b8e-b1c2a3d4e005",
     "CurrentIndex": 0,

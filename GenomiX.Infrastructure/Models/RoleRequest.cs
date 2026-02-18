@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace GenomiX.Infrastructure.Models
 {
     /// <summary>
-    /// Represents a user-initiated request for an additional role (like Teacher / Scientist),
+    /// Represents a user-initiated request for an additional role (like Scientist),
     /// which must be approved or declined by an Admin.
     /// </summary>
     public class RoleRequest
@@ -22,7 +22,7 @@ namespace GenomiX.Infrastructure.Models
         [ForeignKey(nameof(UserId))]
         public GenUser User { get; set; } = null!;
 
-        /// <summary> The role being requested (Teacher / Scientist / etc.). </summary>
+        /// <summary> The role being requested (Scientist / etc.). </summary>
         [Required]
         [MaxLength(RoleRequestPropertyConstraints.RequestedRole_MaxLength)]
         public string RequestedRole { get; set; } = null!;

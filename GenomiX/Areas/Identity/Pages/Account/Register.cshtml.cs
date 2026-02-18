@@ -20,7 +20,7 @@ namespace GenomiX.Areas.Identity.Pages.Account
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
 
-        private const string DefaultRole = "Student";
+        private const string DefaultRole = "User";
 
         public RegisterModel(
             UserManager<GenUser> userManager,

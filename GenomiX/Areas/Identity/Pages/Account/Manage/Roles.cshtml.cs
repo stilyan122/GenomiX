@@ -12,7 +12,7 @@ namespace GenomiX.Areas.Identity.Pages.Account.Manage
     [Authorize]
     public class RolesModel : PageModel
     {
-        private static readonly string[] AllRequestableRoles = { "Student", "Scientist", "Teacher" };
+        private static readonly string[] AllRequestableRoles = { "User", "Scientist" };
 
         private readonly UserManager<GenUser> _userManager;
         private readonly ApplicationDbContext _db;
@@ -143,7 +143,7 @@ namespace GenomiX.Areas.Identity.Pages.Account.Manage
             if (Input.Type == "Remove")
             {
                 if (!AvailableRemoveRoles.Contains(Input.Role, StringComparer.OrdinalIgnoreCase))
-                    Input.Role = AvailableRemoveRoles.FirstOrDefault() ?? "Student";
+                    Input.Role = AvailableRemoveRoles.FirstOrDefault() ?? "User";
             }
             else
             {

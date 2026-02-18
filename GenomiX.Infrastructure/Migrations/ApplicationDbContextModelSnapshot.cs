@@ -83,14 +83,6 @@ namespace GenomiX.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("44444444-0000-0000-0000-000000000004"),
-                            CreatedAt = new DateTimeOffset(new DateTime(2024, 7, 20, 9, 5, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
-                            Name = "Untitled model",
-                            UpdatedAt = new DateTimeOffset(new DateTime(2024, 7, 20, 9, 5, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
-                            UserId = new Guid("a7f9a7d5-56f5-4f3f-8a9f-8c2f0d3d7001")
-                        },
-                        new
-                        {
                             Id = new Guid("44444444-0000-0000-0000-000000000005"),
                             CreatedAt = new DateTimeOffset(new DateTime(2024, 9, 10, 11, 20, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             Name = "Untitled model",
@@ -504,28 +496,9 @@ namespace GenomiX.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("a7f9a7d5-56f5-4f3f-8a9f-8c2f0d3d7001"),
-                            AccessFailedCount = 0,
-                            ConcurrencyStamp = "44444444-4444-4444-4444-444444444444",
-                            CreatedAt = new DateTime(2024, 7, 20, 9, 0, 0, 0, DateTimeKind.Utc),
-                            Email = "maria.teacher@example.com",
-                            EmailConfirmed = true,
-                            FirstName = "Maria",
-                            LastName = "Dimitrova",
-                            LockoutEnabled = false,
-                            NormalizedEmail = "MARIA.TEACHER@EXAMPLE.COM",
-                            NormalizedUserName = "MARIA.TEACHER",
-                            PasswordHash = "AQAAAAIAAYagAAAAEJ8JpK5Cz9z9qzQ2z5y0r8Zc8n5o3g9p+uZkqB5x0Gz3/7jZK3Tj3f1xY2nG8j0q5g==",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "ddddddd4-dddd-dddd-dddd-dddddddddddd",
-                            TwoFactorEnabled = false,
-                            UserName = "maria.teacher"
-                        },
-                        new
-                        {
                             Id = new Guid("c2b3d8ae-2b6d-4c41-9b8e-b1c2a3d4e005"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "55555555-5555-5555-5555-555555555555",
+                            ConcurrencyStamp = "44444444-4444-4444-4444-4444444444444",
                             CreatedAt = new DateTime(2024, 9, 10, 11, 15, 0, 0, DateTimeKind.Utc),
                             Email = "georgi.scientist@example.com",
                             EmailConfirmed = true,
@@ -536,7 +509,7 @@ namespace GenomiX.Infrastructure.Migrations
                             NormalizedUserName = "GEORGI.SCIENTIST",
                             PasswordHash = "AQAAAAIAAYagAAAAEL6H2uXl7u0qg7c+W6ZQ2gk0q0zv2Qm8q6pA6xvYQ2n2eK1m8s0n1l5r3j0h2p4c6w==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "eeeeeee5-eeee-eeee-eeee-eeeeeeeeeeee",
+                            SecurityStamp = "ddddddd5-dddd-dddd-dddd-dddddddddddd",
                             TwoFactorEnabled = false,
                             UserName = "georgi.scientist"
                         });
@@ -912,20 +885,13 @@ namespace GenomiX.Infrastructure.Migrations
                         {
                             Id = new Guid("6e6f2c2a-7c3f-4e7d-9f84-2b3a4d9d1002"),
                             ConcurrencyStamp = "b2222222-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
-                            Name = "Student",
-                            NormalizedName = "STUDENT"
+                            Name = "User",
+                            NormalizedName = "USER"
                         },
                         new
                         {
                             Id = new Guid("6e6f2c2a-7c3f-4e7d-9f84-2b3a4d9d1003"),
-                            ConcurrencyStamp = "c3333333-cccc-cccc-cccc-cccccccccccc",
-                            Name = "Teacher",
-                            NormalizedName = "TEACHER"
-                        },
-                        new
-                        {
-                            Id = new Guid("6e6f2c2a-7c3f-4e7d-9f84-2b3a4d9d1004"),
-                            ConcurrencyStamp = "d4444444-dddd-dddd-dddd-dddddddddddd",
+                            ConcurrencyStamp = "d3333333-dddd-dddd-dddd-dddddddddddd",
                             Name = "Scientist",
                             NormalizedName = "SCIENTIST"
                         });
@@ -1034,13 +1000,8 @@ namespace GenomiX.Infrastructure.Migrations
                         },
                         new
                         {
-                            UserId = new Guid("a7f9a7d5-56f5-4f3f-8a9f-8c2f0d3d7001"),
-                            RoleId = new Guid("6e6f2c2a-7c3f-4e7d-9f84-2b3a4d9d1003")
-                        },
-                        new
-                        {
                             UserId = new Guid("c2b3d8ae-2b6d-4c41-9b8e-b1c2a3d4e005"),
-                            RoleId = new Guid("6e6f2c2a-7c3f-4e7d-9f84-2b3a4d9d1004")
+                            RoleId = new Guid("6e6f2c2a-7c3f-4e7d-9f84-2b3a4d9d1003")
                         });
                 });
 

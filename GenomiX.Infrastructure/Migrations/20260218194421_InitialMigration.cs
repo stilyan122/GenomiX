@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace GenomiX.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class NewMigrationTest : Migration
+    public partial class InitialMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -213,50 +213,6 @@ namespace GenomiX.Infrastructure.Migrations
                 comment: "Editable DNA model holding references to two strand snapshots (double-helix).");
 
             migrationBuilder.CreateTable(
-                name: "Lessons",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, comment: "Primary key (GUID)."),
-                    Title = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false, comment: "Lesson title."),
-                    Topic = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false, comment: "Topic (mutations, repair, probability, ...)."),
-                    Information = table.Column<string>(type: "nvarchar(max)", maxLength: 8000, nullable: false, comment: "Markdown/HTML/plain content."),
-                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true, comment: "User who created the lesson."),
-                    Difficulty = table.Column<byte>(type: "tinyint", nullable: false, comment: "Difficulty from 1 to 5.")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Lessons", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Lessons_AspNetUsers_UserId",
-                        column: x => x.UserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id");
-                },
-                comment: "Lesson content for Education panel.");
-
-            migrationBuilder.CreateTable(
-                name: "Populations",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, comment: "Primary key (GUID)."),
-                    Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false, comment: "Human-friendly name for the run."),
-                    Factors = table.Column<string>(type: "nvarchar(4000)", maxLength: 4000, nullable: false, comment: "JSON with simulation factors (temperature, sunExposure, diseasePressure, ...)."),
-                    BaseModelId = table.Column<Guid>(type: "uniqueidentifier", nullable: true, comment: "Optional link to the base DNAModel used to derive this population."),
-                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true, comment: "User who created the population."),
-                    CreatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false, comment: "UTC created timestamp.")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Populations", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Populations_AspNetUsers_UserId",
-                        column: x => x.UserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id");
-                },
-                comment: "A population of organisms simulated under given environmental/selection factors.");
-
-            migrationBuilder.CreateTable(
                 name: "RoleRequests",
                 columns: table => new
                 {
@@ -359,24 +315,31 @@ namespace GenomiX.Infrastructure.Migrations
                 comment: "Immutable snapshot of a DNA sequence (A/C/G/T only).");
 
             migrationBuilder.CreateTable(
-                name: "Tests",
+                name: "Populations",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, comment: "Primary key (GUID)."),
-                    LessonId = table.Column<Guid>(type: "uniqueidentifier", nullable: false, comment: "FK to Lesson."),
-                    Title = table.Column<string>(type: "nvarchar(512)", maxLength: 512, nullable: false, comment: "The title text.")
+                    Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false, comment: "Human-friendly name for the run."),
+                    Factors = table.Column<string>(type: "nvarchar(4000)", maxLength: 4000, nullable: false, comment: "JSON with simulation factors (temperature, sunExposure, diseasePressure, ...)."),
+                    BaseModelId = table.Column<Guid>(type: "uniqueidentifier", nullable: true, comment: "Link to the base DNAModel used to derive this population."),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true, comment: "User who created the population."),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false, comment: "UTC created timestamp.")
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Tests", x => x.Id);
+                    table.PrimaryKey("PK_Populations", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Tests_Lessons_LessonId",
-                        column: x => x.LessonId,
-                        principalTable: "Lessons",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        name: "FK_Populations_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Populations_DNA_Models_BaseModelId",
+                        column: x => x.BaseModelId,
+                        principalTable: "DNA_Models",
+                        principalColumn: "Id");
                 },
-                comment: "Test/quiz question associated with a Lesson.");
+                comment: "A population of organisms simulated under given environmental/selection factors.");
 
             migrationBuilder.CreateTable(
                 name: "Organisms",
@@ -384,21 +347,25 @@ namespace GenomiX.Infrastructure.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, comment: "Primary key (GUID)."),
                     SimpleName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false, comment: "Simple/UI name."),
+                    Type = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false, comment: "Organism type."),
                     ScientificName = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false, comment: "Scientific-like identifier."),
-                    DNA_Sequence_Id = table.Column<Guid>(type: "uniqueidentifier", nullable: true, comment: "FK to a DNA strand snapshot (for this organism)."),
+                    DNA_Model_Id = table.Column<Guid>(type: "uniqueidentifier", nullable: true, comment: "FK to a DNA model snapshot (for this organism)."),
                     Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false, comment: "Optional description."),
                     PopulationId = table.Column<Guid>(type: "uniqueidentifier", nullable: true, comment: "FK to Population."),
                     SurvivalScore = table.Column<double>(type: "float", nullable: true, comment: "Continuous survival/fitness score (nullable)."),
                     Status = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: false, comment: "Status: alive | dead | reproduced."),
-                    CreatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false, comment: "UTC created timestamp.")
+                    CreatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false, comment: "UTC created timestamp."),
+                    X = table.Column<float>(type: "real", nullable: false, comment: "X coordinate property."),
+                    Y = table.Column<float>(type: "real", nullable: false, comment: "Y coordinate property."),
+                    Fitness = table.Column<double>(type: "float", nullable: false, comment: "Fitness property.")
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Organisms", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Organisms_DNA_Sequences_DNA_Sequence_Id",
-                        column: x => x.DNA_Sequence_Id,
-                        principalTable: "DNA_Sequences",
+                        name: "FK_Organisms_DNA_Models_DNA_Model_Id",
+                        column: x => x.DNA_Model_Id,
+                        principalTable: "DNA_Models",
                         principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Organisms_Populations_PopulationId",
@@ -407,56 +374,14 @@ namespace GenomiX.Infrastructure.Migrations
                         principalColumn: "Id");
                 });
 
-            migrationBuilder.CreateTable(
-                name: "Questions",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, comment: "Primary key (GUID)."),
-                    TestId = table.Column<Guid>(type: "uniqueidentifier", nullable: true, comment: "FK to Test."),
-                    Prompt = table.Column<string>(type: "nvarchar(512)", maxLength: 512, nullable: false, comment: "The question text/prompt."),
-                    Explanation = table.Column<string>(type: "nvarchar(1024)", maxLength: 1024, nullable: true, comment: "Optional explanation or hint for the question."),
-                    Type = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: false, comment: "Question type: mcq | multi | open.")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Questions", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Questions_Tests_TestId",
-                        column: x => x.TestId,
-                        principalTable: "Tests",
-                        principalColumn: "Id");
-                },
-                comment: "Question belonging to a Test, with prompt and possible answers.");
-
-            migrationBuilder.CreateTable(
-                name: "Answers",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, comment: "Primary key (GUID)."),
-                    QuestionId = table.Column<Guid>(type: "uniqueidentifier", nullable: true, comment: "FK to Question."),
-                    Value = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false, comment: "Answer text/value."),
-                    IsCorrect = table.Column<bool>(type: "bit", nullable: false, comment: "Indicates whether the answer is correct.")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Answers", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Answers_Questions_QuestionId",
-                        column: x => x.QuestionId,
-                        principalTable: "Questions",
-                        principalColumn: "Id");
-                },
-                comment: "Answer option for a Test, with correctness flag.");
-
             migrationBuilder.InsertData(
                 table: "AspNetRoles",
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
                     { new Guid("6e6f2c2a-7c3f-4e7d-9f84-2b3a4d9d1001"), "a1111111-aaaa-aaaa-aaaa-aaaaaaaaaaaa", "Admin", "ADMIN" },
-                    { new Guid("6e6f2c2a-7c3f-4e7d-9f84-2b3a4d9d1002"), "b2222222-bbbb-bbbb-bbbb-bbbbbbbbbbbb", "Student", "STUDENT" },
-                    { new Guid("6e6f2c2a-7c3f-4e7d-9f84-2b3a4d9d1003"), "c3333333-cccc-cccc-cccc-cccccccccccc", "Teacher", "TEACHER" },
-                    { new Guid("6e6f2c2a-7c3f-4e7d-9f84-2b3a4d9d1004"), "d4444444-dddd-dddd-dddd-dddddddddddd", "Scientist", "SCIENTIST" }
+                    { new Guid("6e6f2c2a-7c3f-4e7d-9f84-2b3a4d9d1002"), "b2222222-bbbb-bbbb-bbbb-bbbbbbbbbbbb", "User", "USER" },
+                    { new Guid("6e6f2c2a-7c3f-4e7d-9f84-2b3a4d9d1003"), "d3333333-dddd-dddd-dddd-dddddddddddd", "Scientist", "SCIENTIST" }
                 });
 
             migrationBuilder.InsertData(
@@ -466,8 +391,7 @@ namespace GenomiX.Infrastructure.Migrations
                 {
                     { new Guid("58a7c2b5-1347-4f0a-b3ad-912d4f098aaa"), 0, "33333333-3333-3333-3333-333333333333", new DateTime(2024, 8, 20, 8, 45, 0, 0, DateTimeKind.Utc), "ivan@example.com", false, "Ivan", "Petrov", false, null, "IVAN@EXAMPLE.COM", "IVAN", "AQAAAAIAAYagAAAAEIkC1sWbH1iX8tcz2c1oRzFYI0J0mxPOhUkYqGp16wHQi0NmbTQd1+TquU5EtdISew==", null, false, "ccccccc3-cccc-cccc-cccc-cccccccccccc", false, "ivan" },
                     { new Guid("9d5e0ac1-4f1b-422b-b7f0-0f7d5d2dbbb1"), 0, "22222222-2222-2222-2222-222222222222", new DateTime(2024, 7, 15, 10, 30, 0, 0, DateTimeKind.Utc), "alice@example.com", true, "Alice", "Johnson", false, null, "ALICE@EXAMPLE.COM", "ALICE", "AQAAAAIAAYagAAAAED7CaPCa5Oa3vAGoXw8QDdC2aURdW1KhO/yY4ZEnWJoKpRjNUNu4dF9YLeIHByOjLg==", null, false, "bbbbbbb2-bbbb-bbbb-bbbb-bbbbbbbbbbbb", false, "alice" },
-                    { new Guid("a7f9a7d5-56f5-4f3f-8a9f-8c2f0d3d7001"), 0, "44444444-4444-4444-4444-444444444444", new DateTime(2024, 7, 20, 9, 0, 0, 0, DateTimeKind.Utc), "maria.teacher@example.com", true, "Maria", "Dimitrova", false, null, "MARIA.TEACHER@EXAMPLE.COM", "MARIA.TEACHER", "AQAAAAIAAYagAAAAEJ8JpK5Cz9z9qzQ2z5y0r8Zc8n5o3g9p+uZkqB5x0Gz3/7jZK3Tj3f1xY2nG8j0q5g==", null, false, "ddddddd4-dddd-dddd-dddd-dddddddddddd", false, "maria.teacher" },
-                    { new Guid("c2b3d8ae-2b6d-4c41-9b8e-b1c2a3d4e005"), 0, "55555555-5555-5555-5555-555555555555", new DateTime(2024, 9, 10, 11, 15, 0, 0, DateTimeKind.Utc), "georgi.scientist@example.com", true, "Georgi", "Kolev", false, null, "GEORGI.SCIENTIST@EXAMPLE.COM", "GEORGI.SCIENTIST", "AQAAAAIAAYagAAAAEL6H2uXl7u0qg7c+W6ZQ2gk0q0zv2Qm8q6pA6xvYQ2n2eK1m8s0n1l5r3j0h2p4c6w==", null, false, "eeeeeee5-eeee-eeee-eeee-eeeeeeeeeeee", false, "georgi.scientist" },
+                    { new Guid("c2b3d8ae-2b6d-4c41-9b8e-b1c2a3d4e005"), 0, "44444444-4444-4444-4444-4444444444444", new DateTime(2024, 9, 10, 11, 15, 0, 0, DateTimeKind.Utc), "georgi.scientist@example.com", true, "Georgi", "Kolev", false, null, "GEORGI.SCIENTIST@EXAMPLE.COM", "GEORGI.SCIENTIST", "AQAAAAIAAYagAAAAEL6H2uXl7u0qg7c+W6ZQ2gk0q0zv2Qm8q6pA6xvYQ2n2eK1m8s0n1l5r3j0h2p4c6w==", null, false, "ddddddd5-dddd-dddd-dddd-dddddddddddd", false, "georgi.scientist" },
                     { new Guid("ea821ce2-2a3d-43ef-8978-5f34ee07d080"), 0, "11111111-1111-1111-1111-111111111111", new DateTime(2024, 6, 1, 12, 0, 0, 0, DateTimeKind.Utc), "stilyan@example.com", true, "Stilyan", "Chanev", false, null, "STILYAN@EXAMPLE.COM", "STILYAN", "AQAAAAIAAYagAAAAEHzs4+DPBZG9xAgWTlZ7ezRrWg2DfpAjDKOrzJizgKN9PduBps+Ke0JrDB5QNi5u/A==", null, false, "aaaaaaa1-aaaa-aaaa-aaaa-aaaaaaaaaaaa", false, "stilyan" }
                 });
 
@@ -503,8 +427,7 @@ namespace GenomiX.Infrastructure.Migrations
                 {
                     { new Guid("6e6f2c2a-7c3f-4e7d-9f84-2b3a4d9d1002"), new Guid("58a7c2b5-1347-4f0a-b3ad-912d4f098aaa") },
                     { new Guid("6e6f2c2a-7c3f-4e7d-9f84-2b3a4d9d1002"), new Guid("9d5e0ac1-4f1b-422b-b7f0-0f7d5d2dbbb1") },
-                    { new Guid("6e6f2c2a-7c3f-4e7d-9f84-2b3a4d9d1003"), new Guid("a7f9a7d5-56f5-4f3f-8a9f-8c2f0d3d7001") },
-                    { new Guid("6e6f2c2a-7c3f-4e7d-9f84-2b3a4d9d1004"), new Guid("c2b3d8ae-2b6d-4c41-9b8e-b1c2a3d4e005") },
+                    { new Guid("6e6f2c2a-7c3f-4e7d-9f84-2b3a4d9d1003"), new Guid("c2b3d8ae-2b6d-4c41-9b8e-b1c2a3d4e005") },
                     { new Guid("6e6f2c2a-7c3f-4e7d-9f84-2b3a4d9d1001"), new Guid("ea821ce2-2a3d-43ef-8978-5f34ee07d080") }
                 });
 
@@ -516,30 +439,7 @@ namespace GenomiX.Infrastructure.Migrations
                     { new Guid("44444444-0000-0000-0000-000000000001"), new DateTimeOffset(new DateTime(2024, 6, 15, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "Untitled model", new DateTimeOffset(new DateTime(2024, 6, 15, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("ea821ce2-2a3d-43ef-8978-5f34ee07d080") },
                     { new Guid("44444444-0000-0000-0000-000000000002"), new DateTimeOffset(new DateTime(2024, 7, 20, 9, 30, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "Untitled model", new DateTimeOffset(new DateTime(2024, 7, 20, 9, 30, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("9d5e0ac1-4f1b-422b-b7f0-0f7d5d2dbbb1") },
                     { new Guid("44444444-0000-0000-0000-000000000003"), new DateTimeOffset(new DateTime(2024, 8, 25, 10, 45, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "Untitled model", new DateTimeOffset(new DateTime(2024, 8, 25, 10, 45, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("58a7c2b5-1347-4f0a-b3ad-912d4f098aaa") },
-                    { new Guid("44444444-0000-0000-0000-000000000004"), new DateTimeOffset(new DateTime(2024, 7, 20, 9, 5, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "Untitled model", new DateTimeOffset(new DateTime(2024, 7, 20, 9, 5, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("a7f9a7d5-56f5-4f3f-8a9f-8c2f0d3d7001") },
                     { new Guid("44444444-0000-0000-0000-000000000005"), new DateTimeOffset(new DateTime(2024, 9, 10, 11, 20, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "Untitled model", new DateTimeOffset(new DateTime(2024, 9, 10, 11, 20, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("c2b3d8ae-2b6d-4c41-9b8e-b1c2a3d4e005") }
-                });
-
-            migrationBuilder.InsertData(
-                table: "Lessons",
-                columns: new[] { "Id", "Difficulty", "Information", "Title", "Topic", "UserId" },
-                values: new object[,]
-                {
-                    { new Guid("aaaa1111-aaaa-1111-aaaa-aaaaaaaaaaaa"), (byte)1, "DNA (Deoxyribonucleic acid) is a double helix composed of nucleotides: adenine (A), cytosine (C), guanine (G), and thymine (T). A pairs with T, and C pairs with G.", "DNA Structure Basics", "DNA", new Guid("a7f9a7d5-56f5-4f3f-8a9f-8c2f0d3d7001") },
-                    { new Guid("bbbb2222-bbbb-2222-bbbb-bbbbbbbbbbbb"), (byte)2, "Mutations are changes in DNA. **Substitution** replaces one base, **insertion** adds bases, and **deletion** removes bases. Mutations can be harmful, neutral, or beneficial.", "Types of Mutations", "Mutations", new Guid("a7f9a7d5-56f5-4f3f-8a9f-8c2f0d3d7001") },
-                    { new Guid("cccc3333-cccc-3333-cccc-cccccccccccc"), (byte)3, "Cells use repair mechanisms to fix DNA damage. Examples include mismatch repair, nucleotide excision repair, and double-strand break repair. Nanobot simulation in GenomiX demonstrates these concepts.", "DNA Repair Mechanisms", "Repair", new Guid("a7f9a7d5-56f5-4f3f-8a9f-8c2f0d3d7001") },
-                    { new Guid("dddd4444-dddd-4444-dddd-dddddddddddd"), (byte)2, "Probability is key in genetics. For example, Punnett squares can predict the likelihood of offspring inheriting traits. The law of independent assortment applies.", "Probability in Genetics", "Probability", new Guid("a7f9a7d5-56f5-4f3f-8a9f-8c2f0d3d7001") },
-                    { new Guid("eeee5555-eeee-5555-eeee-eeeeeeeeeeee"), (byte)4, "Populations evolve through natural selection, genetic drift, and gene flow. Environmental factors such as temperature or disease pressure influence survival.", "Population Evolution", "Evolution", new Guid("a7f9a7d5-56f5-4f3f-8a9f-8c2f0d3d7001") }
-                });
-
-            migrationBuilder.InsertData(
-                table: "Populations",
-                columns: new[] { "Id", "BaseModelId", "CreatedAt", "Factors", "Name", "UserId" },
-                values: new object[,]
-                {
-                    { new Guid("11111111-1111-1111-1111-111111111111"), new Guid("44444444-0000-0000-0000-000000000001"), new DateTimeOffset(new DateTime(2024, 6, 1, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "{ \"temperature\": 22, \"sunExposure\": \"medium\", \"diseasePressure\": 0.3 }", "Human Urban Population", new Guid("ea821ce2-2a3d-43ef-8978-5f34ee07d080") },
-                    { new Guid("22222222-2222-2222-2222-222222222222"), new Guid("44444444-0000-0000-0000-000000000002"), new DateTimeOffset(new DateTime(2024, 7, 15, 10, 30, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "{ \"temperature\": 25, \"sunExposure\": \"low\", \"diseasePressure\": 0.1 }", "Mouse Lab Population", new Guid("9d5e0ac1-4f1b-422b-b7f0-0f7d5d2dbbb1") },
-                    { new Guid("33333333-3333-3333-3333-333333333333"), new Guid("44444444-0000-0000-0000-000000000003"), new DateTimeOffset(new DateTime(2024, 8, 20, 8, 45, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "{ \"temperature\": 28, \"sunExposure\": \"high\", \"diseasePressure\": 0.5 }", "Dog Wild Pack", new Guid("58a7c2b5-1347-4f0a-b3ad-912d4f098aaa") }
                 });
 
             migrationBuilder.InsertData(
@@ -576,65 +476,24 @@ namespace GenomiX.Infrastructure.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "Tests",
-                columns: new[] { "Id", "LessonId", "Title" },
+                table: "Populations",
+                columns: new[] { "Id", "BaseModelId", "CreatedAt", "Factors", "Name", "UserId" },
                 values: new object[,]
                 {
-                    { new Guid("aaaa1111-aaaa-2222-aaaa-aaaaaaaaaaaa"), new Guid("aaaa1111-aaaa-1111-aaaa-aaaaaaaaaaaa"), "Quiz: DNA Structure" },
-                    { new Guid("bbbb2222-bbbb-3333-bbbb-bbbbbbbbbbbb"), new Guid("bbbb2222-bbbb-2222-bbbb-bbbbbbbbbbbb"), "Quiz: Mutation Types" },
-                    { new Guid("cccc3333-cccc-4444-cccc-cccccccccccc"), new Guid("cccc3333-cccc-3333-cccc-cccccccccccc"), "Quiz: DNA Repair" },
-                    { new Guid("dddd4444-dddd-5555-dddd-dddddddddddd"), new Guid("dddd4444-dddd-4444-dddd-dddddddddddd"), "Quiz: Probability" },
-                    { new Guid("eeee5555-eeee-6666-eeee-eeeeeeeeeeee"), new Guid("eeee5555-eeee-5555-eeee-eeeeeeeeeeee"), "Quiz: Population Evolution" }
+                    { new Guid("11111111-1111-1111-1111-111111111111"), new Guid("44444444-0000-0000-0000-000000000001"), new DateTimeOffset(new DateTime(2024, 6, 1, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "{ \"temperature\": 22, \"sunExposure\": \"medium\", \"diseasePressure\": 0.3 }", "Human Urban Population", new Guid("ea821ce2-2a3d-43ef-8978-5f34ee07d080") },
+                    { new Guid("22222222-2222-2222-2222-222222222222"), new Guid("44444444-0000-0000-0000-000000000002"), new DateTimeOffset(new DateTime(2024, 7, 15, 10, 30, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "{ \"temperature\": 25, \"sunExposure\": \"low\", \"diseasePressure\": 0.1 }", "Mouse Lab Population", new Guid("9d5e0ac1-4f1b-422b-b7f0-0f7d5d2dbbb1") },
+                    { new Guid("33333333-3333-3333-3333-333333333333"), new Guid("44444444-0000-0000-0000-000000000003"), new DateTimeOffset(new DateTime(2024, 8, 20, 8, 45, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "{ \"temperature\": 28, \"sunExposure\": \"high\", \"diseasePressure\": 0.5 }", "Dog Wild Pack", new Guid("58a7c2b5-1347-4f0a-b3ad-912d4f098aaa") }
                 });
 
             migrationBuilder.InsertData(
                 table: "Organisms",
-                columns: new[] { "Id", "CreatedAt", "DNA_Sequence_Id", "Description", "PopulationId", "ScientificName", "SimpleName", "Status", "SurvivalScore" },
+                columns: new[] { "Id", "CreatedAt", "DNA_Model_Id", "Description", "Fitness", "PopulationId", "ScientificName", "SimpleName", "Status", "SurvivalScore", "Type", "X", "Y" },
                 values: new object[,]
                 {
-                    { new Guid("44444444-4444-4444-4444-444444444444"), new DateTimeOffset(new DateTime(2024, 6, 1, 12, 5, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("a1111111-1111-1111-1111-111111111111"), "A simulated human organism from urban population.", new Guid("11111111-1111-1111-1111-111111111111"), "Homo sapiens A", "Human A", "alive", 0.84999999999999998 },
-                    { new Guid("55555555-5555-5555-5555-555555555555"), new DateTimeOffset(new DateTime(2024, 7, 15, 10, 35, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("a2222222-2222-2222-2222-222222222222"), "Lab mouse adapted to controlled temperature and low disease pressure.", new Guid("22222222-2222-2222-2222-222222222222"), "Mus musculus L1", "Lab Mouse 1", "alive", 0.92000000000000004 },
-                    { new Guid("66666666-6666-6666-6666-666666666666"), new DateTimeOffset(new DateTime(2024, 8, 20, 8, 50, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("b1111111-1111-1111-1111-111111111111"), "Leader of the wild dog pack, facing high disease pressure.", new Guid("33333333-3333-3333-3333-333333333333"), "Canis lupus familiaris Alpha", "Dog Alpha", "alive", 0.65000000000000002 }
+                    { new Guid("44444444-4444-4444-4444-444444444444"), new DateTimeOffset(new DateTime(2024, 6, 1, 12, 5, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("44444444-0000-0000-0000-000000000001"), "A simulated human organism from urban population.", 0.0, new Guid("11111111-1111-1111-1111-111111111111"), "Homo sapiens A", "Human A", "alive", 0.84999999999999998, "", 0f, 0f },
+                    { new Guid("55555555-5555-5555-5555-555555555555"), new DateTimeOffset(new DateTime(2024, 7, 15, 10, 35, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("44444444-0000-0000-0000-000000000002"), "Lab mouse adapted to controlled temperature and low disease pressure.", 0.0, new Guid("22222222-2222-2222-2222-222222222222"), "Mus musculus L1", "Lab Mouse 1", "alive", 0.92000000000000004, "", 0f, 0f },
+                    { new Guid("66666666-6666-6666-6666-666666666666"), new DateTimeOffset(new DateTime(2024, 8, 20, 8, 50, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("44444444-0000-0000-0000-000000000003"), "Leader of the wild dog pack, facing high disease pressure.", 0.0, new Guid("33333333-3333-3333-3333-333333333333"), "Canis lupus familiaris Alpha", "Dog Alpha", "alive", 0.65000000000000002, "", 0f, 0f }
                 });
-
-            migrationBuilder.InsertData(
-                table: "Questions",
-                columns: new[] { "Id", "Explanation", "Prompt", "TestId", "Type" },
-                values: new object[,]
-                {
-                    { new Guid("00000000-eeee-bbbb-eeee-eeeeeeeeeeee"), "Consider disease, climate, and mutation.", "Select all factors that influence population survival.", new Guid("eeee5555-eeee-6666-eeee-eeeeeeeeeeee"), "multi" },
-                    { new Guid("11111111-aaaa-2222-aaaa-aaaaaaaaaaaa"), "Remember A pairs with T, and C pairs with G.", "Which bases pair together in DNA?", new Guid("aaaa1111-aaaa-2222-aaaa-aaaaaaaaaaaa"), "mcq" },
-                    { new Guid("22222222-aaaa-3333-aaaa-aaaaaaaaaaaa"), "Think about the double structure.", "What shape does the DNA molecule form?", new Guid("aaaa1111-aaaa-2222-aaaa-aaaaaaaaaaaa"), "open" },
-                    { new Guid("33333333-bbbb-4444-bbbb-bbbbbbbbbbbb"), null, "Which of the following is a substitution mutation?", new Guid("bbbb2222-bbbb-3333-bbbb-bbbbbbbbbbbb"), "mcq" },
-                    { new Guid("44444444-bbbb-5555-bbbb-bbbbbbbbbbbb"), "There are more than one correct answers.", "Select all types of mutations.", new Guid("bbbb2222-bbbb-3333-bbbb-bbbbbbbbbbbb"), "multi" },
-                    { new Guid("55555555-cccc-6666-cccc-cccccccccccc"), "Think about DNA polymerase and ligase.", "What enzyme is responsible for DNA repair?", new Guid("cccc3333-cccc-4444-cccc-cccccccccccc"), "mcq" },
-                    { new Guid("66666666-cccc-7777-cccc-cccccccccccc"), "Short answer expected.", "Describe one method of DNA repair.", new Guid("cccc3333-cccc-4444-cccc-cccccccccccc"), "open" },
-                    { new Guid("77777777-dddd-8888-dddd-dddddddddddd"), null, "If a trait has a probability of 25%, how many individuals out of 200 are expected to show it?", new Guid("dddd4444-dddd-5555-dddd-dddddddddddd"), "mcq" },
-                    { new Guid("88888888-dddd-9999-dddd-dddddddddddd"), "Link probability rules to Punnett squares.", "Explain how probability affects inheritance in genetics.", new Guid("dddd4444-dddd-5555-dddd-dddddddddddd"), "open" },
-                    { new Guid("99999999-eeee-aaaa-eeee-eeeeeeeeeeee"), "Think about recombination and mutation.", "Which factor increases genetic diversity in a population?", new Guid("eeee5555-eeee-6666-eeee-eeeeeeeeeeee"), "mcq" }
-                });
-
-            migrationBuilder.InsertData(
-                table: "Answers",
-                columns: new[] { "Id", "IsCorrect", "QuestionId", "Value" },
-                values: new object[,]
-                {
-                    { new Guid("14d6cb7b-44fa-40a6-a76f-657e7b9e8f95"), true, new Guid("99999999-eeee-aaaa-eeee-eeeeeeeeeeee"), "Mutation" },
-                    { new Guid("1a5f8449-62a3-42e6-97e3-7c30c676890a"), false, new Guid("77777777-dddd-8888-dddd-dddddddddddd"), "25" },
-                    { new Guid("26f84cf2-b33a-46f8-b1df-10f0c50bb979"), false, new Guid("99999999-eeee-aaaa-eeee-eeeeeeeeeeee"), "Uniform environment" },
-                    { new Guid("2d1c707f-43e9-43c2-8f20-dfb6c4140b1e"), true, new Guid("55555555-cccc-6666-cccc-cccccccccccc"), "DNA ligase" },
-                    { new Guid("3d78217b-fb4a-4f64-80d1-1b9f408a64b2"), false, new Guid("33333333-bbbb-4444-bbbb-bbbbbbbbbbbb"), "Removing a whole codon" },
-                    { new Guid("5b0c8cd4-9c26-46f0-94df-c36876ad6bc9"), true, new Guid("77777777-dddd-8888-dddd-dddddddddddd"), "50" },
-                    { new Guid("6a2f6f03-8a56-4a87-a2b9-33fc60a1b10f"), true, new Guid("33333333-bbbb-4444-bbbb-bbbbbbbbbbbb"), "Changing a single base from A to G" },
-                    { new Guid("b4f2f8a9-2a0a-4f67-9b2e-b7ac32af6242"), true, new Guid("11111111-aaaa-2222-aaaa-aaaaaaaaaaaa"), "A pairs with T, C pairs with G" },
-                    { new Guid("b69d2b41-8f21-47f6-9436-d2fc0e2c23b6"), false, new Guid("55555555-cccc-6666-cccc-cccccccccccc"), "Amylase" },
-                    { new Guid("c5e7c6e1-1bfc-4f7d-9f2a-8d2c6e0e8d9c"), false, new Guid("11111111-aaaa-2222-aaaa-aaaaaaaaaaaa"), "A pairs with G, C pairs with T" }
-                });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Answers_QuestionId",
-                table: "Answers",
-                column: "QuestionId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -696,14 +555,9 @@ namespace GenomiX.Infrastructure.Migrations
                 column: "ModelId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Lessons_UserId",
-                table: "Lessons",
-                column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Organisms_DNA_Sequence_Id",
+                name: "IX_Organisms_DNA_Model_Id",
                 table: "Organisms",
-                column: "DNA_Sequence_Id");
+                column: "DNA_Model_Id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Organisms_PopulationId",
@@ -711,14 +565,14 @@ namespace GenomiX.Infrastructure.Migrations
                 column: "PopulationId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Populations_BaseModelId",
+                table: "Populations",
+                column: "BaseModelId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Populations_UserId",
                 table: "Populations",
                 column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Questions_TestId",
-                table: "Questions",
-                column: "TestId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_RoleRequests_DecidedByUserId",
@@ -729,19 +583,11 @@ namespace GenomiX.Infrastructure.Migrations
                 name: "IX_RoleRequests_UserId",
                 table: "RoleRequests",
                 column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Tests_LessonId",
-                table: "Tests",
-                column: "LessonId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "Answers");
-
             migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");
 
@@ -764,6 +610,9 @@ namespace GenomiX.Infrastructure.Migrations
                 name: "DNA_Models_Diseases");
 
             migrationBuilder.DropTable(
+                name: "DNA_Sequences");
+
+            migrationBuilder.DropTable(
                 name: "Organisms");
 
             migrationBuilder.DropTable(
@@ -773,28 +622,16 @@ namespace GenomiX.Infrastructure.Migrations
                 name: "RoleRequests");
 
             migrationBuilder.DropTable(
-                name: "Questions");
-
-            migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
                 name: "Diseases");
 
             migrationBuilder.DropTable(
-                name: "DNA_Sequences");
-
-            migrationBuilder.DropTable(
                 name: "Populations");
 
             migrationBuilder.DropTable(
-                name: "Tests");
-
-            migrationBuilder.DropTable(
                 name: "DNA_Models");
-
-            migrationBuilder.DropTable(
-                name: "Lessons");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");

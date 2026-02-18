@@ -17,15 +17,13 @@ namespace Genomix.Common.Extensions
             var hasher = new PasswordHasher<GenUser>();
 
             await Force(um, hasher, "stilyan", "Admin!123");
-            await Force(um, hasher, "alice", "Student!123");
-            await Force(um, hasher, "ivan", "Student!123");
-            await Force(um, hasher, "maria.teacher", "Teacher!123");
+            await Force(um, hasher, "alice", "User!123");
+            await Force(um, hasher, "ivan", "User!123");
             await Force(um, hasher, "georgi.scientist", "Scientist!123");
 
             await Verify(um, "stilyan", "Admin!123");
-            await Verify(um, "alice", "Student!123");
-            await Verify(um, "ivan", "Student!123");
-            await Verify(um, "maria.teacher", "Teacher!123");
+            await Verify(um, "alice", "User!123");
+            await Verify(um, "ivan", "User!123");
             await Verify(um, "georgi.scientist", "Scientist!123");
         }
 
