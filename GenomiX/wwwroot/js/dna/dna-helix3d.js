@@ -4,9 +4,9 @@ import { OrbitControls } from "https://esm.sh/three@0.159.0/examples/jsm/control
 const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
 
 function qualityForN(N) {
-    if (N >= 200) return { ATOM_SEG: 8, BOND_SEG: 6, H_DASHES: 2, DETAIL_SCALE: 1.25 };
-    if (N >= 100) return { ATOM_SEG: 10, BOND_SEG: 6, H_DASHES: 2, DETAIL_SCALE: 1.30 };
-    return { ATOM_SEG: 12, BOND_SEG: 7, H_DASHES: 2, DETAIL_SCALE: 1.35 };
+    if (N >= 200) return { ATOM_SEG: 6, BOND_SEG: 4, H_DASHES: 2, DETAIL_SCALE: 1.25 };
+    if (N >= 100) return { ATOM_SEG: 8, BOND_SEG: 5, H_DASHES: 2, DETAIL_SCALE: 1.30 };
+    return { ATOM_SEG: 10, BOND_SEG: 6, H_DASHES: 2, DETAIL_SCALE: 1.35 };
 }
 
 const GLOBAL_BASE_SCALE = 1.10;
@@ -77,7 +77,7 @@ function commitInstancers(parent, inst) {
             it.mesh = null;
         }
 
-        const mesh = new THREE.InstancedMesh(it.geom.clone(), it.mat.clone(), count);
+        const mesh = new THREE.InstancedMesh(it.geom, it.mat, count);
         mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
 
         for (let i = 0; i < count; i++) {
@@ -90,21 +90,22 @@ function commitInstancers(parent, inst) {
     }
 }
 
-function clearInstancers(inst) {
-    for (const k of Object.keys(inst)) inst[k].mats.length = 0;
-}
+let bondGeometry = null;
 
-function cylinderBetween(a, b, radius, material, BOND_SEG) {
+
+function cylinderBetween(a, b, radius, material) {
     const dir = new THREE.Vector3().subVectors(b, a);
     const len = dir.length();
-    const g = new THREE.CylinderGeometry(radius, radius, Math.max(0.0001, len), BOND_SEG);
-    const cyl = new THREE.Mesh(g, material);
+    if (!bondGeometry) return new THREE.Group(); 
+
+    const cyl = new THREE.Mesh(bondGeometry, material);
+    cyl.scale.set(radius, len, radius);
     cyl.position.copy(a).addScaledVector(dir, 0.5);
     cyl.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir.normalize());
     return cyl;
 }
 
-function dashedBond(a, b, radius, material, dashes, BOND_SEG) {
+function dashedBond(a, b, radius, material, dashes) {
     const dir = new THREE.Vector3().subVectors(b, a);
     const len = dir.length();
     const u = dir.clone().normalize();
@@ -117,7 +118,7 @@ function dashedBond(a, b, radius, material, dashes, BOND_SEG) {
     for (let i = 0; i < dashes; i++) {
         const p0 = a.clone().addScaledVector(u, start);
         const p1 = a.clone().addScaledVector(u, start + seg);
-        g.add(cylinderBetween(p0, p1, radius, material, BOND_SEG));
+        g.add(cylinderBetween(p0, p1, radius, material));
         start += seg + gap;
     }
     return g;
@@ -174,6 +175,241 @@ function buildBaseRing(letter, center, basisX, basisY, size = 0.24) {
     return { ring, atoms, attachPos: ring[0].clone() };
 }
 
+function createLegendOverlay(mount, { baseHex, enableDetail, elem }) {
+    mount.querySelectorAll(".dna-legend").forEach(el => el.remove());
+
+    const cs = getComputedStyle(mount);
+    if (cs.position === "static") mount.style.position = "relative";
+
+    const toHex = (num) => "#" + (num >>> 0).toString(16).padStart(6, "0");
+
+    const bases = ["A", "T", "C", "G"];
+    const elements = ["H", "C", "N", "O", "P"].filter(k => elem?.[k]);
+
+    const legend = document.createElement("div");
+    legend.className = "dna-legend";
+    legend.innerHTML = `
+        <div class="dna-legend-title">Legend</div>
+
+        <div class="dna-legend-section">
+            <div class="dna-legend-subtitle">Bases</div>
+            <div class="dna-legend-row">
+                ${bases.map(b => `
+                    <div class="dna-legend-item">
+                        <span class="dna-swatch" style="background:${toHex(baseHex[b] ?? 0xffffff)}"></span>
+                        <span class="dna-label">${b}</span>
+                    </div>
+                `).join("")}
+            </div>
+        </div>
+
+        <div class="dna-legend-section" style="margin-top:10px;">
+            <div class="dna-legend-subtitle">Atoms</div>
+            <div class="dna-legend-row">
+                ${elements.map(k => `
+                    <div class="dna-legend-item">
+                        <span class="dna-swatch" style="background:${toHex(elem[k].color)}"></span>
+                        <span class="dna-label">${k}</span>
+                    </div>
+                `).join("")}
+            </div>
+        </div>
+    `;
+
+    mount.appendChild(legend);
+
+    if (!document.getElementById("dna-legend-style")) {
+        const style = document.createElement("style");
+        style.id = "dna-legend-style";
+        style.textContent = `
+            .dna-legend{
+                position:absolute;
+                left:12px;
+                top:12px;
+                z-index:10;
+                padding:10px 12px;
+                border-radius:12px;
+                background:rgba(10,14,25,.55);
+                border:1px solid rgba(255,255,255,.12);
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+                color:rgba(255,255,255,.92);
+                font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+                user-select:none;
+                pointer-events:none;
+                max-width: 340px;
+            }
+            .dna-legend-title{
+                font-size:12px;
+                letter-spacing:.08em;
+                text-transform:uppercase;
+                opacity:.85;
+                margin-bottom:8px;
+            }
+            .dna-legend-subtitle{
+                font-size:12px;
+                opacity:.78;
+                margin-bottom:6px;
+            }
+            .dna-legend-row{
+                display:flex;
+                gap:10px;
+                align-items:center;
+                flex-wrap:wrap;
+            }
+            .dna-legend-item{
+                display:flex;
+                align-items:center;
+                gap:6px;
+            }
+            .dna-swatch{
+                width:12px;
+                height:12px;
+                border-radius:4px;
+                box-shadow: 0 0 0 1px rgba(255,255,255,.18) inset;
+            }
+            .dna-label{
+                font-size:13px;
+                font-weight:600;
+            }
+        `;
+        document.head.appendChild(style);
+    }
+
+    return legend;
+}
+
+function renderBasePairSVG(b1, b2, seqIndex) {
+    const baseColor = { A: "#4bff88", T: "#ffd54b", C: "#4ba3ff", G: "#ff4b4b" };
+    const elemColor = { H: "#ffffff", C: "#7f7f7f", N: "#3a74ff", O: "#ff3a3a", P: "#ffa024" };
+    const baseName = { A: "Adenine", T: "Thymine", C: "Cytosine", G: "Guanine" };
+
+    const chip = (k) => `
+    <span style="
+      display:inline-flex; align-items:center; gap:6px;
+      padding:4px 8px; border-radius:999px;
+      background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.10);
+      font-size:12px;">
+      <span style="width:10px;height:10px;border-radius:50%;background:${elemColor[k]};display:inline-block;"></span>
+      ${k}
+    </span>
+  `;
+
+    const nucleotide = (base, x, y) => {
+        const c = baseColor[base] || "#fff";
+
+        const phosphate = `
+      <circle cx="${x + 30}" cy="${y + 40}" r="12"
+        fill="rgba(255,160,36,0.14)" stroke="rgba(255,255,255,0.75)" stroke-width="1.4"/>
+      <text x="${x + 24}" y="${y + 45}" fill="${elemColor.P}" font-size="12" font-weight="800">P</text>
+
+      <circle cx="${x + 12}" cy="${y + 20}" r="8"
+        fill="rgba(255,58,58,0.12)" stroke="rgba(255,255,255,0.55)" stroke-width="1.2"/>
+      <text x="${x + 8}" y="${y + 25}" fill="${elemColor.O}" font-size="11" font-weight="800">O</text>
+
+      <circle cx="${x + 12}" cy="${y + 60}" r="8"
+        fill="rgba(255,58,58,0.12)" stroke="rgba(255,255,255,0.55)" stroke-width="1.2"/>
+      <text x="${x + 8}" y="${y + 65}" fill="${elemColor.O}" font-size="11" font-weight="800">O</text>
+
+      <circle cx="${x + 52}" cy="${y + 40}" r="8"
+        fill="rgba(255,58,58,0.12)" stroke="rgba(255,255,255,0.55)" stroke-width="1.2"/>
+      <text x="${x + 48}" y="${y + 45}" fill="${elemColor.O}" font-size="11" font-weight="800">O</text>
+    `;
+
+        const bondPS = `
+      <line x1="${x + 42}" y1="${y + 40}" x2="${x + 78}" y2="${y + 80}"
+        stroke="rgba(255,255,255,0.75)" stroke-width="2.2"/>
+    `;
+
+        const sugar = `
+      <polygon points="
+        ${x + 80},${y + 80}
+        ${x + 120},${y + 62}
+        ${x + 150},${y + 82}
+        ${x + 140},${y + 125}
+        ${x + 95},${y + 125}"
+        fill="rgba(120,140,255,0.22)"
+        stroke="rgba(255,255,255,0.75)"
+        stroke-width="1.4"/>
+    `;
+
+        const bondSB = `
+      <line x1="${x + 150}" y1="${y + 82}" x2="${x + 190}" y2="${y + 70}"
+        stroke="rgba(255,255,255,0.75)" stroke-width="2.2"/>
+    `;
+
+        const ring = `
+      <polygon points="
+        ${x + 200},${y + 45}
+        ${x + 235},${y + 65}
+        ${x + 235},${y + 105}
+        ${x + 200},${y + 125}
+        ${x + 165},${y + 105}
+        ${x + 165},${y + 65}"
+        fill="rgba(255,255,255,0.03)"
+        stroke="${c}"
+        stroke-width="2.6"/>
+
+      <text x="${x + 162}" y="${y + 60}" fill="${elemColor.N}" font-size="12" font-weight="900">N</text>
+      <text x="${x + 232}" y="${y + 60}" fill="${elemColor.N}" font-size="12" font-weight="900">N</text>
+
+      ${base === "T" || base === "G"
+                ? `<text x="${x + 212}" y="${y + 137}" fill="${elemColor.O}" font-size="12" font-weight="900">O</text>`
+                : ""}
+
+      ${base === "A" || base === "C"
+                ? `<text x="${x + 170}" y="${y + 141}" fill="${elemColor.N}" font-size="12" font-weight="900">N</text>`
+                : ""}
+
+      <text x="${x + 250}" y="${y + 90}" fill="${c}" font-size="16" font-weight="950">${base}</text>
+    `;
+
+        const label = `
+      <text x="${x + 165}" y="${y + 170}" fill="${c}" font-size="14" font-weight="900">
+        ${baseName[base] || base}
+      </text>
+    `;
+
+        return phosphate + bondPS + sugar + bondSB + ring + label;
+    };
+
+    const hb =
+        ((b1 === "A" && b2 === "T") || (b1 === "T" && b2 === "A")) ? 2 :
+            ((b1 === "C" && b2 === "G") || (b1 === "G" && b2 === "C")) ? 3 : 0;
+
+    const hbLines = hb === 0 ? "" : `
+    <g stroke="rgba(255,255,255,0.65)" stroke-width="2.2" stroke-dasharray="7 6">
+      ${hb >= 1 ? `<line x1="250" y1="115" x2="250" y2="235"/>` : ""}
+      ${hb >= 2 ? `<line x1="230" y1="120" x2="230" y2="230"/>` : ""}
+      ${hb >= 3 ? `<line x1="270" y1="120" x2="270" y2="230"/>` : ""}
+    </g>
+  `;
+
+    return `
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <div style="opacity:0.9;font-size:12px;">
+        Index: <b>${seqIndex}</b> • Pair: <b>${b1}-${b2}</b>
+      </div>
+
+      <svg viewBox="0 0 360 420" width="100%" height="auto"
+           style="border-radius:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);">
+        <!-- top nucleotide -->
+        <g>${nucleotide(b1, 20, 25)}</g>
+
+        <!-- bottom nucleotide -->
+        <g>${nucleotide(b2, 20, 215)}</g>
+
+        <!-- H bonds between bases -->
+        ${hbLines}
+      </svg>
+
+      <div style="display:flex;flex-wrap:wrap;gap:8px;">
+        ${chip("H")}${chip("C")}${chip("N")}${chip("O")}${chip("P")}
+      </div>
+    </div>
+  `;
+}
+
 export function mountHelix3D(strand1, strand2, mount, initialIndex = null) {
     if (!mount) throw new Error("mountHelix3D: missing mount element");
     if (!mount.style.minHeight) mount.style.minHeight = "460px";
@@ -188,14 +424,52 @@ export function mountHelix3D(strand1, strand2, mount, initialIndex = null) {
     const scene = new THREE.Scene();
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setPixelRatio(1);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.12;
 
     mount.querySelectorAll("canvas").forEach(c => c.remove());
+    mount.querySelectorAll(".dna-legend").forEach(el => el.remove());
+    mount.querySelectorAll(".dna-detail-panel").forEach(el => el.remove());
 
     mount.appendChild(renderer.domElement);
+
+    mount.style.position = mount.style.position || "relative";
+
+    const detailPanel = document.createElement("div");
+    detailPanel.className = "dna-detail-panel";
+    detailPanel.style.cssText = `
+      position:absolute; right:12px; top:12px;
+      width:360px; max-width:calc(100% - 24px);
+      background:rgba(8,12,22,0.82);
+      border:1px solid rgba(255,255,255,0.10);
+      border-radius:14px;
+      padding:10px;
+      backdrop-filter: blur(8px);
+      color:#fff;
+      font-family: system-ui, Segoe UI, Arial, sans-serif;
+      display:none;
+      z-index:20;        
+      pointer-events:auto;
+    `;
+    mount.appendChild(detailPanel);
+
+    function showDetailPanel(svgHtml) {
+        detailPanel.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;">
+      <div style="font-weight:700;letter-spacing:0.2px;">Base-pair detail</div>
+      <button id="bpCloseBtn" style="
+        border:0; background:rgba(255,255,255,0.10); color:#fff;
+        padding:6px 10px; border-radius:10px; cursor:pointer;">✕</button>
+    </div>
+    ${svgHtml}
+  `;
+        detailPanel.style.display = "block";
+        detailPanel.querySelector("#bpCloseBtn")?.addEventListener("click", () => {
+            detailPanel.style.display = "none";
+        });
+    }
 
     const camera = new THREE.PerspectiveCamera(45, 1, 0.01, 6000);
 
@@ -215,12 +489,38 @@ export function mountHelix3D(strand1, strand2, mount, initialIndex = null) {
     const root = new THREE.Group();
     scene.add(root);
 
-    const globalGroup = new THREE.Group(); 
+    bondGeometry = new THREE.CylinderGeometry(1, 1, 1, BOND_SEG);
+
+    const globalGroup = new THREE.Group();
     const detailGroup = new THREE.Group();
     root.add(globalGroup, detailGroup);
 
-    const globalBackboneMat = new THREE.MeshStandardMaterial({ color: 0x1b2347, metalness: 0.10, roughness: 0.62 });
+    let rotateTimer = 0;
+    const back1 = [];
+    const back2 = [];
+    const ENABLE_DETAIL = N <= 140;
+    detailGroup.visible = ENABLE_DETAIL;
+
+    controls.addEventListener("start", () => {
+        if (ENABLE_DETAIL) detailGroup.visible = false;
+    });
+
+    controls.addEventListener("end", () => {
+        if (!ENABLE_DETAIL) return;
+        clearTimeout(rotateTimer);
+
+        rotateTimer = setTimeout(() => {
+            detailGroup.visible = true;
+        }, 120);
+    });
+
     const globalRungMat = new THREE.MeshStandardMaterial({ color: 0xffffff, transparent: true, opacity: 0.55, roughness: 0.75 });
+
+    function makeLine(points) {
+        const geom = new THREE.BufferGeometry().setFromPoints(points);
+        const mat = new THREE.LineBasicMaterial({ color: 0x1b2347, transparent: true, opacity: 0.55 });
+        return new THREE.Line(geom, mat);
+    }
 
     const bondMat = new THREE.MeshStandardMaterial({
         color: 0xd7e2ff,
@@ -257,13 +557,12 @@ export function mountHelix3D(strand1, strand2, mount, initialIndex = null) {
     const baseHex = { A: 0xff4b4b, T: 0xffd54b, C: 0x4ba3ff, G: 0x4bff88 };
     const baseGeom = new THREE.SphereGeometry(0.18 * GLOBAL_BASE_SCALE, 16, 16);
     const rungGeom = new THREE.CylinderGeometry(0.055 * GLOBAL_BASE_SCALE, 0.055 * GLOBAL_BASE_SCALE, 2 * r, 12);
+    createLegendOverlay(mount, { baseHex, enableDetail: ENABLE_DETAIL, elem: ELEM });
 
     const baseMeshes1 = [];
     const baseMeshes2 = [];
     const rungMeshes = [];
     const rungBaseOpacity = [];
-    const back1 = [];
-    const back2 = [];
 
     let onPick = null;
     const raycaster = new THREE.Raycaster();
@@ -282,6 +581,10 @@ export function mountHelix3D(strand1, strand2, mount, initialIndex = null) {
         if (!Number.isFinite(vi)) return;
 
         const seqIndex = REV ? (N - 1 - vi) : vi;
+        const b1 = strand1[seqIndex];
+        const b2 = strand2[seqIndex];
+
+        showDetailPanel(renderBasePairSVG(b1, b2, seqIndex));
         onPick?.(seqIndex);
     });
 
@@ -330,26 +633,9 @@ export function mountHelix3D(strand1, strand2, mount, initialIndex = null) {
         rungBaseOpacity.push(baseOp);
     }
 
-    function padded(points) {
-        const p = points.map(v => v.clone());
-        if (p.length >= 2) { p.unshift(p[0].clone()); p.push(p[p.length - 1].clone()); }
-        return p;
-    }
-
-    const curve1 = new THREE.CatmullRomCurve3(padded(back1), false, "centripetal");
-    const curve2 = new THREE.CatmullRomCurve3(padded(back2), false, "centripetal");
-
-    const tubeGeom1 = new THREE.TubeGeometry(curve1, Math.max(32, N * 2), 0.070 * GLOBAL_BASE_SCALE, 10, false);
-    const tubeGeom2 = new THREE.TubeGeometry(curve2, Math.max(32, N * 2), 0.070 * GLOBAL_BASE_SCALE, 10, false);
-
-    const tube1 = new THREE.Mesh(tubeGeom1, globalBackboneMat);
-    const tube2 = new THREE.Mesh(tubeGeom2, globalBackboneMat);
-    globalGroup.add(tube1, tube2);
-
-    tube1.material.transparent = true;
-    tube2.material.transparent = true;
-    tube1.material.opacity = 0.55;
-    tube2.material.opacity = 0.55;
+    const line1 = makeLine(back1);
+    const line2 = makeLine(back2);
+    globalGroup.add(line1, line2);
 
     const beadGeom = new THREE.SphereGeometry(0.11 * GLOBAL_BASE_SCALE, 14, 14);
     const beadMat = new THREE.MeshStandardMaterial({ color: 0xffa024, metalness: 0.08, roughness: 0.35 });
@@ -365,123 +651,129 @@ export function mountHelix3D(strand1, strand2, mount, initialIndex = null) {
     beads.count = beadCount;
     globalGroup.add(beads);
 
-    const detailInst = makeInstancers(ATOM_SEG);
-    const zAxis = new THREE.Vector3(0, 0, 1);
+    let detailInst = null;
 
-    function makeBackbonePoints(a, ang, isStrand2, scale) {
-        const out = a.clone().setZ(0).normalize();
-        const tan = new THREE.Vector3(-Math.sin(ang), Math.cos(ang), 0).normalize();
-        const tanS = isStrand2 ? tan.clone().negate() : tan;
+    if (ENABLE_DETAIL) {
+        detailInst = makeInstancers(ATOM_SEG);
+        const zAxis = new THREE.Vector3(0, 0, 1);
 
-        const sugarCenter = a.clone().addScaledVector(out, 0.34 * scale);
+        function makeBackbonePoints(a, ang, isStrand2, scale) {
+            const out = a.clone().setZ(0).normalize();
+            const tan = new THREE.Vector3(-Math.sin(ang), Math.cos(ang), 0).normalize();
+            const tanS = isStrand2 ? tan.clone().negate() : tan;
 
-        const phosphateCenter = a.clone()
-            .addScaledVector(out, 0.70 * scale)
-            .addScaledVector(tanS, 0.22 * scale);
+            const sugarCenter = a.clone().addScaledVector(out, 0.34 * scale);
 
-        const sugarBasisY = out.clone().cross(zAxis).normalize();
-        const sugarRing = buildPentose(sugarCenter, tanS, sugarBasisY, 0.22 * scale);
+            const phosphateCenter = a.clone()
+                .addScaledVector(out, 0.70 * scale)
+                .addScaledVector(tanS, 0.22 * scale);
 
-        const ph = buildPhosphate(phosphateCenter, tanS, sugarBasisY, out, 0.26 * scale);
+            const sugarBasisY = out.clone().cross(zAxis).normalize();
+            const sugarRing = buildPentose(sugarCenter, tanS, sugarBasisY, 0.22 * scale);
 
-        return { out, tanS, sugarCenter, sugarRing, ph };
-    }
+            const ph = buildPhosphate(phosphateCenter, tanS, sugarBasisY, out, 0.26 * scale);
 
-    function addPO4(ph, scale) {
-        pushAtom(detailInst, "P", ph.P, 1.0);
-        for (const o of ph.O) pushAtom(detailInst, "O", o, 1.0);
-
-        for (const o of ph.O) {
-            detailGroup.add(cylinderBetween(ph.P, o, 0.014 * scale, bondMat, BOND_SEG));
+            return { out, tanS, sugarCenter, sugarRing, ph };
         }
-    }
 
-    function addSugar(sugarRing, scale) {
-        for (const p of sugarRing) pushAtom(detailInst, "C", p, 1.0);
-        for (let i = 0; i < 5; i++) {
-            detailGroup.add(cylinderBetween(sugarRing[i], sugarRing[(i + 1) % 5], 0.016 * scale, bondDarkMat, BOND_SEG));
-        }
-    }
+        function addPO4(ph, scale) {
+            pushAtom(detailInst, "P", ph.P, 1.0);
+            for (const o of ph.O) pushAtom(detailInst, "O", o, 1.0);
 
-    function addSugarToPhosphate(sugarRing, ph, scale) {
-        detailGroup.add(cylinderBetween(sugarRing[3], ph.P, 0.016 * scale, bondDarkMat, BOND_SEG));
-    }
-
-    function addPhosphateToNextSugar(ph, nextSugarRing, scale) {
-        detailGroup.add(cylinderBetween(ph.P, nextSugarRing[1], 0.015 * scale, bondDarkMat, BOND_SEG));
-    }
-
-    function addBase(letter, baseCenter, tan, out, sugarRing, scale) {
-        const baseBasisY = out.clone().cross(zAxis).normalize();
-        const base = buildBaseRing(letter, baseCenter, tan, baseBasisY, 0.28 * scale);
-        for (const at of base.atoms) pushAtom(detailInst, at.elem, at.pos, 1.0);
-
-        for (let i = 0; i < 6; i += 2) {
-            detailGroup.add(cylinderBetween(base.ring[i], base.ring[(i + 1) % 6], 0.013 * scale, bondMat, BOND_SEG));
-        }
-        detailGroup.add(cylinderBetween(base.attachPos, sugarRing[0], 0.014 * scale, bondMat, BOND_SEG));
-
-        return base;
-    }
-
-    const scale = DETAIL_SCALE;
-
-    const strand1Nodes = [];
-    const strand2Nodes = [];
-
-    for (let seq = 0; seq < N; seq++) {
-        const vi = REV ? (N - 1 - seq) : seq;
-        const ang = handedSign * vi * thetaStep;
-
-        const a1 = baseMeshes1[vi].position.clone();
-        const a2 = baseMeshes2[vi].position.clone();
-
-        const n1 = makeBackbonePoints(a1, ang, false, scale);
-        const n2 = makeBackbonePoints(a2, ang, true, scale);
-
-        strand1Nodes.push(n1);
-        strand2Nodes.push(n2);
-
-        addSugar(n1.sugarRing, scale);
-        addSugar(n2.sugarRing, scale);
-
-        addPO4(n1.ph, scale);
-        addPO4(n2.ph, scale);
-
-        addSugarToPhosphate(n1.sugarRing, n1.ph, scale);
-        addSugarToPhosphate(n2.sugarRing, n2.ph, scale);
-
-        const out1 = n1.out;
-        const out2 = n2.out;
-
-        const baseC1 = a1.clone().addScaledVector(out1, -0.40 * scale);
-        const baseC2 = a2.clone().addScaledVector(out2, -0.40 * scale);
-
-        const b1 = strand1[seq];
-        const b2 = strand2[seq];
-
-        const base1 = addBase(b1, baseC1, n1.tanS, out1, n1.sugarRing, scale);
-        const base2 = addBase(b2, baseC2, n2.tanS, out2, n2.sugarRing, scale);
-
-        const hb =
-            ((b1 === "A" && b2 === "T") || (b1 === "T" && b2 === "A")) ? 2 :
-                ((b1 === "C" && b2 === "G") || (b1 === "G" && b2 === "C")) ? 3 : 0;
-
-        if (hb > 0) {
-            const aPts = [base1.ring[2], base1.ring[4], base1.ring[0]];
-            const bPts = [base2.ring[2], base2.ring[4], base2.ring[0]];
-            for (let k = 0; k < hb; k++) {
-                detailGroup.add(dashedBond(aPts[k], bPts[k], 0.010 * scale, hBondMat, H_DASHES, BOND_SEG));
+            for (const o of ph.O) {
+                detailGroup.add(cylinderBetween(ph.P, o, 0.014 * scale, bondMat));
             }
         }
-    }
 
-    for (let i = 0; i < N - 1; i++) {
-        addPhosphateToNextSugar(strand1Nodes[i].ph, strand1Nodes[i + 1].sugarRing, scale);
-        addPhosphateToNextSugar(strand2Nodes[i].ph, strand2Nodes[i + 1].sugarRing, scale);
-    }
+        function addSugar(sugarRing, scale) {
+            for (const p of sugarRing) pushAtom(detailInst, "C", p, 1.0);
+            for (let i = 0; i < 5; i++) {
+                detailGroup.add(cylinderBetween(sugarRing[i], sugarRing[(i + 1) % 5], 0.016 * scale, bondDarkMat));
+            }
+        }
 
-    commitInstancers(detailGroup, detailInst);
+        function addSugarToPhosphate(sugarRing, ph, scale) {
+            detailGroup.add(cylinderBetween(sugarRing[3], ph.P, 0.016 * scale, bondDarkMat));
+        }
+
+        function addPhosphateToNextSugar(ph, nextSugarRing, scale) {
+            detailGroup.add(cylinderBetween(ph.P, nextSugarRing[1], 0.015 * scale, bondDarkMat));
+        }
+
+        function addBase(letter, baseCenter, tan, out, sugarRing, scale) {
+            const baseBasisY = out.clone().cross(zAxis).normalize();
+            const base = buildBaseRing(letter, baseCenter, tan, baseBasisY, 0.28 * scale);
+            for (const at of base.atoms) pushAtom(detailInst, at.elem, at.pos, 1.0);
+
+            for (let i = 0; i < 6; i += 2) {
+                detailGroup.add(cylinderBetween(base.ring[i], base.ring[(i + 1) % 6], 0.013 * scale, bondMat));
+            }
+            detailGroup.add(cylinderBetween(base.attachPos, sugarRing[0], 0.014 * scale, bondMat));
+
+            return base;
+        }
+
+        const scale = DETAIL_SCALE;
+
+        const strand1Nodes = [];
+        const strand2Nodes = [];
+
+        for (let seq = 0; seq < N; seq++) {
+            const vi = REV ? (N - 1 - seq) : seq;
+            const ang = handedSign * vi * thetaStep;
+
+            const a1 = baseMeshes1[vi].position.clone();
+            const a2 = baseMeshes2[vi].position.clone();
+
+            const n1 = makeBackbonePoints(a1, ang, false, scale);
+            const n2 = makeBackbonePoints(a2, ang, true, scale);
+
+            strand1Nodes.push(n1);
+            strand2Nodes.push(n2);
+
+            addSugar(n1.sugarRing, scale);
+            addSugar(n2.sugarRing, scale);
+
+            addPO4(n1.ph, scale);
+            addPO4(n2.ph, scale);
+
+            addSugarToPhosphate(n1.sugarRing, n1.ph, scale);
+            addSugarToPhosphate(n2.sugarRing, n2.ph, scale);
+
+            const out1 = n1.out;
+            const out2 = n2.out;
+
+            const baseC1 = a1.clone().addScaledVector(out1, -0.40 * scale);
+            const baseC2 = a2.clone().addScaledVector(out2, -0.40 * scale);
+
+            const b1 = strand1[seq];
+            const b2 = strand2[seq];
+
+            const base1 = addBase(b1, baseC1, n1.tanS, out1, n1.sugarRing, scale);
+            const base2 = addBase(b2, baseC2, n2.tanS, out2, n2.sugarRing, scale);
+
+            const hb =
+                ((b1 === "A" && b2 === "T") || (b1 === "T" && b2 === "A")) ? 2 :
+                    ((b1 === "C" && b2 === "G") || (b1 === "G" && b2 === "C")) ? 3 : 0;
+
+            if (hb > 0) {
+                const aPts = [base1.ring[2], base1.ring[4], base1.ring[0]];
+                const bPts = [base2.ring[2], base2.ring[4], base2.ring[0]];
+                for (let k = 0; k < hb; k++) {
+                    detailGroup.add(dashedBond(aPts[k], bPts[k], 0.010 * scale, hBondMat, H_DASHES));
+                }
+            }
+        }
+
+        for (let i = 0; i < N - 1; i++) {
+            addPhosphateToNextSugar(strand1Nodes[i].ph, strand1Nodes[i + 1].sugarRing, scale);
+            addPhosphateToNextSugar(strand2Nodes[i].ph, strand2Nodes[i + 1].sugarRing, scale);
+        }
+
+        commitInstancers(detailGroup, detailInst);
+    } else {
+        detailGroup.visible = false;
+    }
 
     const ringGeom = new THREE.TorusGeometry(0.42 * GLOBAL_BASE_SCALE, 0.024 * GLOBAL_BASE_SCALE, 16, 56);
 
@@ -620,7 +912,7 @@ export function mountHelix3D(strand1, strand2, mount, initialIndex = null) {
     function resize() {
         const w = Math.max(mount.clientWidth, 320);
         const h = Math.max(mount.clientHeight, 280);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+        renderer.setPixelRatio(1);
         renderer.setSize(w, h, false);
         camera.aspect = w / h;
         camera.updateProjectionMatrix();
@@ -675,12 +967,17 @@ export function mountHelix3D(strand1, strand2, mount, initialIndex = null) {
         ro.disconnect();
         window.removeEventListener("resize", resize);
 
-        for (const k of Object.keys(detailInst)) {
-            const it = detailInst[k];
-            it.mesh?.geometry?.dispose?.();
-            it.mesh?.material?.dispose?.();
-            it.geom?.dispose?.();
-            it.mat?.dispose?.();
+        bondGeometry?.dispose?.();
+        bondGeometry = null;
+
+        if (detailInst) {
+            for (const k of Object.keys(detailInst)) {
+                const it = detailInst[k];
+                it.mesh?.geometry?.dispose?.();
+                it.mesh?.material?.dispose?.();
+                it.geom?.dispose?.();
+                it.mat?.dispose?.();
+            }
         }
 
         root.traverse((obj) => {
@@ -694,7 +991,12 @@ export function mountHelix3D(strand1, strand2, mount, initialIndex = null) {
 
         renderer.dispose();
         renderer.forceContextLoss?.();
+
+        mount.querySelectorAll(".dna-legend").forEach(el => el.remove());
+        mount.querySelectorAll(".dna-detail-panel").forEach(el => el.remove());
+
         mount.innerHTML = "";
+        mount.querySelectorAll(".dna-legend").forEach(el => el.remove());
     }
 
     return {
