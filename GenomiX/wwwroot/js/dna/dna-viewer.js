@@ -3,7 +3,6 @@ import { mountHelix3D } from "./dna-helix3d.js";
 import { createHistoryController } from "./dna-history.js";
 import { createEditPopController } from "./dna-editpop.js";
 import { createNanobotCinematicRepair } from "./dna-nanobot.js";
-import { openMoleculePopup } from "./dna-molpopup.js";
 
 let gxHistoryIdSeed = 0;
 
@@ -136,13 +135,6 @@ export function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
     function clearRedo() {
         redoStack.length = 0;
         syncUndoRedoButtons();
-    }
-
-    function setLegendVisible(is3D) {
-        const legend = document.getElementById("gx-legend-3d");
-        if (!legend) return;
-
-        legend.classList.toggle("gx-hidden", !is3D);
     }
 
     function record(op) {
@@ -836,97 +828,12 @@ export function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
 
         function ensure3D(idx) {
             if (!threeApi) {
-                threeApi = mountHelix3D(s1.join(""), s2.join(""), threeWrap, idx ?? current);
+                threeApi = mountHelix3D(s1.join(""), s2.join(""), threeWrap, idx ?? current, { detailPanel: true });
             }
 
             threeApi.onPick((seqIndex) => {
                 if (block3DPick) return;
                 if (isHelixFullscreen()) return;
-
-                const b1 = s1[seqIndex];
-                const b2 = s2[seqIndex];
-
-                openMoleculePopup({
-                    title: `Base pair ${seqIndex + 1}: ${b1} – ${b2}`,
-                    build: ({ THREE, group, atom, bond }) => {
-
-                        const z = new THREE.Vector3(0, 0, 1);
-                        const x = new THREE.Vector3(1, 0, 0);
-                        const y = new THREE.Vector3(0, 1, 0);
-
-                        const left = new THREE.Vector3(-0.55, 0, 0);
-                        const right = new THREE.Vector3(0.55, 0, 0);
-
-                        function phosphate(center) {
-                            const P = atom("P"); P.position.copy(center); group.add(P);
-                            const O1 = atom("O"); O1.position.copy(center).addScaledVector(x, 0.22); group.add(O1);
-                            const O2 = atom("O"); O2.position.copy(center).addScaledVector(x, -0.10).addScaledVector(y, 0.20); group.add(O2);
-                            const O3 = atom("O"); O3.position.copy(center).addScaledVector(x, -0.10).addScaledVector(y, -0.20); group.add(O3);
-                            const O4 = atom("O"); O4.position.copy(center).addScaledVector(z, 0.20); group.add(O4);
-                            group.add(bond(P.position, O1.position, 0.020, 0xb7c0cc));
-                            group.add(bond(P.position, O2.position, 0.020, 0xb7c0cc));
-                            group.add(bond(P.position, O3.position, 0.020, 0xb7c0cc));
-                            group.add(bond(P.position, O4.position, 0.020, 0xb7c0cc));
-                            return P.position.clone();
-                        }
-
-                        function sugar(center) {
-                            const pts = [];
-                            for (let i = 0; i < 5; i++) {
-                                const ang = (Math.PI * 2 * i) / 5;
-                                const p = center.clone().addScaledVector(y, Math.cos(ang) * 0.18).addScaledVector(z, Math.sin(ang) * 0.14);
-                                pts.push(p);
-                                const C = atom("C"); C.position.copy(p); group.add(C);
-                            }
-                            const O = atom("O"); O.position.copy(pts[2].clone().addScaledVector(z, 0.10)); group.add(O);
-                            for (let i = 0; i < 5; i++) group.add(bond(pts[i], pts[(i + 1) % 5], 0.024, 0x7f8bb0));
-                            return pts[0].clone(); 
-                        }
-
-                        function base(letter, center) {
-                            const ring = [];
-                            for (let i = 0; i < 6; i++) {
-                                const ang = (Math.PI * 2 * i) / 6;
-                                ring.push(center.clone().addScaledVector(y, Math.cos(ang) * 0.24).addScaledVector(z, Math.sin(ang) * 0.24));
-                            }
-                            const nIdx =
-                                (letter === "A") ? [0, 2] :
-                                    (letter === "G") ? [1, 3] :
-                                        (letter === "C") ? [2] :
-                                            (letter === "T") ? [1] : [];
-                            for (let i = 0; i < 6; i++) {
-                                const el = nIdx.includes(i) ? "N" : "C";
-                                const A = atom(el); A.position.copy(ring[i]); group.add(A);
-                            }
-                            for (let i = 0; i < 6; i++) group.add(bond(ring[i], ring[(i + 1) % 6], 0.022, 0xeaf1ff));
-
-                            if (letter === "T" || letter === "G") {
-                                const O = atom("O"); O.position.copy(ring[4].clone().addScaledVector(z, 0.18)); group.add(O);
-                                group.add(bond(ring[4], O.position, 0.020, 0xeaf1ff));
-                            }
-                            if (letter === "A" || letter === "C") {
-                                const N = atom("N"); N.position.copy(ring[5].clone().addScaledVector(z, -0.18)); group.add(N);
-                                group.add(bond(ring[5], N.position, 0.020, 0xeaf1ff));
-                            }
-
-                            return ring[0].clone(); 
-                        }
-
-                        const pLeft = phosphate(new THREE.Vector3(-1.15, 0, 0));
-                        const sLeftAttach = sugar(new THREE.Vector3(-0.85, 0, 0));
-                        group.add(bond(pLeft, sLeftAttach, 0.026, 0x7f8bb0));
-                        const bLeftAttach = base(b1, left);
-                        group.add(bond(sLeftAttach, bLeftAttach, 0.026, 0xeaf1ff));
-
-                        const pRight = phosphate(new THREE.Vector3(1.15, 0, 0));
-                        const sRightAttach = sugar(new THREE.Vector3(0.85, 0, 0));
-                        group.add(bond(pRight, sRightAttach, 0.026, 0x7f8bb0));
-                        const bRightAttach = base(b2, right);
-                        group.add(bond(sRightAttach, bRightAttach, 0.026, 0xeaf1ff));
-
-                        group.add(bond(left, right, 0.010, 0xffffff));
-                    }
-                });
             });
         }
 
@@ -978,7 +885,7 @@ export function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
         const [tab2d, tab3d] = toggle.querySelectorAll(".sci-tab");
 
         const onTab2D = () => {
-            setLegendVisible(false);
+            threeWrap.querySelectorAll(".dna-legend").forEach(el => el.remove());
             tab2d.classList.add("is-active");
             tab3d.classList.remove("is-active");
             threeWrap.classList.add("hidden");
@@ -1006,8 +913,6 @@ export function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
 
         const onTab3D = () =>
         { 
-            setLegendVisible(true);
-
             tab3d.classList.add("is-active");
             tab2d.classList.remove("is-active");
 
@@ -1017,8 +922,21 @@ export function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
             ensure3D(current);
             containerForLadder = threeWrap;
 
-            const legend = document.getElementById("gx-legend-3d");
-            if (legend) threeWrap.appendChild(legend);
+            let legend = threeWrap.querySelector(".dna-legend");
+
+            if (!legend) {
+                legend = createLegendOverlay(threeWrap, {
+                    baseHex: { A: 0xff4b4b, T: 0xffd54b, C: 0x4ba3ff, G: 0x4bff88 },
+                    enableDetail: true,
+                    elem: {
+                        H: { color: 0xffffff },
+                        C: { color: 0x7f7f7f },
+                        N: { color: 0x3a74ff },
+                        O: { color: 0xff3a3a },
+                        P: { color: 0xffa024 }
+                    }
+                });
+            }
 
             threeWrap.appendChild(overlayRefs.overlay);
             threeWrap.appendChild(overlayRefs.progCont);

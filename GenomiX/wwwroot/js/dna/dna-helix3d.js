@@ -9,14 +9,120 @@ function qualityForN(N) {
     return { ATOM_SEG: 10, BOND_SEG: 6, H_DASHES: 2, DETAIL_SCALE: 1.35 };
 }
 
+function createLegendOverlay(mount, { baseHex, enableDetail, elem }) {
+    mount.querySelectorAll('.dna-legend[data-gx="1"]').forEach(el => el.remove());
+
+    const cs = getComputedStyle(mount);
+    if (cs.position === "static") mount.style.position = "relative";
+
+    const toHex = (num) => "#" + (num >>> 0).toString(16).padStart(6, "0");
+
+    const bases = ["A", "T", "C", "G"];
+    const elements = ["H", "C", "N", "O", "P"].filter(k => elem?.[k]);
+
+    const legend = document.createElement("div");
+    legend.className = "dna-legend";
+    legend.dataset.gx = "1";
+
+    legend.innerHTML = `
+    <div class="dna-legend-title">Legend</div>
+
+    <div class="dna-legend-section">
+      <div class="dna-legend-subtitle">Bases</div>
+      <div class="dna-legend-row">
+        ${bases.map(b => `
+          <div class="dna-legend-item">
+            <span class="dna-swatch" style="background:${toHex(baseHex[b] ?? 0xffffff)}"></span>
+            <span class="dna-label">${b}</span>
+          </div>
+        `).join("")}
+      </div>
+    </div>
+
+    <div class="dna-legend-section" style="margin-top:10px;">
+      <div class="dna-legend-subtitle">Atoms</div>
+      <div class="dna-legend-row">
+        ${elements.map(k => `
+          <div class="dna-legend-item">
+            <span class="dna-swatch" style="background:${toHex(elem[k].color)}"></span>
+            <span class="dna-label">${k}</span>
+          </div>
+        `).join("")}
+      </div>
+    </div>
+  `;
+
+    mount.appendChild(legend);
+
+    if (!document.getElementById("dna-legend-style")) {
+        const style = document.createElement("style");
+        style.id = "dna-legend-style";
+        style.textContent = `
+      .dna-legend{
+        position:absolute;
+        left:12px;
+        top:12px;
+        z-index:10;
+        padding:10px 12px;
+        border-radius:12px;
+        background:rgba(10,14,25,.55);
+        border:1px solid rgba(255,255,255,.12);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        color:rgba(255,255,255,.92);
+        font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+        user-select:none;
+        pointer-events:none;
+        max-width: 340px;
+      }
+      .dna-legend-title{
+        font-size:12px;
+        letter-spacing:.08em;
+        text-transform:uppercase;
+        opacity:.85;
+        margin-bottom:8px;
+      }
+      .dna-legend-subtitle{
+        font-size:12px;
+        opacity:.78;
+        margin-bottom:6px;
+      }
+      .dna-legend-row{
+        display:flex;
+        gap:10px;
+        align-items:center;
+        flex-wrap:wrap;
+      }
+      .dna-legend-item{
+        display:flex;
+        align-items:center;
+        gap:6px;
+      }
+      .dna-swatch{
+        width:12px;
+        height:12px;
+        border-radius:4px;
+        box-shadow: 0 0 0 1px rgba(255,255,255,.18) inset;
+      }
+      .dna-label{
+        font-size:13px;
+        font-weight:600;
+      }
+    `;
+        document.head.appendChild(style);
+    }
+
+    return legend;
+}
+
 const GLOBAL_BASE_SCALE = 1.10;
 
 const ELEM = {
-    H: { color: 0xffffff, r: 0.045 },
-    C: { color: 0x7f7f7f, r: 0.078 },
-    N: { color: 0x3a74ff, r: 0.082 },
-    O: { color: 0xff3a3a, r: 0.090 },
-    P: { color: 0xffa024, r: 0.098 },
+    H: { color: 0xffffff, r: 0.055 },
+    C: { color: 0x2b2b2b, r: 0.090 },
+    N: { color: 0x2f52ff, r: 0.095 },
+    O: { color: 0xff3030, r: 0.100 },
+    P: { color: 0xffd000, r: 0.115 },
 };
 
 function frameObject(camera, object, controls, padding = 1.25) {
@@ -35,6 +141,9 @@ function frameObject(camera, object, controls, padding = 1.25) {
     camera.near = Math.max(0.01, dist / 100);
     camera.far = dist * 100;
     camera.updateProjectionMatrix();
+
+    camera.position.add(new THREE.Vector3(0.0, 0.25, 0.0));
+    camera.lookAt(0, 0, 0);
 
     camera.lookAt(0, 0, 0);
     controls?.target?.set?.(0, 0, 0);
@@ -91,12 +200,215 @@ function commitInstancers(parent, inst) {
 }
 
 let bondGeometry = null;
+let detailPanel = null;
+let detailModal = null;
+let detailBackdrop = null;
+let escHandler = null;
 
+function mountBasePairPreview3D(hostEl, { b1, b2, hb, baseHex, ELEM }) {
+    if (!hostEl) return null;
+
+    let paused = false;
+
+    function pause() { paused = true; }
+    function resume() { paused = false; }
+
+    hostEl.innerHTML = "";
+    hostEl.style.position = hostEl.style.position || "relative";
+
+    const scene = new THREE.Scene();
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.12;
+    hostEl.appendChild(renderer.domElement);
+
+    const camera = new THREE.PerspectiveCamera(45, 1, 0.01, 2000);
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.enablePan = false;
+    controls.rotateSpeed = 0.8;
+    controls.zoomSpeed = 1.0;
+    renderer.domElement.style.touchAction = "none";
+
+    scene.add(new THREE.AmbientLight(0xffffff, 0.45));
+    const key = new THREE.DirectionalLight(0xffffff, 1.15); key.position.set(6, 10, 10); scene.add(key);
+    const fill = new THREE.DirectionalLight(0xffffff, 0.55); fill.position.set(-8, 3, 6); scene.add(fill);
+    const rim = new THREE.DirectionalLight(0x7ee6ff, 0.35); rim.position.set(0, -10, -8); scene.add(rim);
+
+    const group = new THREE.Group();
+    scene.add(group);
+
+    const bondMat = new THREE.MeshStandardMaterial({
+        color: 0xd7e2ff,
+        metalness: 0.0,
+        roughness: 0.90,
+        transparent: true,
+        opacity: 0.55
+    });
+
+    const hBondMat = new THREE.MeshStandardMaterial({
+        color: 0xffffff,
+        transparent: true,
+        opacity: 0.55,
+        roughness: 0.95,
+        metalness: 0.0
+    });
+
+    const leftC = new THREE.Vector3(-0.72, 0, 0);
+    const rightC = new THREE.Vector3(+0.72, 0, 0);
+
+    const basisX_L = new THREE.Vector3(0, 1, 0);
+    const basisY_L = new THREE.Vector3(0, 0, 1);
+
+    const basisX_R = new THREE.Vector3(0, -1, 0);
+    const basisY_R = new THREE.Vector3(0, 0, 1);
+
+    const baseL = buildBaseRing(b1, leftC, basisX_L, basisY_L, 0.34);
+    const baseR = buildBaseRing(b2, rightC, basisX_R, basisY_R, 0.34);
+
+    function stubBackbone(sideCenter, dir, flip = 1) {
+        const sugar = sideCenter.clone().addScaledVector(dir, 0.55);
+        const phos = sideCenter.clone().addScaledVector(dir, 0.95).add(new THREE.Vector3(0, 0.18 * flip, 0));
+
+        const s = atomMesh("C"); s.position.copy(sugar); group.add(s);
+
+        const p = atomMesh("P"); p.position.copy(phos); group.add(p);
+        const o1 = atomMesh("O"); o1.position.copy(phos.clone().add(new THREE.Vector3(0.14, 0.08, 0))); group.add(o1);
+        const o2 = atomMesh("O"); o2.position.copy(phos.clone().add(new THREE.Vector3(-0.10, -0.12, 0))); group.add(o2);
+
+        group.add(cylinderBetween(sideCenter, sugar, 0.012, bondMat));
+        group.add(cylinderBetween(sugar, phos, 0.012, bondMat));
+    }
+
+    stubBackbone(leftC, new THREE.Vector3(-1, 0, 0), 1);
+    stubBackbone(rightC, new THREE.Vector3(1, 0, 0), -1);
+
+    function basePlate(center, colorHex, isPurine) {
+        const plateGeom = new THREE.CylinderGeometry(isPurine ? 0.48 : 0.42, isPurine ? 0.48 : 0.42, 0.08, 42);
+        const plateMat = new THREE.MeshStandardMaterial({
+            color: colorHex ?? 0xffffff,
+            metalness: 0.05,
+            roughness: 0.35,
+            transparent: true,
+            opacity: 0.22,
+            emissive: colorHex ?? 0xffffff,
+            emissiveIntensity: 0.12,
+        });
+        const plate = new THREE.Mesh(plateGeom, plateMat);
+        plate.position.copy(center);
+        plate.rotation.z = Math.PI / 2;
+        return plate;
+    }
+
+    const isPurine = (x) => x === "A" || x === "G";
+    group.add(basePlate(leftC, baseHex[b1], isPurine(b1)));
+    group.add(basePlate(rightC, baseHex[b2], isPurine(b2)));
+
+    function atomMesh(el) {
+        const r = (ELEM?.[el]?.r ?? 0.09) * 1.25;
+        const g = new THREE.SphereGeometry(r, 16, 16);
+        const m = new THREE.MeshStandardMaterial({
+            color: ELEM?.[el]?.color ?? 0xffffff,
+            metalness: 0.08,
+            roughness: 0.35
+        });
+        return new THREE.Mesh(g, m);
+    }
+
+    function addAtomsFromBase(base) {
+        for (const at of base.atoms) {
+            const m = atomMesh(at.elem);
+            m.position.copy(at.pos);
+            group.add(m);
+        }
+    }
+    addAtomsFromBase(baseL);
+    addAtomsFromBase(baseR);
+
+    for (let i = 0; i < 6; i++) {
+        const a0 = baseL.ring[i];
+        const a1 = baseL.ring[(i + 1) % 6];
+        group.add(cylinderBetween(a0, a1, 0.014, bondMat));
+
+        const b0 = baseR.ring[i];
+        const b1p = baseR.ring[(i + 1) % 6];
+        group.add(cylinderBetween(b0, b1p, 0.014, bondMat));
+    }
+
+    const aPts = [baseL.ring[2], baseL.ring[4], baseL.ring[0]];
+    const bPts = [baseR.ring[2], baseR.ring[4], baseR.ring[0]];
+    const dashes = 4;
+
+    for (let k = 0; k < hb; k++) {
+        group.add(dashedBond(aPts[k], bPts[k], 0.010, hBondMat, dashes));
+    }
+
+    frameObject(camera, group, controls, 1.55);
+    controls.minDistance = 0.35;
+    controls.maxDistance = 20;
+    controls.update();
+
+    function resize() {
+        const w = Math.max(hostEl.clientWidth, 280);
+        const h = Math.max(hostEl.clientHeight, 260);
+        renderer.setSize(w, h, false);
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+    }
+    resize();
+    const ro = new ResizeObserver(resize);
+    ro.observe(hostEl);
+
+    let raf = 0;
+    let running = true;
+
+    const spin = { t: 0 };
+
+    const loop = () => {
+        if (!running) return;
+        raf = requestAnimationFrame(loop);
+
+        if (!paused) {
+            spin.t += 0.008;
+            group.rotation.y = Math.sin(spin.t) * 0.25;
+            group.rotation.x = Math.cos(spin.t * 0.7) * 0.08;
+        }
+
+        controls.update();
+        renderer.render(scene, camera);
+    };
+
+    loop();
+
+    function dispose() {
+        running = false;
+        if (raf) cancelAnimationFrame(raf);
+        ro.disconnect();
+
+        scene.traverse(obj => {
+            if (obj.geometry) obj.geometry.dispose?.();
+            if (obj.material) {
+                const mats = Array.isArray(obj.material) ? obj.material : [obj.material];
+                for (const m of mats) m?.dispose?.();
+            }
+        });
+
+        renderer.dispose();
+        renderer.forceContextLoss?.();
+        renderer.domElement?.remove();
+        hostEl.innerHTML = "";
+    }
+
+    return { dispose, resize, pause, resume };
+}
 
 function cylinderBetween(a, b, radius, material) {
     const dir = new THREE.Vector3().subVectors(b, a);
     const len = dir.length();
-    if (!bondGeometry) return new THREE.Group(); 
+    if (!bondGeometry) return new THREE.Group();
 
     const cyl = new THREE.Mesh(bondGeometry, material);
     cyl.scale.set(radius, len, radius);
@@ -175,242 +487,9 @@ function buildBaseRing(letter, center, basisX, basisY, size = 0.24) {
     return { ring, atoms, attachPos: ring[0].clone() };
 }
 
-function createLegendOverlay(mount, { baseHex, enableDetail, elem }) {
-    mount.querySelectorAll(".dna-legend").forEach(el => el.remove());
+export function mountHelix3D(strand1, strand2, mount, initialIndex = null, opts = {}) {
+    const SHOW_DETAIL_PANEL = opts?.detailPanel !== false;
 
-    const cs = getComputedStyle(mount);
-    if (cs.position === "static") mount.style.position = "relative";
-
-    const toHex = (num) => "#" + (num >>> 0).toString(16).padStart(6, "0");
-
-    const bases = ["A", "T", "C", "G"];
-    const elements = ["H", "C", "N", "O", "P"].filter(k => elem?.[k]);
-
-    const legend = document.createElement("div");
-    legend.className = "dna-legend";
-    legend.innerHTML = `
-        <div class="dna-legend-title">Legend</div>
-
-        <div class="dna-legend-section">
-            <div class="dna-legend-subtitle">Bases</div>
-            <div class="dna-legend-row">
-                ${bases.map(b => `
-                    <div class="dna-legend-item">
-                        <span class="dna-swatch" style="background:${toHex(baseHex[b] ?? 0xffffff)}"></span>
-                        <span class="dna-label">${b}</span>
-                    </div>
-                `).join("")}
-            </div>
-        </div>
-
-        <div class="dna-legend-section" style="margin-top:10px;">
-            <div class="dna-legend-subtitle">Atoms</div>
-            <div class="dna-legend-row">
-                ${elements.map(k => `
-                    <div class="dna-legend-item">
-                        <span class="dna-swatch" style="background:${toHex(elem[k].color)}"></span>
-                        <span class="dna-label">${k}</span>
-                    </div>
-                `).join("")}
-            </div>
-        </div>
-    `;
-
-    mount.appendChild(legend);
-
-    if (!document.getElementById("dna-legend-style")) {
-        const style = document.createElement("style");
-        style.id = "dna-legend-style";
-        style.textContent = `
-            .dna-legend{
-                position:absolute;
-                left:12px;
-                top:12px;
-                z-index:10;
-                padding:10px 12px;
-                border-radius:12px;
-                background:rgba(10,14,25,.55);
-                border:1px solid rgba(255,255,255,.12);
-                backdrop-filter: blur(10px);
-                -webkit-backdrop-filter: blur(10px);
-                color:rgba(255,255,255,.92);
-                font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-                user-select:none;
-                pointer-events:none;
-                max-width: 340px;
-            }
-            .dna-legend-title{
-                font-size:12px;
-                letter-spacing:.08em;
-                text-transform:uppercase;
-                opacity:.85;
-                margin-bottom:8px;
-            }
-            .dna-legend-subtitle{
-                font-size:12px;
-                opacity:.78;
-                margin-bottom:6px;
-            }
-            .dna-legend-row{
-                display:flex;
-                gap:10px;
-                align-items:center;
-                flex-wrap:wrap;
-            }
-            .dna-legend-item{
-                display:flex;
-                align-items:center;
-                gap:6px;
-            }
-            .dna-swatch{
-                width:12px;
-                height:12px;
-                border-radius:4px;
-                box-shadow: 0 0 0 1px rgba(255,255,255,.18) inset;
-            }
-            .dna-label{
-                font-size:13px;
-                font-weight:600;
-            }
-        `;
-        document.head.appendChild(style);
-    }
-
-    return legend;
-}
-
-function renderBasePairSVG(b1, b2, seqIndex) {
-    const baseColor = { A: "#4bff88", T: "#ffd54b", C: "#4ba3ff", G: "#ff4b4b" };
-    const elemColor = { H: "#ffffff", C: "#7f7f7f", N: "#3a74ff", O: "#ff3a3a", P: "#ffa024" };
-    const baseName = { A: "Adenine", T: "Thymine", C: "Cytosine", G: "Guanine" };
-
-    const chip = (k) => `
-    <span style="
-      display:inline-flex; align-items:center; gap:6px;
-      padding:4px 8px; border-radius:999px;
-      background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.10);
-      font-size:12px;">
-      <span style="width:10px;height:10px;border-radius:50%;background:${elemColor[k]};display:inline-block;"></span>
-      ${k}
-    </span>
-  `;
-
-    const nucleotide = (base, x, y) => {
-        const c = baseColor[base] || "#fff";
-
-        const phosphate = `
-      <circle cx="${x + 30}" cy="${y + 40}" r="12"
-        fill="rgba(255,160,36,0.14)" stroke="rgba(255,255,255,0.75)" stroke-width="1.4"/>
-      <text x="${x + 24}" y="${y + 45}" fill="${elemColor.P}" font-size="12" font-weight="800">P</text>
-
-      <circle cx="${x + 12}" cy="${y + 20}" r="8"
-        fill="rgba(255,58,58,0.12)" stroke="rgba(255,255,255,0.55)" stroke-width="1.2"/>
-      <text x="${x + 8}" y="${y + 25}" fill="${elemColor.O}" font-size="11" font-weight="800">O</text>
-
-      <circle cx="${x + 12}" cy="${y + 60}" r="8"
-        fill="rgba(255,58,58,0.12)" stroke="rgba(255,255,255,0.55)" stroke-width="1.2"/>
-      <text x="${x + 8}" y="${y + 65}" fill="${elemColor.O}" font-size="11" font-weight="800">O</text>
-
-      <circle cx="${x + 52}" cy="${y + 40}" r="8"
-        fill="rgba(255,58,58,0.12)" stroke="rgba(255,255,255,0.55)" stroke-width="1.2"/>
-      <text x="${x + 48}" y="${y + 45}" fill="${elemColor.O}" font-size="11" font-weight="800">O</text>
-    `;
-
-        const bondPS = `
-      <line x1="${x + 42}" y1="${y + 40}" x2="${x + 78}" y2="${y + 80}"
-        stroke="rgba(255,255,255,0.75)" stroke-width="2.2"/>
-    `;
-
-        const sugar = `
-      <polygon points="
-        ${x + 80},${y + 80}
-        ${x + 120},${y + 62}
-        ${x + 150},${y + 82}
-        ${x + 140},${y + 125}
-        ${x + 95},${y + 125}"
-        fill="rgba(120,140,255,0.22)"
-        stroke="rgba(255,255,255,0.75)"
-        stroke-width="1.4"/>
-    `;
-
-        const bondSB = `
-      <line x1="${x + 150}" y1="${y + 82}" x2="${x + 190}" y2="${y + 70}"
-        stroke="rgba(255,255,255,0.75)" stroke-width="2.2"/>
-    `;
-
-        const ring = `
-      <polygon points="
-        ${x + 200},${y + 45}
-        ${x + 235},${y + 65}
-        ${x + 235},${y + 105}
-        ${x + 200},${y + 125}
-        ${x + 165},${y + 105}
-        ${x + 165},${y + 65}"
-        fill="rgba(255,255,255,0.03)"
-        stroke="${c}"
-        stroke-width="2.6"/>
-
-      <text x="${x + 162}" y="${y + 60}" fill="${elemColor.N}" font-size="12" font-weight="900">N</text>
-      <text x="${x + 232}" y="${y + 60}" fill="${elemColor.N}" font-size="12" font-weight="900">N</text>
-
-      ${base === "T" || base === "G"
-                ? `<text x="${x + 212}" y="${y + 137}" fill="${elemColor.O}" font-size="12" font-weight="900">O</text>`
-                : ""}
-
-      ${base === "A" || base === "C"
-                ? `<text x="${x + 170}" y="${y + 141}" fill="${elemColor.N}" font-size="12" font-weight="900">N</text>`
-                : ""}
-
-      <text x="${x + 250}" y="${y + 90}" fill="${c}" font-size="16" font-weight="950">${base}</text>
-    `;
-
-        const label = `
-      <text x="${x + 165}" y="${y + 170}" fill="${c}" font-size="14" font-weight="900">
-        ${baseName[base] || base}
-      </text>
-    `;
-
-        return phosphate + bondPS + sugar + bondSB + ring + label;
-    };
-
-    const hb =
-        ((b1 === "A" && b2 === "T") || (b1 === "T" && b2 === "A")) ? 2 :
-            ((b1 === "C" && b2 === "G") || (b1 === "G" && b2 === "C")) ? 3 : 0;
-
-    const hbLines = hb === 0 ? "" : `
-    <g stroke="rgba(255,255,255,0.65)" stroke-width="2.2" stroke-dasharray="7 6">
-      ${hb >= 1 ? `<line x1="250" y1="115" x2="250" y2="235"/>` : ""}
-      ${hb >= 2 ? `<line x1="230" y1="120" x2="230" y2="230"/>` : ""}
-      ${hb >= 3 ? `<line x1="270" y1="120" x2="270" y2="230"/>` : ""}
-    </g>
-  `;
-
-    return `
-    <div style="display:flex;flex-direction:column;gap:10px;">
-      <div style="opacity:0.9;font-size:12px;">
-        Index: <b>${seqIndex}</b> • Pair: <b>${b1}-${b2}</b>
-      </div>
-
-      <svg viewBox="0 0 360 420" width="100%" height="auto"
-           style="border-radius:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);">
-        <!-- top nucleotide -->
-        <g>${nucleotide(b1, 20, 25)}</g>
-
-        <!-- bottom nucleotide -->
-        <g>${nucleotide(b2, 20, 215)}</g>
-
-        <!-- H bonds between bases -->
-        ${hbLines}
-      </svg>
-
-      <div style="display:flex;flex-wrap:wrap;gap:8px;">
-        ${chip("H")}${chip("C")}${chip("N")}${chip("O")}${chip("P")}
-      </div>
-    </div>
-  `;
-}
-
-export function mountHelix3D(strand1, strand2, mount, initialIndex = null) {
     if (!mount) throw new Error("mountHelix3D: missing mount element");
     if (!mount.style.minHeight) mount.style.minHeight = "460px";
 
@@ -430,45 +509,377 @@ export function mountHelix3D(strand1, strand2, mount, initialIndex = null) {
     renderer.toneMappingExposure = 1.12;
 
     mount.querySelectorAll("canvas").forEach(c => c.remove());
-    mount.querySelectorAll(".dna-legend").forEach(el => el.remove());
-    mount.querySelectorAll(".dna-detail-panel").forEach(el => el.remove());
+    mount.querySelectorAll('.dna-legend[data-gx="1"]').forEach(el => el.remove());
+    mount.querySelectorAll('.dna-detail-panel[data-gx="1"]').forEach(el => el.remove());
 
     mount.appendChild(renderer.domElement);
 
     mount.style.position = mount.style.position || "relative";
 
-    const detailPanel = document.createElement("div");
-    detailPanel.className = "dna-detail-panel";
-    detailPanel.style.cssText = `
-      position:absolute; right:12px; top:12px;
-      width:360px; max-width:calc(100% - 24px);
-      background:rgba(8,12,22,0.82);
-      border:1px solid rgba(255,255,255,0.10);
-      border-radius:14px;
-      padding:10px;
-      backdrop-filter: blur(8px);
-      color:#fff;
-      font-family: system-ui, Segoe UI, Arial, sans-serif;
-      display:none;
-      z-index:20;        
-      pointer-events:auto;
-    `;
-    mount.appendChild(detailPanel);
+    let bpPreview = null;
 
-    function showDetailPanel(svgHtml) {
-        detailPanel.innerHTML = `
-    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;">
-      <div style="font-weight:700;letter-spacing:0.2px;">Base-pair detail</div>
-      <button id="bpCloseBtn" style="
-        border:0; background:rgba(255,255,255,0.10); color:#fff;
-        padding:6px 10px; border-radius:10px; cursor:pointer;">✕</button>
-    </div>
-    ${svgHtml}
+    function renderBasePairSVG(b1, b2, seqIndex) {
+        return gxPairSVG(b1, b2, seqIndex);
+    }
+
+    function gxPairSVG(b1, b2, seqIndex) {
+        const canonical =
+            (b1 === "A" && b2 === "T") || (b1 === "T" && b2 === "A") ||
+            (b1 === "G" && b2 === "C") || (b1 === "C" && b2 === "G");
+
+        const hb =
+            ((b1 === "A" && b2 === "T") || (b1 === "T" && b2 === "A")) ? 2 :
+                ((b1 === "G" && b2 === "C") || (b1 === "C" && b2 === "G")) ? 3 : 0;
+
+        let L = b1, R = b2;
+        if (canonical) {
+            if (b1 === "T" && b2 === "A") { L = "A"; R = "T"; }
+            if (b1 === "C" && b2 === "G") { L = "G"; R = "C"; }
+        }
+
+        const W = 1100, H = 520;
+
+        let inner = "";
+        if (L === "A" && R === "T") inner = svgAT();
+        else if (L === "G" && R === "C") inner = svgGC();
+        else inner = svgNonCanonical(L, R);
+
+        return `
+          <div class="gx-comp">
+            <svg viewBox="0 0 ${W} ${H}" width="100%" height="100%" class="gx-chem" aria-label="Base pair complementarity diagram">
+              ${gxDefs()}
+              <rect x="18" y="18" width="${W - 36}" height="${H - 36}" rx="20"
+                    fill="rgba(255,255,255,0.02)" stroke="rgba(255,255,255,0.10)"/>
+              ${inner}
+            </svg>
+          </div>
+          `;
+    }
+
+    function gxDefs() {
+        return `
+  <defs>
+    <filter id="gxShadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="16" stdDeviation="16" flood-color="rgba(0,0,0,0.55)"/>
+    </filter>
+
+    <style>
+      .gxRing { stroke: rgba(0,0,0,.90); stroke-width: 8; stroke-linejoin: round; }
+      .gxBond { stroke: rgba(0,0,0,.80); stroke-width: 5; stroke-linecap: round; }
+      .gxBond2 { stroke: rgba(0,0,0,.65); stroke-width: 4; stroke-linecap: round; }
+
+      .gxTxt {
+        font-family: system-ui, Segoe UI, Arial;
+        font-weight: 950;
+        font-size: 30px;
+        paint-order: stroke;
+        stroke: rgba(0,0,0,.65);
+        stroke-width: 10px;
+      }
+      .gxRed { fill: #ff4b4b; }
+      .gxBlk { fill: rgba(255,255,255,.95); }
+
+      .gxHB { stroke: #ff4b4b; stroke-width: 7; stroke-dasharray: 2 14; stroke-linecap: round; opacity: .95; }
+
+      .gxName {
+        font-family: system-ui, Segoe UI, Arial;
+        font-size: 44px;
+        font-weight: 950;
+        fill: rgba(255,255,255,.92);
+        paint-order: stroke;
+        stroke: rgb(0 71 105);
+        stroke-width: 10px;
+      }
+    </style>
+  </defs>
   `;
-        detailPanel.style.display = "block";
-        detailPanel.querySelector("#bpCloseBtn")?.addEventListener("click", () => {
-            detailPanel.style.display = "none";
-        });
+    }
+
+    function nameOf(x) {
+        return ({ A: "Adenine", T: "Thymine", G: "Guanine", C: "Cytosine" }[x] || x);
+    }
+
+    function regularPoly(n, cx, cy, r, rotRad) {
+        const pts = [];
+        for (let i = 0; i < n; i++) {
+            const a = rotRad + (Math.PI * 2 * i) / n;
+            pts.push([cx + Math.cos(a) * r, cy + Math.sin(a) * r]);
+        }
+        return pts;
+    }
+
+    const poly = (pts, fill) =>
+        `<polygon points="${pts.map(p => p.join(",")).join(" ")}" fill="${fill}" class="gxRing"/>`;
+
+    const ln = (x1, y1, x2, y2, cls = "gxBond") =>
+        `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" class="${cls}"/>`;
+
+    const dbl = (x1, y1, x2, y2, off = 7) => {
+        const dx = x2 - x1, dy = y2 - y1;
+        const L = Math.hypot(dx, dy) || 1;
+        const nx = -(dy / L) * off, ny = (dx / L) * off;
+        return `
+    ${ln(x1, y1, x2, y2, "gxBond")}
+    ${ln(x1 + nx, y1 + ny, x2 + nx, y2 + ny, "gxBond")}
+  `;
+    };
+
+    const hbLine = (x1, y1, x2, y2) =>
+        `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" class="gxHB"/>`;
+
+    function mixText(x, y, parts, anchor = "middle") {
+        return `
+    <text x="${x}" y="${y}" text-anchor="${anchor}" class="gxTxt">
+      ${parts.map(p => `<tspan class="${p.cls}">${p.t}</tspan>`).join("")}
+    </text>
+  `;
+    }
+
+    function svgGC() {
+        const colG = "#12a7ff";
+        const colC = "#28e58c";
+
+        const rings = `
+      <g filter="url(#gxShadow)">
+        <path d="
+          M 160 150
+          L 90 235
+          L 150 340
+          L 245 305
+          L 245 180
+          Z" fill="${colG}" class="gxRing"/>
+        <path d="
+          M 360 120
+          L 245 180
+          L 245 305
+          L 375 360
+          L 470 305
+          L 470 200
+          Z" fill="${colG}" class="gxRing"/>
+        <line x1="245" y1="180" x2="245" y2="305" class="gxBond"/>
+        <path d="
+          M 850 120
+          L 740 200
+          L 740 310
+          L 870 370
+          L 965 310
+          L 965 185
+          Z" fill="${colC}" class="gxRing"/>
+      </g>
+    `;
+
+        const bonds = `
+      ${ln(360, 120, 360, 85, "gxBond2")}
+      ${ln(366, 120, 366, 85, "gxBond2")}
+      ${ln(740, 310, 700, 330, "gxBond2")}
+      ${ln(746, 310, 706, 330, "gxBond2")}
+    `;
+
+        const labels = `
+      ${mixText(360, 65, [{ t: "O", cls: "gxRed" }])}
+      ${mixText(160, 130, [{ t: "N" }])}
+      ${mixText(150, 365, [{ t: "N" }])}
+      ${mixText(150, 395, [{ t: "H" }])}
+      ${mixText(375, 395, [{ t: "N" }])}
+      ${mixText(505, 195, [{ t: "N" }, { t: "-" }, { t: "H", cls: "gxRed" }])}
+      ${mixText(490, 305, [{ t: "N" }, { t: "-" }, { t: "H", cls: "gxRed" }])}
+      ${mixText(480, 340, [{ t: "H" }])}
+      ${mixText(850, 85, [{ t: "H", cls: "gxRed" }, { t: "-" }, { t: "N" }, { t: "-" }, { t: "H" }])}
+      ${ln(850, 120, 850, 160, "gxBond2")}
+      ${mixText(720, 200, [{ t: "N", cls: "gxRed" }])}
+      ${mixText(705, 330, [{ t: "O", cls: "gxRed" }])}
+      ${ln(740, 310, 705, 330, "gxBond2")}
+      ${ln(746, 310, 711, 330, "gxBond2")}
+      ${mixText(870, 400, [{ t: "N" }])}
+      ${mixText(870, 430, [{ t: "H" }])}
+    `;
+
+        const hbonds = `
+      ${hbLine(400, 60, 760, 70)}
+      ${hbLine(550, 185, 690, 190)}
+      ${hbLine(550, 300, 660, 315)}
+    `;
+
+        const names = `
+      <text x="320" y="470" text-anchor="middle" class="gxName">Guanine</text>
+      <text x="880" y="470" text-anchor="middle" class="gxName">Cytosine</text>
+    `;
+
+        return `<g>${rings}${bonds}${hbonds}${labels}${names}</g>`;
+    }
+
+    function svgAT() {
+        const colA = "#ff4b4b";
+        const colT = "#ffd54b";
+
+        const rings = `
+    <g filter="url(#gxShadow)">
+      <path d="
+        M 160 150
+        L 90 235
+        L 150 340
+        L 245 305
+        L 245 180
+        Z" fill="${colA}" class="gxRing"/>
+      <path d="
+        M 360 120
+        L 245 180
+        L 245 305
+        L 375 360
+        L 470 305
+        L 470 200
+        Z" fill="${colA}" class="gxRing"/>
+      <line x1="245" y1="180" x2="245" y2="305" class="gxBond"/>
+      <line x1="360" y1="120" x2="360" y2="75" class="gxBond"/>
+      <path d="
+        M 850 120
+        L 740 200
+        L 740 310
+        L 870 370
+        L 965 310
+        L 965 185
+        Z" fill="${colT}" class="gxRing"/>
+    </g>
+  `;
+
+        const bonds = `
+    ${ln(850, 120, 850, 85, "gxBond2")}
+    ${ln(856, 120, 856, 85, "gxBond2")}
+    ${ln(740, 310, 700, 330, "gxBond2")}
+    ${ln(746, 310, 706, 330, "gxBond2")}
+  `;
+
+        const labels = `
+    ${mixText(160, 130, [{ t: "N" }])}
+    ${mixText(150, 365, [{ t: "N" }])}
+    ${mixText(150, 395, [{ t: "H" }])}
+    ${mixText(375, 395, [{ t: "N" }])}
+    ${mixText(360, 65, [{ t: "H" }, { t: "-" }, { t: "N" }, { t: "-" }, { t: "H", cls: "gxRed" }])}
+    ${mixText(485, 195, [{ t: "N", cls: "gxRed" }])}
+    ${mixText(850, 65, [{ t: "O", cls: "gxRed" }])}
+    ${mixText(705, 335, [{ t: "O" }])}
+    ${mixText(720, 200, [{ t: "H", cls: "gxRed" }, { t: "-" }, { t: "N" }])}
+    ${mixText(870, 400, [{ t: "N" }])}
+    ${mixText(870, 430, [{ t: "H" }])}
+    ${mixText(955, 190, [{ t: "CH3" }], "start")}
+  `;
+
+        const hbonds = `
+    ${hbLine(420, 53, 830, 55)}
+    ${hbLine(510, 185, 680, 190)}
+  `;
+
+        const names = `
+    <text x="320" y="470" text-anchor="middle" class="gxName">Adenine</text>
+    <text x="880" y="470" text-anchor="middle" class="gxName">Thymine</text>
+  `;
+
+        return `<g>${rings}${bonds}${hbonds}${labels}${names}</g>`;
+    }
+
+    function svgNonCanonical(L, R) {
+        const cxL = 340, cxR = 760, cy = 240;
+        const nameL = nameOf(L), nameR = nameOf(R);
+        return `
+          <g>
+            <text x="${cxL}" y="440" text-anchor="middle" class="gxName">${nameL}</text>
+            <text x="${cxR}" y="440" text-anchor="middle" class="gxName">${nameR}</text>
+            <text x="${(cxL + cxR) / 2}" y="${cy}" text-anchor="middle"
+                  style="font: 700 24px system-ui; fill: rgba(255,255,255,.70);">
+              Non-canonical pair
+            </text>
+          </g>
+        `;
+    }
+
+    function showDetailPanel(svgHtml, extraHtml = "") {
+        if (!SHOW_DETAIL_PANEL) return;
+
+        if (!detailBackdrop) {
+            detailBackdrop = document.createElement("div");
+            detailBackdrop.className = "gx-modal-backdrop";
+            document.body.appendChild(detailBackdrop);
+
+            detailBackdrop.addEventListener("click", (e) => {
+                if (e.target === detailBackdrop) hideDetailPanel();
+            });
+        }
+
+        if (!detailModal) {
+            detailModal = document.createElement("div");
+            detailModal.className = "gx-modal";
+            document.body.appendChild(detailModal);
+        }
+
+        detailModal.innerHTML = `
+            <div class="gx-modal__hd">
+              <div class="gx-modal__title">Base-pair detail</div>
+  
+              <div class="gx-modal__tabs" role="tablist" aria-label="Base pair views">
+                <button type="button" class="gx-tab is-active" data-tab="mol">3D Molecule</button>
+                <button type="button" class="gx-tab" data-tab="comp">Complementarity</button>
+              </div>
+  
+              <button type="button" class="gx-modal__close" id="bpCloseBtn">✕</button>
+            </div>
+  
+            <div class="gx-modal__bd">
+              <div class="gx-modal__pane is-active" data-pane="mol">
+                <div class="gx-modal__grid onecol">
+                  <div class="gx-modal__left">
+                    <div class="gx-bp3d__mount" id="gxBp3dMount"></div>
+                  </div>
+                </div>
+              </div>
+  
+              <div class="gx-modal__pane" data-pane="comp">
+                <div class="gx-modal__grid onecol">
+                  <div class="gx-modal__right">
+                    <div class="gx-bp3d__mount" id="gxBpCompMount"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+
+        detailModal.querySelector("#bpCloseBtn")?.addEventListener("click", hideDetailPanel);
+
+        detailBackdrop.style.display = "block";
+        detailModal.style.display = "block";
+
+        escHandler = (ev) => {
+            if (ev.key === "Escape") hideDetailPanel();
+        };
+
+        document.addEventListener("keydown", escHandler);
+
+        const tabs = [...detailModal.querySelectorAll(".gx-tab")];
+        const panes = [...detailModal.querySelectorAll(".gx-modal__pane")];
+
+        function setTab(name) {
+            tabs.forEach(t => t.classList.toggle("is-active", t.dataset.tab === name));
+            panes.forEach(p => p.classList.toggle("is-active", p.dataset.pane === name));
+
+            if (name !== "mol") bpPreview?.pause?.();
+            else bpPreview?.resume?.();
+        }
+
+        tabs.forEach(t => t.addEventListener("click", () => setTab(t.dataset.tab)));
+        setTab("mol");
+    }
+
+    function hideDetailPanel() {
+        bpPreview?.dispose?.();
+        bpPreview = null;
+
+        detailPanel?.dispose?.();
+        detailPanel = null;
+
+        if (detailBackdrop) detailBackdrop.style.display = "none";
+        if (detailModal) detailModal.style.display = "none";
+
+        if (escHandler) document.removeEventListener("keydown", escHandler);
+        escHandler = null;
     }
 
     const camera = new THREE.PerspectiveCamera(45, 1, 0.01, 6000);
@@ -499,6 +910,7 @@ export function mountHelix3D(strand1, strand2, mount, initialIndex = null) {
     const back1 = [];
     const back2 = [];
     const ENABLE_DETAIL = N <= 140;
+
     detailGroup.visible = ENABLE_DETAIL;
 
     controls.addEventListener("start", () => {
@@ -557,7 +969,6 @@ export function mountHelix3D(strand1, strand2, mount, initialIndex = null) {
     const baseHex = { A: 0xff4b4b, T: 0xffd54b, C: 0x4ba3ff, G: 0x4bff88 };
     const baseGeom = new THREE.SphereGeometry(0.18 * GLOBAL_BASE_SCALE, 16, 16);
     const rungGeom = new THREE.CylinderGeometry(0.055 * GLOBAL_BASE_SCALE, 0.055 * GLOBAL_BASE_SCALE, 2 * r, 12);
-    createLegendOverlay(mount, { baseHex, enableDetail: ENABLE_DETAIL, elem: ELEM });
 
     const baseMeshes1 = [];
     const baseMeshes2 = [];
@@ -567,6 +978,8 @@ export function mountHelix3D(strand1, strand2, mount, initialIndex = null) {
     let onPick = null;
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
+
+    createLegendOverlay(mount, { baseHex, enableDetail: ENABLE_DETAIL, elem: ELEM });
 
     renderer.domElement.addEventListener("pointerdown", (e) => {
         const rect = renderer.domElement.getBoundingClientRect();
@@ -584,8 +997,22 @@ export function mountHelix3D(strand1, strand2, mount, initialIndex = null) {
         const b1 = strand1[seqIndex];
         const b2 = strand2[seqIndex];
 
-        showDetailPanel(renderBasePairSVG(b1, b2, seqIndex));
-        onPick?.(seqIndex);
+        if (SHOW_DETAIL_PANEL) {
+            const hb =
+                ((b1 === "A" && b2 === "T") || (b1 === "T" && b2 === "A")) ? 2 :
+                    ((b1 === "C" && b2 === "G") || (b1 === "G" && b2 === "C")) ? 3 : 0;
+
+            showDetailPanel(renderBasePairSVG(b1, b2, seqIndex), "");
+
+            const hostMol = detailModal?.querySelector("#gxBp3dMount");
+            const hostComp = detailModal?.querySelector("#gxBpCompMount");
+
+            bpPreview?.dispose?.();
+            bpPreview = mountBasePairPreview3D(hostMol, { b1, b2, hb, baseHex, ELEM });
+
+            if (hostComp)
+                hostComp.innerHTML = renderBasePairSVG(b1, b2, seqIndex);
+        };
     });
 
     for (let vi = 0; vi < N; vi++) {
@@ -898,8 +1325,6 @@ export function mountHelix3D(strand1, strand2, mount, initialIndex = null) {
         ring2.position.copy(baseMeshes2[vi].position);
         ring1.visible = ring2.visible = true;
         ringPulse = 1.85;
-
-        const seqIndex = REV ? (N - 1 - vi) : vi;
     }
 
     function toIndex(seqIndex) {
@@ -967,6 +1392,10 @@ export function mountHelix3D(strand1, strand2, mount, initialIndex = null) {
         ro.disconnect();
         window.removeEventListener("resize", resize);
 
+        bpPreview?.dispose?.();
+        bpPreview = null;
+        detailPanel = null;
+
         bondGeometry?.dispose?.();
         bondGeometry = null;
 
@@ -992,11 +1421,17 @@ export function mountHelix3D(strand1, strand2, mount, initialIndex = null) {
         renderer.dispose();
         renderer.forceContextLoss?.();
 
-        mount.querySelectorAll(".dna-legend").forEach(el => el.remove());
-        mount.querySelectorAll(".dna-detail-panel").forEach(el => el.remove());
+        renderer.domElement?.remove();
 
-        mount.innerHTML = "";
-        mount.querySelectorAll(".dna-legend").forEach(el => el.remove());
+        mount.querySelectorAll('.dna-legend[data-gx="1"]').forEach(el => el.remove());
+        mount.querySelectorAll('.dna-detail-panel[data-gx="1"]').forEach(el => el.remove());
+
+        detailModal?.remove();
+        detailModal = null;
+        detailBackdrop?.remove();
+        detailBackdrop = null;
+        if (escHandler) document.removeEventListener("keydown", escHandler);
+        escHandler = null;
     }
 
     return {
