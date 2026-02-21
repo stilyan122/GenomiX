@@ -1,0 +1,62 @@
+﻿@model IReadOnlyList<AdminReferenceSequenceListItemViewModel>
+
+@{
+    ViewData["Title"] = "Rejected Sequences";
+}
+
+<div class="gx-admin-page">
+    <div class="gx-admin-head">
+        <div>
+            <h1 class="gx-admin-title">Rejected</h1>
+            <div class="gx-admin-sub">Rejected submissions remain editable by the scientist.</div>
+        </div>
+
+        <div class="gx-admin-tabs">
+            <a class="gx-admin-tab" href="/admin/sequences">Pending</a>
+            <a class="gx-admin-tab" href="/admin/sequences/approved">Approved</a>
+            <a class="gx-admin-tab is-active" href="/admin/sequences/rejected">Rejected</a>
+        </div>
+    </div>
+
+    <div class="gx-admin-card">
+        @if (Model.Count == 0)
+        {
+            <div class="gx-admin-empty">
+                <div class="gx-admin-empty__title">No rejected items</div>
+                <div class="gx-admin-empty__text">Rejected sequences will show here.</div>
+            </div>
+        }
+        else
+        {
+            <div class="gx-admin-tablewrap">
+                <table class="gx-admin-table">
+                    <thead>
+                        <tr>
+                            <th>Species</th>
+                            <th>Name</th>
+                            <th class="gx-admin-col--num">Length</th>
+                            <th class="gx-admin-col--num">Created On</th>
+                            <th class="gx-admin-col--num">Created By</th>
+                            <th class="gx-admin-col--actions">Details</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var s in Model)
+                        {
+                            <tr>
+                                <td class="gx-admin-td-strong">@s.Species</td>
+                                <td>@s.Name</td>
+                                <td class="gx-admin-col--num">@s.Length</td>
+                                <td class="gx-admin-col--num gx-admin-muted">@s.CreatedAt</td>
+                                <td class="gx-admin-col--num gx-admin-muted">@s.CreatedBy</td>
+                                <td class="gx-admin-col--actions">
+                                    <a class="gx-admin-link" href="/admin/sequences/review/@s.Id">Open</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>

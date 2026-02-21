@@ -1,0 +1,55 @@
+﻿@model EditReferenceSequenceViewModel
+
+@{
+    ViewData["Title"] = "Edit Sequence";
+}
+
+<div class="gx-lab-page">
+    <div class="gx-lab-head">
+        <div>
+            <h1 class="gx-lab-title">Edit reference sequence</h1>
+            <div class="gx-lab-sub">Edits resubmit the sequence as pending (and clear rejection reason).</div>
+        </div>
+
+        <div class="gx-lab-actions">
+            <a class="gx-lab-btn" href="/lab/sequences">Back</a>
+        </div>
+    </div>
+
+    <div class="gx-lab-card">
+        <form method="post" action="/lab/sequences/edit" class="gx-lab-form">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="Id" />
+
+            <div class="gx-lab-grid">
+                <div class="gx-lab-field">
+                    <label class="gx-lab-label" asp-for="Species"></label>
+                    <input class="gx-lab-input" asp-for="Species" autocomplete="off" />
+                    <span class="gx-lab-val" asp-validation-for="Species"></span>
+                </div>
+
+                <div class="gx-lab-field">
+                    <label class="gx-lab-label" asp-for="Name"></label>
+                    <input class="gx-lab-input" asp-for="Name" autocomplete="off" />
+                    <span class="gx-lab-val" asp-validation-for="Name"></span>
+                </div>
+            </div>
+
+            <div class="gx-lab-field">
+                <label class="gx-lab-label" asp-for="Sequence"></label>
+                <textarea class="gx-lab-textarea" asp-for="Sequence" rows="8" spellcheck="false"></textarea>
+                <div class="gx-lab-hint">Allowed: A, C, G, T.</div>
+                <span class="gx-lab-val" asp-validation-for="Sequence"></span>
+            </div>
+
+            <div class="gx-lab-footer">
+                <button type="submit" class="gx-lab-btn gx-lab-btn--primary">Save</button>
+                <a class="gx-lab-btn" href="/lab/sequences">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

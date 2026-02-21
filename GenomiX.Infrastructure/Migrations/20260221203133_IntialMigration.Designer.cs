@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GenomiX.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260218194421_InitialMigration")]
-    partial class InitialMigration
+    [Migration("20260221203133_IntialMigration")]
+    partial class IntialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -721,15 +721,39 @@ namespace GenomiX.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasComment("Primary key (GUID).");
 
+                    b.Property<DateTimeOffset?>("ApprovedAt")
+                        .HasColumnType("datetimeoffset")
+                        .HasComment("When approved (UTC).");
+
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("datetimeoffset")
-                        .HasComment("UTC timestamp when the reference sequence was created.");
+                        .HasComment("When created (UTC).");
+
+                    b.Property<Guid>("CreatedByUserId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasComment("Creator user id (Scientist who submitted it).");
+
+                    b.Property<bool>("IsApproved")
+                        .HasColumnType("bit")
+                        .HasComment("Approved flag. If true -> visible to the whole app.");
+
+                    b.Property<bool>("IsRejected")
+                        .HasColumnType("bit")
+                        .HasComment("Rejected flag.");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)")
-                        .HasComment("Descriptive name for the reference sequence (e.g., Beta-globin fragment).");
+                        .HasComment("Human-friendly name (e.g., Beta-globin fragment).");
+
+                    b.Property<DateTimeOffset?>("RejectedAt")
+                        .HasColumnType("datetimeoffset")
+                        .HasComment("When rejected (UTC).");
+
+                    b.Property<string>("RejectionReason")
+                        .HasColumnType("nvarchar(max)")
+                        .HasComment("Optional rejection reason (shown to the scientist).");
 
                     b.Property<string>("Sequence")
                         .IsRequired()
@@ -741,13 +765,19 @@ namespace GenomiX.Infrastructure.Migrations
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)")
-                        .HasComment("Species or organism identifier for the reference sequence (e.g., Human, Mouse, Dog).");
+                        .HasComment("Species/organism label (e.g., Human, Mouse).");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset")
+                        .HasComment("When edited while pending (UTC).");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CreatedByUserId");
+
                     b.ToTable("Reference_Sequences", t =>
                         {
-                            t.HasComment("Reference DNA sequence template (e.g., Human, Mouse, Dog). Not tied to a user.");
+                            t.HasComment("Reference DNA sequence template submission/approved item.");
                         });
 
                     b.HasData(
@@ -755,6 +785,9 @@ namespace GenomiX.Infrastructure.Migrations
                         {
                             Id = new Guid("11111111-0000-0000-0000-000000000001"),
                             CreatedAt = new DateTimeOffset(new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedByUserId = new Guid("c2b3d8ae-2b6d-4c41-9b8e-b1c2a3d4e005"),
+                            IsApproved = false,
+                            IsRejected = false,
                             Name = "BRCA1 fragment",
                             Sequence = "ATGGAAGAGCTGTCAGGAGAGCTGCCAGCTGGTGAGGAAGCAGTGAGCCTGAGCAAGAGCTGAG",
                             Species = "Homo sapiens"
@@ -763,6 +796,9 @@ namespace GenomiX.Infrastructure.Migrations
                         {
                             Id = new Guid("11111111-0000-0000-0000-000000000002"),
                             CreatedAt = new DateTimeOffset(new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedByUserId = new Guid("c2b3d8ae-2b6d-4c41-9b8e-b1c2a3d4e005"),
+                            IsApproved = false,
+                            IsRejected = false,
                             Name = "BRCA1 fragment (complement)",
                             Sequence = "CTCAGCTCTTGCTCAGGCTCACTGCTTCCTCACCAGCTGGCAGCTCTCCTGACAGCTCTTCCAT",
                             Species = "Homo sapiens"
@@ -771,6 +807,9 @@ namespace GenomiX.Infrastructure.Migrations
                         {
                             Id = new Guid("22222222-0000-0000-0000-000000000001"),
                             CreatedAt = new DateTimeOffset(new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedByUserId = new Guid("c2b3d8ae-2b6d-4c41-9b8e-b1c2a3d4e005"),
+                            IsApproved = false,
+                            IsRejected = false,
                             Name = "TP53 fragment",
                             Sequence = "ATGGTCAGGACCTGGAGAAGGAGCTGAGGCTGGATGAAGTCAAGAGTGTCAAGCGAGCTGAGG",
                             Species = "Mus musculus"
@@ -779,6 +818,9 @@ namespace GenomiX.Infrastructure.Migrations
                         {
                             Id = new Guid("22222222-0000-0000-0000-000000000002"),
                             CreatedAt = new DateTimeOffset(new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedByUserId = new Guid("c2b3d8ae-2b6d-4c41-9b8e-b1c2a3d4e005"),
+                            IsApproved = false,
+                            IsRejected = false,
                             Name = "TP53 fragment (complement)",
                             Sequence = "CCTCAGCTCGCTTGACACTCTTGACTTCATCCAGCCTCAGCTCCTTCTCCAGGTCCTGACCAG",
                             Species = "Mus musculus"
@@ -787,6 +829,9 @@ namespace GenomiX.Infrastructure.Migrations
                         {
                             Id = new Guid("33333333-0000-0000-0000-000000000001"),
                             CreatedAt = new DateTimeOffset(new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedByUserId = new Guid("c2b3d8ae-2b6d-4c41-9b8e-b1c2a3d4e005"),
+                            IsApproved = false,
+                            IsRejected = false,
                             Name = "COX1 mitochondrial fragment",
                             Sequence = "ATGGAAGAGGAGCTGCTGAGGAGCTGGTGAGGAAGCAGTGAGCCTGAGCAAGAGCTGAGCTA",
                             Species = "Canis lupus familiaris"
@@ -795,6 +840,9 @@ namespace GenomiX.Infrastructure.Migrations
                         {
                             Id = new Guid("33333333-0000-0000-0000-000000000002"),
                             CreatedAt = new DateTimeOffset(new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedByUserId = new Guid("c2b3d8ae-2b6d-4c41-9b8e-b1c2a3d4e005"),
+                            IsApproved = false,
+                            IsRejected = false,
                             Name = "COX1 mitochondrial fragment (complement)",
                             Sequence = "TAGCTCAGCTCTTGCTCAGGCTCACTGCTTCCTCACCAGCTCCTCAGCAGCTCCTCTTCCAT",
                             Species = "Canis lupus familiaris"
@@ -1101,6 +1149,17 @@ namespace GenomiX.Infrastructure.Migrations
                     b.Navigation("BaseModel");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("GenomiX.Infrastructure.Models.ReferenceSequence", b =>
+                {
+                    b.HasOne("GenomiX.Infrastructure.Models.GenUser", "CreatedByUser")
+                        .WithMany()
+                        .HasForeignKey("CreatedByUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CreatedByUser");
                 });
 
             modelBuilder.Entity("GenomiX.Infrastructure.Models.RoleRequest", b =>

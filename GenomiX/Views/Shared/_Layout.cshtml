@@ -13,6 +13,8 @@
     <link rel="stylesheet" href="~/css/dna/dna.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/core/core.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/simulations/sim.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/lab/lab.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/admin/admin.css" asp-append-version="true" />
 
     @await RenderSectionAsync("Styles", required: false)
 </head>
@@ -28,6 +30,17 @@
                 <div class="navlinks navlinks--primary">
                     <a class="navlink @(ViewData["ActiveNav"] as string == "dna" ? "is-active" : "")" href="/dna">DNA Builder</a>
                     <a class="navlink @(ViewData["ActiveNav"] as string == "sim" ? "is-active" : "")" href="/simulations">Simulations</a>
+
+                    @if (User?.Identity?.IsAuthenticated == true && (User.IsInRole("Scientist") || User.IsInRole("Admin")))
+                    {
+                        <a class="navlink @(ViewData["ActiveNav"] as string == "lab" ? "is-active" : "")" href="/lab/sequences">Lab</a>
+                    }
+
+                    @if (User?.Identity?.IsAuthenticated == true && User.IsInRole("Admin"))
+                    {
+                        <a class="navlink @(ViewData["ActiveNav"] as string == "admin" ? "is-active" : "")" href="/admin/sequences">Sequences Panel</a>
+                        <a class="navlink @(ViewData["ActiveNav"] as string == "admin" ? "is-active" : "")" href="/admin/users">Users Panel</a>
+                    }
                 </div>
 
                 <div class="auth">

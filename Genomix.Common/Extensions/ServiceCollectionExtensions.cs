@@ -1,4 +1,4 @@
-﻿using Genomix.Common.Email;
+﻿using GenomiX.Common.Email;
 using GenomiX.Core.Interfaces;
 using GenomiX.Core.Services;
 using GenomiX.Infrastructure;
@@ -10,12 +10,8 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Net.Http.Headers;
-using System.Security.Claims;
-using System.Text.Json;
 
-namespace Genomix.Common.Extensions
+namespace GenomiX.Common.Extensions
 {
     public static class ServiceCollectionExtensions
     {

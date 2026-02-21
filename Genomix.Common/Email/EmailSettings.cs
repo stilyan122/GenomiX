@@ -1,4 +1,4 @@
-﻿namespace Genomix.Common.Email
+﻿namespace GenomiX.Common.Email
 {
     public class EmailSettings
     {

@@ -1,0 +1,91 @@
+﻿@model IReadOnlyList<ReferenceSequenceListItemViewModel>
+
+@{
+    ViewData["Title"] = "Lab Sequences";
+}
+
+<div class="gx-lab-page">
+    <div class="gx-lab-head">
+        <div>
+            <h1 class="gx-lab-title">Lab Sequences</h1>
+            <div class="gx-lab-sub">Create reference sequences and submit them for admin approval.</div>
+        </div>
+
+        <div class="gx-lab-actions">
+            <a class="gx-lab-btn gx-lab-btn--primary" href="/lab/sequences/create">Create sequence</a>
+        </div>
+    </div>
+
+    <div class="gx-lab-card">
+        <div class="gx-lab-card__hd">
+            <div class="gx-lab-card__title">My submissions</div>
+            <div class="gx-lab-card__meta">@Model.Count item(s)</div>
+        </div>
+
+        @if (Model.Count == 0)
+        {
+            <div class="gx-lab-empty">
+                <div class="gx-lab-empty__title">No sequences yet</div>
+                <div class="gx-lab-empty__text">Create your first reference sequence and send it for approval.</div>
+                <a class="gx-lab-btn gx-lab-btn--primary" href="/lab/sequences/create">Create sequence</a>
+            </div>
+        }
+        else
+        {
+            <div class="gx-lab-tablewrap">
+                <table class="gx-lab-table">
+                    <thead>
+                        <tr>
+                            <th>Species</th>
+                            <th>Name</th>
+                            <th class="gx-lab-col--num">Length</th>
+                            <th>Status</th>
+                            <th class="gx-lab-col--num">Created</th>
+                            <th class="gx-lab-col--num">Updated</th>
+                            <th class="gx-lab-col--actions">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var s in Model)
+                        {
+                            var status = s.IsApproved ? "Approved" : (s.IsRejected ? "Rejected" : "Pending");
+                            var statusCls = s.IsApproved ? "gx-lab-pill--ok" : (s.IsRejected ? "gx-lab-pill--bad" : "gx-lab-pill--mid");
+                            <tr>
+                                <td class="gx-lab-td-strong">@s.Species</td>
+                                <td>@s.Name</td>
+                                <td class="gx-lab-col--num">@s.Length</td>
+                                <td>
+                                    <span class="gx-lab-pill @statusCls">@status</span>
+                                    @if (s.IsRejected && !string.IsNullOrWhiteSpace(s.RejectionReason))
+                                    {
+                                        <div class="gx-lab-note">Reason: @s.RejectionReason</div>
+                                    }
+                                </td>
+                                <td class="gx-lab-col--num gx-lab-muted">@s.CreatedAt</td>
+                                <td class="gx-lab-col--num gx-lab-muted">@(!string.IsNullOrWhiteSpace(s.UpdatedAt) ? s.UpdatedAt : "—")</td>
+                                <td class="gx-lab-col--actions">
+                                    @if (!s.IsApproved)
+                                    {
+                                        <a class="gx-lab-link" href="/lab/sequences/edit/@s.Id">Edit</a>
+
+                                        <form class="gx-lab-inline" method="post" action="/lab/sequences/delete/@s.Id">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="gx-lab-link gx-lab-link--danger"
+                                                    onclick="return confirm('Delete this sequence? This cannot be undone.');">
+                                                Delete
+                                            </button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <span class="gx-lab-muted">Locked</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>

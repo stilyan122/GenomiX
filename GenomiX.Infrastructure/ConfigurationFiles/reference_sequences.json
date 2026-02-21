@@ -6,7 +6,8 @@
     "Sequence": "ATGGAAGAGCTGTCAGGAGAGCTGCCAGCTGGTGAGGAAGCAGTGAGCCTGAGCAAGAGCTGAG",
     "Strand": 1,
     "PairIndex": 0,
-    "CreatedAt": "2024-01-01T00:00:00Z"
+    "CreatedAt": "2024-01-01T00:00:00Z",
+    "CreatedByUserId": "c2b3d8ae-2b6d-4c41-9b8e-b1c2a3d4e005"
   },
   {
     "Id": "11111111-0000-0000-0000-000000000002",
@@ -15,7 +16,8 @@
     "Sequence": "CTCAGCTCTTGCTCAGGCTCACTGCTTCCTCACCAGCTGGCAGCTCTCCTGACAGCTCTTCCAT",
     "Strand": 2,
     "PairIndex": 0,
-    "CreatedAt": "2024-01-01T00:00:00Z"
+    "CreatedAt": "2024-01-01T00:00:00Z",
+    "CreatedByUserId": "c2b3d8ae-2b6d-4c41-9b8e-b1c2a3d4e005"
   },
   {
     "Id": "22222222-0000-0000-0000-000000000001",
@@ -24,7 +26,8 @@
     "Sequence": "ATGGTCAGGACCTGGAGAAGGAGCTGAGGCTGGATGAAGTCAAGAGTGTCAAGCGAGCTGAGG",
     "Strand": 1,
     "PairIndex": 1,
-    "CreatedAt": "2024-01-01T00:00:00Z"
+    "CreatedAt": "2024-01-01T00:00:00Z",
+    "CreatedByUserId": "c2b3d8ae-2b6d-4c41-9b8e-b1c2a3d4e005"
   },
   {
     "Id": "22222222-0000-0000-0000-000000000002",
@@ -33,7 +36,8 @@
     "Sequence": "CCTCAGCTCGCTTGACACTCTTGACTTCATCCAGCCTCAGCTCCTTCTCCAGGTCCTGACCAG",
     "Strand": 2,
     "PairIndex": 1,
-    "CreatedAt": "2024-01-01T00:00:00Z"
+    "CreatedAt": "2024-01-01T00:00:00Z",
+    "CreatedByUserId": "c2b3d8ae-2b6d-4c41-9b8e-b1c2a3d4e005"
   },
   {
     "Id": "33333333-0000-0000-0000-000000000001",
@@ -42,7 +46,8 @@
     "Sequence": "ATGGAAGAGGAGCTGCTGAGGAGCTGGTGAGGAAGCAGTGAGCCTGAGCAAGAGCTGAGCTA",
     "Strand": 1,
     "PairIndex": 2,
-    "CreatedAt": "2024-01-01T00:00:00Z"
+    "CreatedAt": "2024-01-01T00:00:00Z",
+    "CreatedByUserId": "c2b3d8ae-2b6d-4c41-9b8e-b1c2a3d4e005"
   },
   {
     "Id": "33333333-0000-0000-0000-000000000002",
@@ -51,6 +56,7 @@
     "Sequence": "TAGCTCAGCTCTTGCTCAGGCTCACTGCTTCCTCACCAGCTCCTCAGCAGCTCCTCTTCCAT",
     "Strand": 2,
     "PairIndex": 2,
-    "CreatedAt": "2024-01-01T00:00:00Z"
+    "CreatedAt": "2024-01-01T00:00:00Z",
+    "CreatedByUserId": "c2b3d8ae-2b6d-4c41-9b8e-b1c2a3d4e005"
   }
 ]

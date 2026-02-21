@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Genomix.Common.Extensions
+namespace GenomiX.Common.Extensions
 {
     /// <summary>
     /// Helper to force known dev passwords for seeded users (and other web app extensions).
@@ -25,6 +25,22 @@ namespace Genomix.Common.Extensions
             await Verify(um, "alice", "User!123");
             await Verify(um, "ivan", "User!123");
             await Verify(um, "georgi.scientist", "Scientist!123");
+        }
+
+        public static void MapAppRoutes(this WebApplication app)
+        {
+            app.MapControllerRoute(
+                name: "default",
+                pattern: "{controller=Home}/{action=Index}/{id?}")
+                .WithStaticAssets();
+
+            app.MapControllerRoute(
+                name: "areas",
+                pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
+
+            app.MapControllerRoute(
+                name: "default",
+                pattern: "{controller=Home}/{action=Index}/{id?}");
         }
 
         private static async Task Force(UserManager<GenUser> um, PasswordHasher<GenUser> hasher,

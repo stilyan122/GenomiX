@@ -32,7 +32,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Genomix.Common\Genomix.Common.csproj" />
+    <ProjectReference Include="..\Genomix.Common\GenomiX.Common.csproj" />
     <ProjectReference Include="..\GenomiX.Core\GenomiX.Core.csproj" />
     <ProjectReference Include="..\GenomiX.Infrastructure\GenomiX.Infrastructure.csproj" />
   </ItemGroup>

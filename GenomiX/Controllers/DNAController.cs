@@ -8,7 +8,7 @@ using GenomiX.Infrastructure.Models;
 
 namespace GenomiX.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "User,Scientist,Admin")]
     public class DNAController : Controller
     {
         private readonly IDNAService _DNAService;
@@ -83,15 +83,16 @@ namespace GenomiX.Controllers
         public async Task<IActionResult> Predefined()
         {
             var predefinedServiceSequences = await this ._sequenceService
-                .GetAllReferenceSequencesAsync();
+                .GetApprovedAsync();
 
             var sequenceViewModels = predefinedServiceSequences
                 .Select(s => new SequenceViewModel()
             {
                 Id = s.Id,
                 Species = s.Species,
-                Sequence = s.Sequence
-            }).ToList();
+                Sequence = s.Sequence,
+                CreatedBy = s.CreatedByUser?.Email ?? "Unknown"
+                }).ToList();
 
             return View(sequenceViewModels);
         }

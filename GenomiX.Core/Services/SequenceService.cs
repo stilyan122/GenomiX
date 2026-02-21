@@ -7,68 +7,277 @@ namespace GenomiX.Core.Services
 {
     public class SequenceService : ISequenceService
     {
-        private IRepository<DNASequence> _user_sequence_repository;
-        private IRepository<ReferenceSequence> _reference_sequence_repository;
+        private readonly IRepository<DNASequence> _userSequenceRepo;
+        private readonly IRepository<ReferenceSequence> _referenceSequenceRepo;
 
         public SequenceService(
-            IRepository<DNASequence> user_sequence_repository,
-            IRepository<ReferenceSequence> reference_sequence_repository
-            )
+            IRepository<DNASequence> userSequenceRepo,
+            IRepository<ReferenceSequence> referenceSequenceRepo)
         {
-            _user_sequence_repository = user_sequence_repository;
-            _reference_sequence_repository = reference_sequence_repository;
+            _userSequenceRepo = userSequenceRepo;
+            _referenceSequenceRepo = referenceSequenceRepo;
         }
 
-        public Task AddReferenceSequenceAsync(ReferenceSequence dna)
+        public async Task<IReadOnlyList<ReferenceSequence>> GetApprovedAsync()
         {
-            throw new NotImplementedException();
+            return await _referenceSequenceRepo.GetAll()
+                .Include(rs => rs.CreatedByUser)
+                .Where(x => x.IsApproved && !x.IsRejected)
+                .OrderByDescending(x => x.ApprovedAt ?? x.CreatedAt)
+                .ToListAsync();
         }
 
-        public Task AddUserSequenceAsync(DNASequence dna)
+        public async Task<IReadOnlyList<ReferenceSequence>> GetPendingAsync()
         {
-            throw new NotImplementedException();
+            return await _referenceSequenceRepo.GetAll()
+                .Include(rs => rs.CreatedByUser)
+                .Where(x => !x.IsApproved && !x.IsRejected)
+                .OrderByDescending(x => x.CreatedAt)
+                .ToListAsync();
         }
 
-        public Task DeleteReferenceSequenceAsync(object id)
+        public async Task<IReadOnlyList<ReferenceSequence>> GetRejectedAsync()
         {
-            throw new NotImplementedException();
+            return await _referenceSequenceRepo.GetAll()
+                .Include(rs => rs.CreatedByUser)
+                .Where(x => x.IsRejected && !x.IsApproved)
+                .OrderByDescending(x => x.RejectedAt ?? x.CreatedAt)
+                .ToListAsync();
         }
 
-        public Task DeleteUserSequenceAsync(object id)
+        public async Task<IReadOnlyList<ReferenceSequence>> GetMineAsync(Guid userId)
         {
-            throw new NotImplementedException();
+            return await _referenceSequenceRepo.GetAll()
+                .Include(rs => rs.CreatedByUser)
+                .Where(x => x.CreatedByUserId == userId)
+                .OrderByDescending(x => x.CreatedAt)
+                .ToListAsync();
+        }
+
+        public async Task<IReadOnlyList<ReferenceSequence>> GetPendingMineAsync(Guid userId)
+        {
+            return await _referenceSequenceRepo.GetAll()
+                .Include(rs => rs.CreatedByUser)
+                .Where(x => x.CreatedByUserId == userId && !x.IsApproved && !x.IsRejected)
+                .OrderByDescending(x => x.CreatedAt)
+                .ToListAsync();
+        }
+
+        public async Task<ReferenceSequence?> GetReferenceByIdAsync(Guid id)
+        {
+            return await _referenceSequenceRepo.GetAll()
+                .Include(rs => rs.CreatedByUser)
+                .FirstOrDefaultAsync(x => x.Id == id);
+        }
+
+        public async Task<Guid> CreateReferenceAsync(Guid userId, string species, string name, string sequence)
+        {
+            var now = DateTimeOffset.UtcNow;
+
+            var entity = new ReferenceSequence
+            {
+                Id = Guid.NewGuid(),
+                CreatedByUserId = userId,
+                Species = (species ?? "").Trim(),
+                Name = (name ?? "").Trim(),
+                Sequence = (sequence ?? "").Trim().ToUpperInvariant(),
+                CreatedAt = now,
+                UpdatedAt = now,
+                IsApproved = false,
+                IsRejected = false,
+                RejectionReason = null,
+                ApprovedAt = null,
+                RejectedAt = null
+            };
+
+            await _referenceSequenceRepo.AddAsync(entity);
+            return entity.Id;
+        }
+
+        public async Task<bool> UpdateReferenceAsync(Guid userId, Guid id, string species, string name, string sequence)
+        {
+            var entity = await _referenceSequenceRepo.GetAll().FirstOrDefaultAsync(x => x.Id == id);
+           
+            if (entity == null) 
+                return false;
+
+            if (entity.CreatedByUserId != userId) 
+                return false;
+
+            if (entity.IsApproved) 
+                return false;
+
+            entity.Species = (species ?? "").Trim();
+            entity.Name = (name ?? "").Trim();
+            entity.Sequence = (sequence ?? "").Trim().ToUpperInvariant();
+            entity.UpdatedAt = DateTimeOffset.UtcNow;
+
+            entity.IsRejected = false;
+            entity.RejectionReason = null;
+            entity.RejectedAt = null;
+
+            await _referenceSequenceRepo.UpdateAsync(entity);
+            return true;
+        }
+
+        public async Task<bool> DeleteReferenceAsync(Guid userId, Guid id)
+        {
+            var entity = await _referenceSequenceRepo.GetAll().FirstOrDefaultAsync(x => x.Id == id);
+            if (entity == null) return false;
+
+            if (entity.CreatedByUserId != userId) return false;
+
+            if (entity.IsApproved) return false;
+
+            await _referenceSequenceRepo.DeleteAsync(id);
+            return true;
+        }
+
+        public async Task<bool> ApproveReferenceAsync(Guid id)
+        {
+            var entity = await _referenceSequenceRepo.GetAll().FirstOrDefaultAsync(x => x.Id == id);
+            if (entity == null) return false;
+
+            if (entity.IsApproved) return true;
+
+            entity.IsApproved = true;
+            entity.IsRejected = false;
+            entity.RejectionReason = null;
+            entity.ApprovedAt = DateTimeOffset.UtcNow;
+            entity.RejectedAt = null;
+            entity.UpdatedAt = DateTimeOffset.UtcNow;
+
+            await _referenceSequenceRepo.UpdateAsync(entity);
+            return true;
+        }
+
+        public async Task<bool> RejectReferenceAsync(Guid id, string reason)
+        {
+            var entity = await _referenceSequenceRepo.GetAll().FirstOrDefaultAsync(x => x.Id == id);
+            if (entity == null) return false;
+
+            if (entity.IsApproved) return false;
+
+            entity.IsRejected = true;
+            entity.IsApproved = false;
+            entity.RejectionReason = (reason ?? "").Trim();
+            entity.RejectedAt = DateTimeOffset.UtcNow;
+            entity.ApprovedAt = null;
+            entity.UpdatedAt = DateTimeOffset.UtcNow;
+
+            await _referenceSequenceRepo.UpdateAsync(entity);
+            return true;
+        }
+
+        public async Task AddReferenceSequenceAsync(ReferenceSequence dna)
+        {
+            dna.Sequence = Normalize(dna.Sequence);
+            Validate(dna.Sequence);
+
+            await _referenceSequenceRepo.AddAsync(dna);
+        }
+
+        public async Task UpdateReferenceSequenceAsync(ReferenceSequence dna)
+        {
+            var existing = await _referenceSequenceRepo.GetByIdAsync(dna.Id);
+            if (existing == null)
+                throw new ArgumentException("Reference sequence not found.");
+
+            dna.Sequence = Normalize(dna.Sequence);
+            Validate(dna.Sequence);
+
+            existing.Species = dna.Species.Trim();
+            existing.Sequence = dna.Sequence;
+
+            await _referenceSequenceRepo.UpdateAsync(existing);
+        }
+
+        public async Task DeleteReferenceSequenceAsync(object id)
+        {
+            var entity = await _referenceSequenceRepo.GetByIdAsync(id);
+            if (entity == null)
+                return;
+
+            await _referenceSequenceRepo.DeleteAsync(id);
         }
 
         public async Task<IEnumerable<ReferenceSequence>> GetAllReferenceSequencesAsync()
         {
-            return await this._reference_sequence_repository
+            return await _referenceSequenceRepo
                 .GetAll()
+                .Include(rs => rs.CreatedByUser)
                 .ToListAsync();
-        }
-
-        public Task<IEnumerable<DNASequence>> GetAllUserSequencesAsync()
-        {
-            throw new NotImplementedException();
         }
 
         public async Task<ReferenceSequence?> GetReferenceSequenceByIdAsync(object id)
         {
-            return await _reference_sequence_repository.GetByIdAsync(id);
+            return await _referenceSequenceRepo
+                .GetByIdAsync(id);
         }
 
-        public Task<DNASequence?> GetUserSequenceByIdAsync(object id)
+        public async Task AddUserSequenceAsync(DNASequence dna)
         {
-            throw new NotImplementedException();
+            dna.Sequence = Normalize(dna.Sequence);
+            Validate(dna.Sequence);
+
+            await _userSequenceRepo.AddAsync(dna);
         }
 
-        public Task UpdateReferenceSequenceAsync(ReferenceSequence dna)
+        public async Task UpdateUserSequenceAsync(DNASequence dna)
         {
-            throw new NotImplementedException();
+            var existing = await _userSequenceRepo.GetByIdAsync(dna.Id);
+            if (existing == null)
+                throw new ArgumentException("User sequence not found.");
+
+            dna.Sequence = Normalize(dna.Sequence);
+            Validate(dna.Sequence);
+
+            existing.Sequence = dna.Sequence;
+
+            await _userSequenceRepo.UpdateAsync(existing);
         }
 
-        public Task UpdateUserSequenceAsync(DNASequence dna)
+        public async Task DeleteUserSequenceAsync(object id)
         {
-            throw new NotImplementedException();
+            var entity = await _userSequenceRepo.GetByIdAsync(id);
+            if (entity == null)
+                return;
+
+            await _userSequenceRepo.DeleteAsync(id);
+        }
+
+        public async Task<IEnumerable<DNASequence>> GetAllUserSequencesAsync()
+        {
+            return await _userSequenceRepo
+                .GetAll()
+                .ToListAsync();
+        }
+
+        public async Task<DNASequence?> GetUserSequenceByIdAsync(object id)
+        {
+            return await _userSequenceRepo.GetByIdAsync(id);
+        }
+
+        private static string Normalize(string s)
+        {
+            return new string(
+                (s ?? "")
+                .Trim()
+                .ToUpperInvariant()
+                .Where(c => !char.IsWhiteSpace(c))
+                .ToArray()
+            );
+        }
+
+        private static void Validate(string sequence)
+        {
+            if (string.IsNullOrWhiteSpace(sequence))
+                throw new ArgumentException("Sequence cannot be empty.");
+
+            bool valid = sequence.All(c => c is 'A' or 'C' or 'G' or 'T');
+
+            if (!valid)
+                throw new ArgumentException("Invalid DNA bases. Allowed: A, C, G, T.");
         }
     }
 }

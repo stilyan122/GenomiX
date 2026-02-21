@@ -74,5 +74,57 @@ namespace GenomiX.Core.Interfaces
         /// <param name="id">The identifier of the Reference Sequence entity to delete.</param>
         /// <returns>A task that represents the asynchronous operation.</returns>
         Task DeleteReferenceSequenceAsync(object id);
+
+        /// <summary>
+        /// Asynchronously retrieves a read-only list of approved reference sequences.
+        /// </summary>
+        Task<IReadOnlyList<ReferenceSequence>> GetApprovedAsync();
+
+        /// <summary>
+        /// Asynchronously retrieves a read-only list of reference sequences that are pending processing.
+        /// </summary>
+        Task<IReadOnlyList<ReferenceSequence>> GetPendingAsync();
+
+        /// <summary>
+        /// Asynchronously retrieves a read-only list of reference sequences that have been rejected.
+        /// </summary>
+        Task<IReadOnlyList<ReferenceSequence>> GetRejectedAsync();
+
+        /// <summary>
+        /// Retrieves all reference sequences associated with the specified user.
+        /// </summary>
+        Task<IReadOnlyList<ReferenceSequence>> GetMineAsync(Guid userId);
+
+        /// <summary>
+        /// Retrieves a list of reference sequences that are pending mining for the specified user.
+        /// </summary>
+        /// <param name="userId">The unique identifier of the user for whom pending reference sequences are retrieved. Cannot be null or
+        /// empty.</param>
+        Task<IReadOnlyList<ReferenceSequence>> GetPendingMineAsync(Guid userId);
+
+        /// <summary>
+        /// Asynchronously approves the reference identified by the specified unique identifier.
+        /// </summary>
+        Task<bool> ApproveReferenceAsync(Guid id);
+
+        /// <summary>
+        /// Asynchronously rejects a reference identified by the specified ID, providing a reason for the rejection.
+        /// </summary>
+        Task<bool> RejectReferenceAsync(Guid id, string reason);
+
+        /// <summary>
+        /// Creates a new genetic reference entry for the specified user asynchronously.
+        /// </summary>
+        Task<Guid> CreateReferenceAsync(Guid userId, string species, string name, string sequence);
+
+        /// <summary>
+        /// Updates the reference data for a specified user and reference identifier asynchronously.
+        /// </summary>
+        Task<bool> UpdateReferenceAsync(Guid userId, Guid id, string species, string name, string sequence);
+
+        /// <summary>
+        /// Asynchronously deletes a reference identified by the specified user and reference ID.
+        /// </summary>
+        Task<bool> DeleteReferenceAsync(Guid userId, Guid id);
     }
 }

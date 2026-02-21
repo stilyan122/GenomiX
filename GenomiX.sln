@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GenomiX.Infrastructure", "G
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GenomiX.Core", "GenomiX.Core\GenomiX.Core.csproj", "{A846D32D-5DB9-440F-BAF7-9DDB0F71F8F7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Genomix.Common", "Genomix.Common\Genomix.Common.csproj", "{8730C756-E44B-49CB-8FA0-B079D27FAF4A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GenomiX.Common", "Genomix.Common\GenomiX.Common.csproj", "{8730C756-E44B-49CB-8FA0-B079D27FAF4A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

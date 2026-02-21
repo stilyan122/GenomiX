@@ -11,7 +11,7 @@ using GenomiX.Core.ServiceHelpers;
 
 namespace GenomiX.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "User,Scientist,Admin")]
     public class SimulationController : Controller
     {
         private readonly ISimulationService _sim;

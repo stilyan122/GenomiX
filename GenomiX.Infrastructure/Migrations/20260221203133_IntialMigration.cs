@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace GenomiX.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialMigration : Migration
+    public partial class IntialMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -68,22 +68,6 @@ namespace GenomiX.Infrastructure.Migrations
                     table.PrimaryKey("PK_Diseases", x => x.Id);
                 },
                 comment: "Catalog of known diseases.");
-
-            migrationBuilder.CreateTable(
-                name: "Reference_Sequences",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, comment: "Primary key (GUID)."),
-                    Species = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false, comment: "Species or organism identifier for the reference sequence (e.g., Human, Mouse, Dog)."),
-                    Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false, comment: "Descriptive name for the reference sequence (e.g., Beta-globin fragment)."),
-                    Sequence = table.Column<string>(type: "nvarchar(max)", maxLength: 10000, nullable: false, comment: "Raw uppercase DNA string (A,C,G,T only)."),
-                    CreatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false, comment: "UTC timestamp when the reference sequence was created.")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Reference_Sequences", x => x.Id);
-                },
-                comment: "Reference DNA sequence template (e.g., Human, Mouse, Dog). Not tied to a user.");
 
             migrationBuilder.CreateTable(
                 name: "AspNetRoleClaims",
@@ -211,6 +195,35 @@ namespace GenomiX.Infrastructure.Migrations
                         principalColumn: "Id");
                 },
                 comment: "Editable DNA model holding references to two strand snapshots (double-helix).");
+
+            migrationBuilder.CreateTable(
+                name: "Reference_Sequences",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, comment: "Primary key (GUID)."),
+                    Species = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false, comment: "Species/organism label (e.g., Human, Mouse)."),
+                    Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false, comment: "Human-friendly name (e.g., Beta-globin fragment)."),
+                    Sequence = table.Column<string>(type: "nvarchar(max)", maxLength: 10000, nullable: false, comment: "Raw uppercase DNA string (A,C,G,T only)."),
+                    CreatedByUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false, comment: "Creator user id (Scientist who submitted it)."),
+                    IsApproved = table.Column<bool>(type: "bit", nullable: false, comment: "Approved flag. If true -> visible to the whole app."),
+                    IsRejected = table.Column<bool>(type: "bit", nullable: false, comment: "Rejected flag."),
+                    RejectionReason = table.Column<string>(type: "nvarchar(max)", nullable: true, comment: "Optional rejection reason (shown to the scientist)."),
+                    ApprovedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true, comment: "When approved (UTC)."),
+                    RejectedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true, comment: "When rejected (UTC)."),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false, comment: "When created (UTC)."),
+                    UpdatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true, comment: "When edited while pending (UTC).")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Reference_Sequences", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Reference_Sequences_AspNetUsers_CreatedByUserId",
+                        column: x => x.CreatedByUserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                },
+                comment: "Reference DNA sequence template submission/approved item.");
 
             migrationBuilder.CreateTable(
                 name: "RoleRequests",
@@ -408,19 +421,6 @@ namespace GenomiX.Infrastructure.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "Reference_Sequences",
-                columns: new[] { "Id", "CreatedAt", "Name", "Sequence", "Species" },
-                values: new object[,]
-                {
-                    { new Guid("11111111-0000-0000-0000-000000000001"), new DateTimeOffset(new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "BRCA1 fragment", "ATGGAAGAGCTGTCAGGAGAGCTGCCAGCTGGTGAGGAAGCAGTGAGCCTGAGCAAGAGCTGAG", "Homo sapiens" },
-                    { new Guid("11111111-0000-0000-0000-000000000002"), new DateTimeOffset(new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "BRCA1 fragment (complement)", "CTCAGCTCTTGCTCAGGCTCACTGCTTCCTCACCAGCTGGCAGCTCTCCTGACAGCTCTTCCAT", "Homo sapiens" },
-                    { new Guid("22222222-0000-0000-0000-000000000001"), new DateTimeOffset(new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "TP53 fragment", "ATGGTCAGGACCTGGAGAAGGAGCTGAGGCTGGATGAAGTCAAGAGTGTCAAGCGAGCTGAGG", "Mus musculus" },
-                    { new Guid("22222222-0000-0000-0000-000000000002"), new DateTimeOffset(new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "TP53 fragment (complement)", "CCTCAGCTCGCTTGACACTCTTGACTTCATCCAGCCTCAGCTCCTTCTCCAGGTCCTGACCAG", "Mus musculus" },
-                    { new Guid("33333333-0000-0000-0000-000000000001"), new DateTimeOffset(new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "COX1 mitochondrial fragment", "ATGGAAGAGGAGCTGCTGAGGAGCTGGTGAGGAAGCAGTGAGCCTGAGCAAGAGCTGAGCTA", "Canis lupus familiaris" },
-                    { new Guid("33333333-0000-0000-0000-000000000002"), new DateTimeOffset(new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "COX1 mitochondrial fragment (complement)", "TAGCTCAGCTCTTGCTCAGGCTCACTGCTTCCTCACCAGCTCCTCAGCAGCTCCTCTTCCAT", "Canis lupus familiaris" }
-                });
-
-            migrationBuilder.InsertData(
                 table: "AspNetUserRoles",
                 columns: new[] { "RoleId", "UserId" },
                 values: new object[,]
@@ -440,6 +440,19 @@ namespace GenomiX.Infrastructure.Migrations
                     { new Guid("44444444-0000-0000-0000-000000000002"), new DateTimeOffset(new DateTime(2024, 7, 20, 9, 30, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "Untitled model", new DateTimeOffset(new DateTime(2024, 7, 20, 9, 30, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("9d5e0ac1-4f1b-422b-b7f0-0f7d5d2dbbb1") },
                     { new Guid("44444444-0000-0000-0000-000000000003"), new DateTimeOffset(new DateTime(2024, 8, 25, 10, 45, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "Untitled model", new DateTimeOffset(new DateTime(2024, 8, 25, 10, 45, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("58a7c2b5-1347-4f0a-b3ad-912d4f098aaa") },
                     { new Guid("44444444-0000-0000-0000-000000000005"), new DateTimeOffset(new DateTime(2024, 9, 10, 11, 20, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "Untitled model", new DateTimeOffset(new DateTime(2024, 9, 10, 11, 20, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("c2b3d8ae-2b6d-4c41-9b8e-b1c2a3d4e005") }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Reference_Sequences",
+                columns: new[] { "Id", "ApprovedAt", "CreatedAt", "CreatedByUserId", "IsApproved", "IsRejected", "Name", "RejectedAt", "RejectionReason", "Sequence", "Species", "UpdatedAt" },
+                values: new object[,]
+                {
+                    { new Guid("11111111-0000-0000-0000-000000000001"), null, new DateTimeOffset(new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("c2b3d8ae-2b6d-4c41-9b8e-b1c2a3d4e005"), false, false, "BRCA1 fragment", null, null, "ATGGAAGAGCTGTCAGGAGAGCTGCCAGCTGGTGAGGAAGCAGTGAGCCTGAGCAAGAGCTGAG", "Homo sapiens", null },
+                    { new Guid("11111111-0000-0000-0000-000000000002"), null, new DateTimeOffset(new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("c2b3d8ae-2b6d-4c41-9b8e-b1c2a3d4e005"), false, false, "BRCA1 fragment (complement)", null, null, "CTCAGCTCTTGCTCAGGCTCACTGCTTCCTCACCAGCTGGCAGCTCTCCTGACAGCTCTTCCAT", "Homo sapiens", null },
+                    { new Guid("22222222-0000-0000-0000-000000000001"), null, new DateTimeOffset(new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("c2b3d8ae-2b6d-4c41-9b8e-b1c2a3d4e005"), false, false, "TP53 fragment", null, null, "ATGGTCAGGACCTGGAGAAGGAGCTGAGGCTGGATGAAGTCAAGAGTGTCAAGCGAGCTGAGG", "Mus musculus", null },
+                    { new Guid("22222222-0000-0000-0000-000000000002"), null, new DateTimeOffset(new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("c2b3d8ae-2b6d-4c41-9b8e-b1c2a3d4e005"), false, false, "TP53 fragment (complement)", null, null, "CCTCAGCTCGCTTGACACTCTTGACTTCATCCAGCCTCAGCTCCTTCTCCAGGTCCTGACCAG", "Mus musculus", null },
+                    { new Guid("33333333-0000-0000-0000-000000000001"), null, new DateTimeOffset(new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("c2b3d8ae-2b6d-4c41-9b8e-b1c2a3d4e005"), false, false, "COX1 mitochondrial fragment", null, null, "ATGGAAGAGGAGCTGCTGAGGAGCTGGTGAGGAAGCAGTGAGCCTGAGCAAGAGCTGAGCTA", "Canis lupus familiaris", null },
+                    { new Guid("33333333-0000-0000-0000-000000000002"), null, new DateTimeOffset(new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("c2b3d8ae-2b6d-4c41-9b8e-b1c2a3d4e005"), false, false, "COX1 mitochondrial fragment (complement)", null, null, "TAGCTCAGCTCTTGCTCAGGCTCACTGCTTCCTCACCAGCTCCTCAGCAGCTCCTCTTCCAT", "Canis lupus familiaris", null }
                 });
 
             migrationBuilder.InsertData(
@@ -573,6 +586,11 @@ namespace GenomiX.Infrastructure.Migrations
                 name: "IX_Populations_UserId",
                 table: "Populations",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Reference_Sequences_CreatedByUserId",
+                table: "Reference_Sequences",
+                column: "CreatedByUserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_RoleRequests_DecidedByUserId",

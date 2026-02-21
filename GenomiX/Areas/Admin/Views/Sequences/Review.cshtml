@@ -1,0 +1,101 @@
+﻿@model ReviewReferenceSequenceViewModel
+
+@{
+    ViewData["Title"] = "Review Sequence";
+}
+
+<div class="gx-admin-page">
+    <div class="gx-admin-head">
+        <div>
+            <h1 class="gx-admin-title">Review submission</h1>
+            <div class="gx-admin-sub">Approve to publish it to the app, or reject with a reason.</div>
+        </div>
+
+        <div class="gx-admin-actions">
+            <a class="gx-admin-btn" href="/admin/sequences">Back</a>
+        </div>
+    </div>
+
+    <div class="gx-admin-card">
+        <div class="gx-admin-kv">
+            <div class="gx-admin-kv__item">
+                <div class="gx-admin-kv__k">Species</div>
+                <div class="gx-admin-kv__v">@Model.Species</div>
+            </div>
+            <div class="gx-admin-kv__item">
+                <div class="gx-admin-kv__k">Name</div>
+                <div class="gx-admin-kv__v">@Model.Name</div>
+            </div>
+            <div class="gx-admin-kv__item">
+                <div class="gx-admin-kv__k">Length</div>
+                <div class="gx-admin-kv__v">@Model.Length</div>
+            </div>
+            <div class="gx-admin-kv__item">
+                <div class="gx-admin-kv__k">Created On</div>
+                <div class="gx-admin-kv__v gx-admin-muted">@Model.CreatedAt</div>
+            </div>
+            <div class="gx-admin-kv__item">
+                <div class="gx-admin-kv__k">Created By</div>
+                <div class="gx-admin-kv__v gx-admin-muted">@Model.CreatedBy</div>
+            </div>
+        </div>
+
+        <div class="gx-admin-seq">
+            <div class="gx-admin-seq__hd">
+                <div class="gx-admin-seq__title">Sequence</div>
+                <div class="gx-admin-seq__meta">A/C/G/T</div>
+            </div>
+            <pre class="gx-admin-seq__box">@Model.Sequence</pre>
+        </div>
+
+        <div class="gx-admin-reviewbar">
+            @if (Model.IsApproved)
+            {
+                <div class="gx-admin-pill gx-admin-pill--ok">Approved</div>
+            }
+            else if (Model.IsRejected)
+            {
+                <div class="gx-admin-pill gx-admin-pill--bad">Rejected</div>
+                @if (!string.IsNullOrWhiteSpace(Model.RejectionReason))
+                {
+                    <div class="gx-admin-note">Reason: @Model.RejectionReason</div>
+                }
+            }
+            else
+            {
+                <div class="gx-admin-pill gx-admin-pill--mid">Pending</div>
+            }
+        </div>
+
+        @if (!Model.IsApproved)
+        {
+            <div class="gx-admin-split">
+                <form method="post" action="/admin/sequences/approve/@Model.Id" class="gx-admin-box">
+                    @Html.AntiForgeryToken()
+                    <div class="gx-admin-box__title">Approve</div>
+                    <div class="gx-admin-box__text">This will make the sequence available in the app.</div>
+                    <button type="submit" class="gx-admin-btn gx-admin-btn--ok"
+                            onclick="return confirm('Approve this sequence?');">
+                        Approve
+                    </button>
+                </form>
+
+                <form method="post" action="/admin/sequences/reject" class="gx-admin-box">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="Id" value="@Model.Id" />
+
+                    <div class="gx-admin-box__title">Reject</div>
+                    <div class="gx-admin-box__text">Scientist will see the reason and can edit/resubmit.</div>
+
+                    <label class="gx-admin-label" for="Reason">Reason</label>
+                    <textarea class="gx-admin-textarea" id="Reason" name="Reason" rows="3" maxlength="400"></textarea>
+
+                    <button type="submit" class="gx-admin-btn gx-admin-btn--danger"
+                            onclick="return confirm('Reject this sequence?');">
+                        Reject
+                    </button>
+                </form>
+            </div>
+        }
+    </div>
+</div>

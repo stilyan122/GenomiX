@@ -1,7 +1,5 @@
-using Genomix.Common.Extensions;
 using Microsoft.EntityFrameworkCore;
-using GenomiX.Infrastructure;
-using Microsoft.AspNetCore.Identity;
+using GenomiX.Common.Extensions;
 
 namespace GenomiX
 {
@@ -12,7 +10,7 @@ namespace GenomiX
             var builder = WebApplication.CreateBuilder(args);
 
             var connectionString = builder.Configuration
-                .GetConnectionString("ApplicationDbContextConnection") ?? 
+                .GetConnectionString("DefaultConnection") ?? 
                 throw new InvalidOperationException("Connection string not found.");
 
             builder.Services
@@ -45,10 +43,7 @@ namespace GenomiX
 
             app.MapStaticAssets();
 
-            app.MapControllerRoute(
-                name: "default",
-                pattern: "{controller=Home}/{action=Index}/{id?}")
-                .WithStaticAssets();
+            app.MapAppRoutes();
 
             app.MapRazorPages()
                .WithStaticAssets();

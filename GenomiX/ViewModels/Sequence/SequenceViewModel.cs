@@ -10,5 +10,8 @@
 
         /// <summary> Species or organism identifier (examples: Human, Mouse, Dog). </summary>
         public string Species { get; set; } = "";
+
+        /// <summary> Name of creator. </summary>
+        public string CreatedBy { get; set; } = "-";
     }
 }
