@@ -209,7 +209,6 @@ function mountBasePairPreview3D(hostEl, { b1, b2, hb, baseHex, ELEM }) {
     if (!hostEl) return null;
 
     let paused = false;
-
     function pause() { paused = true; }
     function resume() { paused = false; }
 
@@ -224,6 +223,7 @@ function mountBasePairPreview3D(hostEl, { b1, b2, hb, baseHex, ELEM }) {
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.12;
     hostEl.appendChild(renderer.domElement);
+    createLegendOverlay(hostEl, { baseHex, enableDetail: true, elem: ELEM });
 
     const camera = new THREE.PerspectiveCamera(45, 1, 0.01, 2000);
     const controls = new OrbitControls(camera, renderer.domElement);
@@ -246,19 +246,27 @@ function mountBasePairPreview3D(hostEl, { b1, b2, hb, baseHex, ELEM }) {
         metalness: 0.0,
         roughness: 0.90,
         transparent: true,
-        opacity: 0.55
+        opacity: 0.65
+    });
+
+    const bondDarkMat = new THREE.MeshStandardMaterial({
+        color: 0x8ea0c8,
+        metalness: 0.0,
+        roughness: 0.92,
+        transparent: true,
+        opacity: 0.82
     });
 
     const hBondMat = new THREE.MeshStandardMaterial({
-        color: 0xffffff,
+        color: 0xff4b4b,
         transparent: true,
-        opacity: 0.55,
+        opacity: 0.85,
         roughness: 0.95,
         metalness: 0.0
     });
 
-    const leftC = new THREE.Vector3(-0.72, 0, 0);
-    const rightC = new THREE.Vector3(+0.72, 0, 0);
+    const leftC = new THREE.Vector3(-0.85, 0, 0);
+    const rightC = new THREE.Vector3(+0.85, 0, 0);
 
     const basisX_L = new THREE.Vector3(0, 1, 0);
     const basisY_L = new THREE.Vector3(0, 0, 1);
@@ -266,50 +274,11 @@ function mountBasePairPreview3D(hostEl, { b1, b2, hb, baseHex, ELEM }) {
     const basisX_R = new THREE.Vector3(0, -1, 0);
     const basisY_R = new THREE.Vector3(0, 0, 1);
 
-    const baseL = buildBaseRing(b1, leftC, basisX_L, basisY_L, 0.34);
-    const baseR = buildBaseRing(b2, rightC, basisX_R, basisY_R, 0.34);
-
-    function stubBackbone(sideCenter, dir, flip = 1) {
-        const sugar = sideCenter.clone().addScaledVector(dir, 0.55);
-        const phos = sideCenter.clone().addScaledVector(dir, 0.95).add(new THREE.Vector3(0, 0.18 * flip, 0));
-
-        const s = atomMesh("C"); s.position.copy(sugar); group.add(s);
-
-        const p = atomMesh("P"); p.position.copy(phos); group.add(p);
-        const o1 = atomMesh("O"); o1.position.copy(phos.clone().add(new THREE.Vector3(0.14, 0.08, 0))); group.add(o1);
-        const o2 = atomMesh("O"); o2.position.copy(phos.clone().add(new THREE.Vector3(-0.10, -0.12, 0))); group.add(o2);
-
-        group.add(cylinderBetween(sideCenter, sugar, 0.012, bondMat));
-        group.add(cylinderBetween(sugar, phos, 0.012, bondMat));
-    }
-
-    stubBackbone(leftC, new THREE.Vector3(-1, 0, 0), 1);
-    stubBackbone(rightC, new THREE.Vector3(1, 0, 0), -1);
-
-    function basePlate(center, colorHex, isPurine) {
-        const plateGeom = new THREE.CylinderGeometry(isPurine ? 0.48 : 0.42, isPurine ? 0.48 : 0.42, 0.08, 42);
-        const plateMat = new THREE.MeshStandardMaterial({
-            color: colorHex ?? 0xffffff,
-            metalness: 0.05,
-            roughness: 0.35,
-            transparent: true,
-            opacity: 0.22,
-            emissive: colorHex ?? 0xffffff,
-            emissiveIntensity: 0.12,
-        });
-        const plate = new THREE.Mesh(plateGeom, plateMat);
-        plate.position.copy(center);
-        plate.rotation.z = Math.PI / 2;
-        return plate;
-    }
-
-    const isPurine = (x) => x === "A" || x === "G";
-    group.add(basePlate(leftC, baseHex[b1], isPurine(b1)));
-    group.add(basePlate(rightC, baseHex[b2], isPurine(b2)));
+    if (!bondGeometry) bondGeometry = new THREE.CylinderGeometry(1, 1, 1, 10);
 
     function atomMesh(el) {
-        const r = (ELEM?.[el]?.r ?? 0.09) * 1.25;
-        const g = new THREE.SphereGeometry(r, 16, 16);
+        const r = (ELEM?.[el]?.r ?? 0.09) * 1.15;
+        const g = new THREE.SphereGeometry(r, 18, 18);
         const m = new THREE.MeshStandardMaterial({
             color: ELEM?.[el]?.color ?? 0xffffff,
             metalness: 0.08,
@@ -318,35 +287,94 @@ function mountBasePairPreview3D(hostEl, { b1, b2, hb, baseHex, ELEM }) {
         return new THREE.Mesh(g, m);
     }
 
-    function addAtomsFromBase(base) {
-        for (const at of base.atoms) {
+    function addBond(a, b, radius, mat) {
+        group.add(cylinderBetween(a, b, radius, mat));
+    }
+
+    function addDoubleBond(a, b, radius, mat, off = 0.02) {
+        const dir = new THREE.Vector3().subVectors(b, a);
+        const len = dir.length() || 1;
+        const u = dir.clone().multiplyScalar(1 / len);
+        const n = new THREE.Vector3().crossVectors(u, new THREE.Vector3(1, 0, 0));
+        if (n.lengthSq() < 1e-6) n.crossVectors(u, new THREE.Vector3(0, 1, 0));
+        n.normalize().multiplyScalar(off);
+
+        addBond(a.clone().add(n), b.clone().add(n), radius, mat);
+        addBond(a.clone().sub(n), b.clone().sub(n), radius, mat);
+    }
+
+    function makeBase(letter, center, bx, by, mirror = 1, scale = 0.33) {
+        const t = baseTemplate(letter);
+        const atoms = t.atoms.map(a => {
+            const p = center.clone()
+                .add(bx.clone().multiplyScalar(a.x * scale * mirror))
+                .add(by.clone().multiplyScalar(a.y * scale));
+            return { elem: a.e, pos: p };
+        });
+
+        const meshes = atoms.map(at => {
             const m = atomMesh(at.elem);
             m.position.copy(at.pos);
             group.add(m);
+            return m;
+        });
+
+        for (const bd of t.bonds) {
+            const a = atoms[bd[0]].pos;
+            const b = atoms[bd[1]].pos;
+            const order = bd[2] ?? 1;
+            const rad = 0.014;
+            if (order === 2) addDoubleBond(a, b, rad, bondDarkMat, 0.018);
+            else addBond(a, b, rad, bondMat);
         }
-    }
-    addAtomsFromBase(baseL);
-    addAtomsFromBase(baseR);
 
-    for (let i = 0; i < 6; i++) {
-        const a0 = baseL.ring[i];
-        const a1 = baseL.ring[(i + 1) % 6];
-        group.add(cylinderBetween(a0, a1, 0.014, bondMat));
+        const anchors = {};
+        for (const k of Object.keys(t.anchors || {})) {
+            const idx = t.anchors[k];
+            anchors[k] = atoms[idx]?.pos?.clone?.() ?? null;
+        }
 
-        const b0 = baseR.ring[i];
-        const b1p = baseR.ring[(i + 1) % 6];
-        group.add(cylinderBetween(b0, b1p, 0.014, bondMat));
+        return { atoms, meshes, anchors };
     }
 
-    const aPts = [baseL.ring[2], baseL.ring[4], baseL.ring[0]];
-    const bPts = [baseR.ring[2], baseR.ring[4], baseR.ring[0]];
-    const dashes = 4;
+    function stubBackbone(sideCenter, dir, flip = 1) {
+        const sugar = sideCenter.clone().addScaledVector(dir, 0.62);
+        const phos = sideCenter.clone().addScaledVector(dir, 1.05).add(new THREE.Vector3(0, 0.20 * flip, 0));
 
-    for (let k = 0; k < hb; k++) {
-        group.add(dashedBond(aPts[k], bPts[k], 0.010, hBondMat, dashes));
+        const s = atomMesh("C"); s.position.copy(sugar); group.add(s);
+
+        const p = atomMesh("P"); p.position.copy(phos); group.add(p);
+        const o1 = atomMesh("O"); o1.position.copy(phos.clone().add(new THREE.Vector3(0.16, 0.10, 0))); group.add(o1);
+        const o2 = atomMesh("O"); o2.position.copy(phos.clone().add(new THREE.Vector3(-0.12, -0.14, 0))); group.add(o2);
+        const o3 = atomMesh("O"); o3.position.copy(phos.clone().add(new THREE.Vector3(-0.10, 0.14, 0.10))); group.add(o3);
+
+        addBond(sideCenter, sugar, 0.014, bondMat);
+        addBond(sugar, phos, 0.014, bondMat);
+        addBond(phos, o1.position, 0.012, bondDarkMat);
+        addBond(phos, o2.position, 0.012, bondDarkMat);
+        addBond(phos, o3.position, 0.012, bondDarkMat);
+
+        return { sugar, phos };
     }
 
-    frameObject(camera, group, controls, 1.55);
+    const backL = stubBackbone(leftC, new THREE.Vector3(-1, 0, 0), 1);
+    const backR = stubBackbone(rightC, new THREE.Vector3(1, 0, 0), -1);
+
+    const baseL = makeBase(b1, leftC, basisX_L, basisY_L, 1, 0.34);
+    const baseR = makeBase(b2, rightC, basisX_R, basisY_R, 1, 0.34);
+
+    addBond(backL.sugar, baseL.anchors.attach, 0.014, bondMat);
+    addBond(backR.sugar, baseR.anchors.attach, 0.014, bondMat);
+
+    const hbPairs = hbondPairs(b1, b2);
+    for (const p of hbPairs) {
+        const a = baseL.anchors[p[0]];
+        const b = baseR.anchors[p[1]];
+        if (!a || !b) continue;
+        group.add(dashedBond(a, b, 0.010, hBondMat, 6));
+    }
+
+    frameObject(camera, group, controls, 1.65);
     controls.minDistance = 0.35;
     controls.maxDistance = 20;
     controls.update();
@@ -358,13 +386,13 @@ function mountBasePairPreview3D(hostEl, { b1, b2, hb, baseHex, ELEM }) {
         camera.aspect = w / h;
         camera.updateProjectionMatrix();
     }
+
     resize();
     const ro = new ResizeObserver(resize);
     ro.observe(hostEl);
 
     let raf = 0;
     let running = true;
-
     const spin = { t: 0 };
 
     const loop = () => {
@@ -403,6 +431,128 @@ function mountBasePairPreview3D(hostEl, { b1, b2, hb, baseHex, ELEM }) {
     }
 
     return { dispose, resize, pause, resume };
+}
+
+function baseTemplate(letter) {
+    const A = {
+        atoms: [
+            { e: "N", x: -1.05, y: 0.75 },
+            { e: "C", x: -0.55, y: 1.10 },
+            { e: "N", x: 0.05, y: 0.95 },
+            { e: "C", x: 0.55, y: 0.55 },
+            { e: "C", x: 0.45, y: -0.05 },
+            { e: "N", x: -0.05, y: -0.35 },
+            { e: "C", x: -0.65, y: -0.05 },
+            { e: "C", x: -0.95, y: 0.35 },
+            { e: "N", x: 0.95, y: 0.85 },
+            { e: "H", x: 1.35, y: 1.05 },
+            { e: "H", x: 1.35, y: 0.65 },
+            { e: "H", x: -1.25, y: 0.95 },
+            { e: "N", x: 0.10, y: -0.95 },
+            { e: "H", x: 0.10, y: -1.35 },
+            { e: "H", x: -0.35, y: -1.10 }
+        ],
+        bonds: [
+            [0, 1, 1], [1, 2, 2], [2, 3, 1], [3, 4, 2], [4, 5, 1], [5, 6, 2], [6, 7, 1], [7, 0, 2],
+            [2, 8, 1], [8, 9, 1], [8, 10, 1], [0, 11, 1],
+            [5, 12, 1], [12, 13, 1], [12, 14, 1]
+        ],
+        anchors: { attach: 6, hb1: 8, hb2: 2 }
+    };
+
+    const T = {
+        atoms: [
+            { e: "N", x: -0.95, y: 0.75 },
+            { e: "C", x: -0.35, y: 1.05 },
+            { e: "O", x: 0.10, y: 1.45 },
+            { e: "C", x: 0.35, y: 0.55 },
+            { e: "C", x: 0.25, y: -0.10 },
+            { e: "O", x: -0.20, y: -0.55 },
+            { e: "N", x: -0.75, y: -0.25 },
+            { e: "H", x: -0.95, y: -0.65 },
+            { e: "C", x: 0.95, y: 0.85 },
+            { e: "H", x: 1.35, y: 1.05 },
+            { e: "H", x: 1.35, y: 0.65 },
+            { e: "H", x: 0.95, y: 1.25 }
+        ],
+        bonds: [
+            [0, 1, 1], [1, 3, 2], [3, 4, 1], [4, 6, 2], [6, 0, 1],
+            [1, 2, 2], [4, 5, 2], [6, 7, 1],
+            [3, 8, 1], [8, 9, 1], [8, 10, 1], [8, 11, 1]
+        ],
+        anchors: { attach: 0, hb1: 2, hb2: 7 }
+    };
+
+    const G = {
+        atoms: [
+            { e: "N", x: -1.05, y: 0.75 },
+            { e: "C", x: -0.55, y: 1.10 },
+            { e: "N", x: 0.05, y: 0.95 },
+            { e: "C", x: 0.55, y: 0.55 },
+            { e: "O", x: 0.95, y: 0.25 },
+            { e: "C", x: 0.45, y: -0.05 },
+            { e: "N", x: -0.05, y: -0.35 },
+            { e: "C", x: -0.65, y: -0.05 },
+            { e: "C", x: -0.95, y: 0.35 },
+            { e: "N", x: 0.10, y: -0.95 },
+            { e: "H", x: 0.10, y: -1.35 },
+            { e: "N", x: 1.05, y: 0.95 },
+            { e: "H", x: 1.45, y: 1.10 },
+            { e: "H", x: 1.45, y: 0.80 },
+            { e: "H", x: -1.25, y: 0.95 }
+        ],
+        bonds: [
+            [0, 1, 1], [1, 2, 2], [2, 3, 1], [3, 5, 2], [5, 6, 1], [6, 7, 2], [7, 8, 1], [8, 0, 2],
+            [3, 4, 2], [2, 11, 1], [11, 12, 1], [11, 13, 1], [6, 9, 1], [9, 10, 1], [0, 14, 1]
+        ],
+        anchors: { attach: 7, hb1: 4, hb2: 11, hb3: 10 }
+    };
+
+    const C = {
+        atoms: [
+            { e: "N", x: -0.95, y: 0.75 },
+            { e: "C", x: -0.35, y: 1.05 },
+            { e: "N", x: 0.25, y: 0.85 },
+            { e: "C", x: 0.35, y: 0.25 },
+            { e: "C", x: 0.10, y: -0.30 },
+            { e: "O", x: -0.25, y: -0.75 },
+            { e: "C", x: -0.70, y: -0.20 },
+            { e: "N", x: 0.85, y: 1.05 },
+            { e: "H", x: 1.25, y: 1.20 },
+            { e: "H", x: 1.25, y: 0.85 },
+            { e: "H", x: -1.15, y: 0.95 }
+        ],
+        bonds: [
+            [0, 1, 1], [1, 2, 2], [2, 3, 1], [3, 4, 2], [4, 6, 1], [6, 0, 2],
+            [4, 5, 2], [2, 7, 1], [7, 8, 1], [7, 9, 1], [0, 10, 1]
+        ],
+        anchors: { attach: 6, hb1: 10, hb2: 2, hb3: 5 }
+    };
+
+    if (letter === "A") return A;
+    if (letter === "T") return T;
+    if (letter === "G") return G;
+    return C;
+}
+
+function hbondPairs(L, R) {
+    const canonical =
+        (L === "A" && R === "T") || (L === "T" && R === "A") ||
+        (L === "G" && R === "C") || (L === "C" && R === "G");
+
+    if (!canonical) return [];
+
+    if ((L === "A" && R === "T") || (L === "T" && R === "A")) {
+        if (L === "A") return [["hb1", "hb1"], ["hb2", "hb2"]];
+        return [["hb1", "hb1"], ["hb2", "hb2"]];
+    }
+
+    if ((L === "G" && R === "C") || (L === "C" && R === "G")) {
+        if (L === "G") return [["hb1", "hb1"], ["hb2", "hb2"], ["hb3", "hb3"]];
+        return [["hb1", "hb1"], ["hb2", "hb2"], ["hb3", "hb3"]];
+    }
+
+    return [];
 }
 
 function cylinderBetween(a, b, radius, material) {
