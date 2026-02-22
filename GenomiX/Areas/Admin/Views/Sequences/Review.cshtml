@@ -7,27 +7,27 @@
 <div class="gx-admin-page">
     <div class="gx-admin-head">
         <div>
-            <h1 class="gx-admin-title">Review submission</h1>
-            <div class="gx-admin-sub">Approve to publish it to the app, or reject with a reason.</div>
+            <h1 class="gx-admin-title"><span data-i18n="AdminReview_Title">Review submission</span></h1>
+            <div class="gx-admin-sub"><span data-i18n="AdminReview_Subtitle">Approve to publish it to the app, or reject with a reason.</span></div>
         </div>
 
         <div class="gx-admin-actions">
-            <a class="gx-admin-btn" href="/admin/sequences">Back</a>
+            <a class="gx-admin-btn" href="/admin/sequences"><span data-i18n="Common_Back">Back</span></a>
         </div>
     </div>
 
     <div class="gx-admin-card">
         <div class="gx-admin-kv">
             <div class="gx-admin-kv__item">
-                <div class="gx-admin-kv__k">Species</div>
+                <div class="gx-admin-kv__k"><span data-i18n="Admin_KV_Species">Species</span></div>
                 <div class="gx-admin-kv__v">@Model.Species</div>
             </div>
             <div class="gx-admin-kv__item">
-                <div class="gx-admin-kv__k">Name</div>
+                <div class="gx-admin-kv__k"><span data-i18n="Admin_KV_Name">Name</span></div>
                 <div class="gx-admin-kv__v">@Model.Name</div>
             </div>
             <div class="gx-admin-kv__item">
-                <div class="gx-admin-kv__k">Length</div>
+                <div class="gx-admin-kv__k"><span data-i18n="Admin_KV_Length">Length</span></div>
                 <div class="gx-admin-kv__v">@Model.Length</div>
             </div>
             <div class="gx-admin-kv__item">
@@ -51,19 +51,19 @@
         <div class="gx-admin-reviewbar">
             @if (Model.IsApproved)
             {
-                <div class="gx-admin-pill gx-admin-pill--ok">Approved</div>
+                <div class="gx-admin-pill gx-admin-pill--ok"><span data-i18n="Admin_Status_Approved">Approved</span></div>
             }
             else if (Model.IsRejected)
             {
-                <div class="gx-admin-pill gx-admin-pill--bad">Rejected</div>
+                <div class="gx-admin-pill gx-admin-pill--bad"><span data-i18n="Admin_Status_Rejected">Rejected</span></div>
                 @if (!string.IsNullOrWhiteSpace(Model.RejectionReason))
                 {
-                    <div class="gx-admin-note">Reason: @Model.RejectionReason</div>
+                    <div class="gx-admin-note"><span data-i18n="AdminReview_ReasonLabel">Reason:</span> @Model.RejectionReason</div>
                 }
             }
             else
             {
-                <div class="gx-admin-pill gx-admin-pill--mid">Pending</div>
+                <div class="gx-admin-pill gx-admin-pill--mid"><span data-i18n="Admin_Status_Pending">Pending</span></div>
             }
         </div>
 
@@ -72,8 +72,8 @@
             <div class="gx-admin-split">
                 <form method="post" action="/admin/sequences/approve/@Model.Id" class="gx-admin-box">
                     @Html.AntiForgeryToken()
-                    <div class="gx-admin-box__title">Approve</div>
-                    <div class="gx-admin-box__text">This will make the sequence available in the app.</div>
+                    <div class="gx-admin-box__title"><span data-i18n="AdminReview_ApproveTitle">Approve</span></div>
+                    <div class="gx-admin-box__text"><span data-i18n="AdminReview_ApproveText">This will make the sequence available in the app.</span></div>
                     <button type="submit" class="gx-admin-btn gx-admin-btn--ok"
                             onclick="return confirm('Approve this sequence?');">
                         Approve
@@ -84,10 +84,10 @@
                     @Html.AntiForgeryToken()
                     <input type="hidden" name="Id" value="@Model.Id" />
 
-                    <div class="gx-admin-box__title">Reject</div>
-                    <div class="gx-admin-box__text">Scientist will see the reason and can edit/resubmit.</div>
+                    <div class="gx-admin-box__title"><span data-i18n="AdminReview_RejectTitle">Reject</span></div>
+                    <div class="gx-admin-box__text"><span data-i18n="AdminReview_RejectText">Scientist will see the reason and can edit/resubmit.</span></div>
 
-                    <label class="gx-admin-label" for="Reason">Reason</label>
+                    <label class="gx-admin-label" for="Reason"><span data-i18n="AdminReview_ReasonLabelShort">Reason</span></label>
                     <textarea class="gx-admin-textarea" id="Reason" name="Reason" rows="3" maxlength="400"></textarea>
 
                     <button type="submit" class="gx-admin-btn gx-admin-btn--danger"
@@ -99,3 +99,7 @@
         }
     </div>
 </div>
+
+@section Scripts {
+    <script src="~/js/admin-i18n.js" asp-append-version="true"></script>
+}

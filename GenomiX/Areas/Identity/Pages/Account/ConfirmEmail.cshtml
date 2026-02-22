@@ -1,4 +1,4 @@
-﻿@page
+@page
 @model ConfirmEmailModel
 @{
     ViewData["Title"] = "Email confirmed";
@@ -6,7 +6,7 @@
 
 <div class="auth-wrap">
     <div class="auth-card">
-        <h1 class="auth-title">Email confirmed ✅</h1>
+        <h1 class="auth-title"><span data-i18n="Confirm_Title">Email confirmed ✅</span></h1>
 
         @if (Model.StatusMessage != null)
         {
@@ -14,11 +14,14 @@
         }
         else
         {
-            <p class="auth-sub">Your email is confirmed. You can sign in now.</p>
+            <p class="auth-sub"><span data-i18n="Confirm_Sub">Your email is confirmed. You can sign in now.</span></p>
         }
 
         <div class="auth-foot">
-            <a class="auth-link" asp-page="./Login">Go to sign in</a>
+            <a class="auth-link" asp-page="./Login"><span data-i18n="Confirm_GoLogin">Go to sign in</span></a>
         </div>
     </div>
 </div>
+
+
+<script src="~/js/identity-i18n.js" asp-append-version="true"></script>

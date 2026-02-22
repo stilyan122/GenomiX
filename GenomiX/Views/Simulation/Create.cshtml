@@ -1,7 +1,8 @@
 ﻿@model CreatePopulationViewModel
+@inject Microsoft.AspNetCore.Mvc.Localization.IViewLocalizer L
 
 @{
-    ViewData["Title"] = "Create simulation";
+    ViewData["Title"] = L["SimCreate_PageTitle"];
     ViewData["ActiveNav"] = "simulations";
 }
 
@@ -9,13 +10,13 @@
     <div class="container container--wide gx-sim">
         <header class="gx-sim__header gx-sim__header--index">
             <div class="gx-sim__head-left">
-                <div class="gx-sim__kicker">Simulations</div>
-                <h1 class="gx-sim__title">Create population</h1>
-                <p class="gx-sim__subtitle">Pick a base DNA model, set size, and start a live evolution run.</p>
+                <div class="gx-sim__kicker">@L["SimCreate_Kicker_Simulations"]</div>
+                <h1 class="gx-sim__title">@L["SimCreate_Title"]</h1>
+                <p class="gx-sim__subtitle">@L["SimCreate_Subtitle"]</p>
             </div>
 
             <div class="gx-sim__head-right gx-sim__head-right--index">
-                <a class="gx-btn gx-btn--ghost" href="/simulations">Back</a>
+                <a class="gx-btn gx-btn--ghost" href="/simulations">@L["Common_Back"]</a>
             </div>
         </header>
 
@@ -27,28 +28,28 @@
 
                 <div class="gx-simform__grid">
                     <div class="gx-field">
-                        <label class="gx-label" asp-for="Name">Simulation name</label>
-                        <input class="gx-input" asp-for="Name" placeholder="e.g. Arctic radiation test" />
+                        <label class="gx-label" asp-for="Name">@L["SimCreate_SimulationName_Label"]</label>
+                        <input class="gx-input" asp-for="Name" placeholder="@L["SimCreate_SimulationName_Placeholder"]" />
                         <span class="gx-val" asp-validation-for="Name"></span>
                     </div>
 
                     <div class="gx-field">
-                        <label class="gx-label" for="Species">Organism type</label>
+                        <label class="gx-label" for="Species">@L["SimCreate_OrganismType_Label"]</label>
                         <select class="gx-select" id="Species" name="Species">
-                            <option value="mouse">🐭 Mouse</option>
-                            <option value="pig">🐷 Pig</option>
-                            <option value="cow">🐮 Cow</option>
-                            <option value="rabbit">🐰 Rabbit</option>
-                            <option value="fox">🦊 Fox</option>
-                            <option value="bird">🐦 Bird</option>
-                            <option value="mixed">🌍 Mixed ecosystem</option>
+                            <option value="mouse">@L["SimCreate_Species_Mouse"]</option>
+                            <option value="pig">@L["SimCreate_Species_Pig"]</option>
+                            <option value="cow">@L["SimCreate_Species_Cow"]</option>
+                            <option value="rabbit">@L["SimCreate_Species_Rabbit"]</option>
+                            <option value="fox">@L["SimCreate_Species_Fox"]</option>
+                            <option value="bird">@L["SimCreate_Species_Bird"]</option>
+                            <option value="mixed">@L["SimCreate_Species_Mixed"]</option>
                         </select>
                     </div>
 
                     <div class="gx-field">
-                        <label class="gx-label" for="BaseModelId">Base DNA model</label>
+                        <label class="gx-label" for="BaseModelId">@L["SimCreate_BaseModel_Label"]</label>
                         <select class="gx-select" name="BaseModelId" id="BaseModelId">
-                            <option value="">— choose model —</option>
+                            <option value="">@L["SimCreate_BaseModel_Placeholder"]</option>
                             @foreach (var m in (Model.Models ?? new List<CreatePopulationViewModel.ModelOption>()))
                             {
                                 <option value="@m.Id" selected="@(Model?.BaseModelId == m.Id)">
@@ -60,9 +61,9 @@
                     </div>
 
                     <div class="gx-field">
-                        <label class="gx-label" asp-for="Size">Population size</label>
+                        <label class="gx-label" asp-for="Size">@L["SimCreate_PopulationSize_Label"]</label>
                         <input class="gx-input" asp-for="Size" type="number" min="2" max="5000" step="1" />
-                        <div class="gx-help">2-5000 organisms (bigger = heavier)</div>
+                        <div class="gx-help">@L["SimCreate_PopulationSize_Help"]</div>
                         <span class="gx-val" asp-validation-for="Size"></span>
                     </div>
                 </div>
@@ -70,11 +71,11 @@
                 <div class="gx-divider"></div>
 
                 <div class="gx-simform__section">
-                    <div class="gx-simform__sectionTitle">Initial environment</div>
+                    <div class="gx-simform__sectionTitle">@L["SimCreate_InitialEnvironment_Title"]</div>
                     <div class="gx-simsliders">
                         <div class="gx-slider">
                             <div class="gx-slider__top">
-                                <label class="gx-label" asp-for="Temperature">Temperature</label>
+                                <label class="gx-label" asp-for="Temperature">@L["SimCreate_Temperature_Label"]</label>
                                 <div class="gx-chip mono"><span id="vTemp">@Model.Temperature</span>°C</div>
                             </div>
                             <input class="gx-range" asp-for="Temperature" type="range" min="-20" max="60" step="1" id="tempRange" />
@@ -82,7 +83,7 @@
 
                         <div class="gx-slider">
                             <div class="gx-slider__top">
-                                <label class="gx-label" asp-for="Radiation">Radiation</label>
+                                <label class="gx-label" asp-for="Radiation">@L["SimCreate_Radiation_Label"]</label>
                                 <div class="gx-chip mono" id="vRad">@Model.Radiation</div>
                             </div>
                             <input class="gx-range" asp-for="Radiation" type="range" min="0" max="1" step="0.01" id="radRange" />
@@ -90,7 +91,7 @@
 
                         <div class="gx-slider">
                             <div class="gx-slider__top">
-                                <label class="gx-label" asp-for="DiseasePressure">Disease pressure</label>
+                                <label class="gx-label" asp-for="DiseasePressure">@L["SimCreate_DiseasePressure_Label"]</label>
                                 <div class="gx-chip mono" id="vDis">@Model.DiseasePressure</div>
                             </div>
                             <input class="gx-range" asp-for="DiseasePressure" type="range" min="0" max="1" step="0.01" id="disRange" />
@@ -98,7 +99,7 @@
 
                         <div class="gx-slider">
                             <div class="gx-slider__top">
-                                <label class="gx-label" asp-for="Resources">Resources</label>
+                                <label class="gx-label" asp-for="Resources">@L["SimCreate_Resources_Label"]</label>
                                 <div class="gx-chip mono" id="vRes">@Model.Resources</div>
                             </div>
                             <input class="gx-range" asp-for="Resources" type="range" min="0" max="1" step="0.01" id="resRange" />
@@ -108,26 +109,26 @@
 
                 <div class="gx-simform__actions">
                     <button class="gx-btn gx-btn--primary gx-btn--lg" type="submit">
-                        Start simulation
+                        @L["SimCreate_StartSimulation_Button"]
                     </button>
-                    <div class="gx-muted">You can change the environment live after creation.</div>
+                    <div class="gx-muted">@L["SimCreate_LiveEnvironment_Note"]</div>
                 </div>
             </form>
 
             <aside class="gx-card gx-simside">
                 <div class="gx-simside__hd">
-                    <div class="gx-simside__kicker">Tip</div>
-                    <div class="gx-simside__title">How to choose options?</div>
+                    <div class="gx-simside__kicker">@L["SimCreate_Tip_Kicker"]</div>
+                    <div class="gx-simside__title">@L["SimCreate_Tip_Title"]</div>
                 </div>
 
                 <div class="gx-simside__body">
                     <ul class="gx-ul">
-                        <li><strong>High radiation</strong> + low resources → fast population collapse</li>
-                        <li><strong>Warm</strong> + high resources → rapid growth bursts</li>
-                        <li><strong>Disease pressure</strong> creates visible selection shifts</li>
+                        <li>@L["SimCreate_Tip_Line1"]</li>
+                        <li>@L["SimCreate_Tip_Line2"]</li>
+                        <li>@L["SimCreate_Tip_Line3"]</li>
                     </ul>
                     <div class="gx-note">
-                        Keep runs around 200-800 organisms for smooth live visuals.
+                        @L["SimCreate_Tip_Note"]
                     </div>
                 </div>
             </aside>

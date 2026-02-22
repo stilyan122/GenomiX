@@ -19,9 +19,7 @@ namespace GenomiX
                 .AddGenomixAppServices(builder.Configuration)
                 .AddAuthenticationServices(builder.Configuration);
 
-            builder.Services.AddRazorPages();
-           
-            builder.Services.AddControllersWithViews();
+            builder.Services.AddLocalizationServices();
 
             var app = builder.Build();
 
@@ -35,14 +33,15 @@ namespace GenomiX
                 app.UseHsts();
             }
 
+            app.Localize();
             app.UseHttpsRedirection();
             app.UseRouting();
-
+            app.UseStaticFiles();
             app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapStaticAssets();
-
+            app.MapRazorPages();
             app.MapAppRoutes();
 
             app.MapRazorPages()

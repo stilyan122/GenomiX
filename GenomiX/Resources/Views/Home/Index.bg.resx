@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="CTA_ExploreModules" xml:space="preserve">
+    <value>Разгледай модулите</value>
+  </data>
+  <data name="CTA_MySimulations" xml:space="preserve">
+    <value>Моите симулации</value>
+  </data>
+  <data name="CTA_OpenBuilder" xml:space="preserve">
+    <value>Отвори ДНК Конструктора</value>
+  </data>
+  <data name="CTA_OpenSimulations" xml:space="preserve">
+    <value>Отвори симулациите</value>
+  </data>
+  <data name="CTA_StartBuilder" xml:space="preserve">
+    <value>Стартирай ДНК Конструктора</value>
+  </data>
+  <data name="CTA_Sub" xml:space="preserve">
+    <value>Започни с ДНК Конструктора, после премини към симулациите. Ако си Scientist или Admin, използвай Lab и инструментите за модерация.</value>
+  </data>
+  <data name="CTA_Title" xml:space="preserve">
+    <value>Готов ли си за експерименти?</value>
+  </data>
+  <data name="Card_2D_A" xml:space="preserve">
+    <value>Виж ДНК →</value>
+  </data>
+  <data name="Card_2D_L1" xml:space="preserve">
+    <value>SVG визуализация на сдвояването</value>
+  </data>
+  <data name="Card_2D_L2" xml:space="preserve">
+    <value>Водородни връзки и индикации за mismatch</value>
+  </data>
+  <data name="Card_2D_L3" xml:space="preserve">
+    <value>Мигновена обратна връзка при мутация</value>
+  </data>
+  <data name="Card_2D_P" xml:space="preserve">
+    <value>Виж ясно базовото сдвояване, водородните връзки и несъответствията.</value>
+  </data>
+  <data name="Card_2D_T" xml:space="preserve">
+    <value>2D Комплементарен изглед</value>
+  </data>
+  <data name="Card_3D_A" xml:space="preserve">
+    <value>Отвори 3D →</value>
+  </data>
+  <data name="Card_3D_L1" xml:space="preserve">
+    <value>Атоми, връзки, гръбнак</value>
+  </data>
+  <data name="Card_3D_L2" xml:space="preserve">
+    <value>Пунктирани водородни връзки</value>
+  </data>
+  <data name="Card_3D_L3" xml:space="preserve">
+    <value>Динамично качество според дължината</value>
+  </data>
+  <data name="Card_3D_P" xml:space="preserve">
+    <value>Изследвай ДНК структурата в 3D с orbit контроли и мащабируем детайл.</value>
+  </data>
+  <data name="Card_3D_T" xml:space="preserve">
+    <value>3D Спирала (Three.js)</value>
+  </data>
+  <data name="Card_Builder_A" xml:space="preserve">
+    <value>Отвори конструктора →</value>
+  </data>
+  <data name="Card_Builder_L1" xml:space="preserve">
+    <value>Двуверижно редактиране (равна дължина, валидни бази)</value>
+  </data>
+  <data name="Card_Builder_L2" xml:space="preserve">
+    <value>Комплементарност, наложена на сървъра</value>
+  </data>
+  <data name="Card_Builder_L3" xml:space="preserve">
+    <value>Запази / преименувай / изтрий модели</value>
+  </data>
+  <data name="Card_Builder_P" xml:space="preserve">
+    <value>Създавай модели от шаблони или собствени последователности, а после мутирай безопасно.</value>
+  </data>
+  <data name="Card_Builder_T" xml:space="preserve">
+    <value>ДНК Конструктор</value>
+  </data>
+  <data name="Card_Lab_L1" xml:space="preserve">
+    <value>ReferenceSequence: species, name, sequence</value>
+  </data>
+  <data name="Card_Lab_L2" xml:space="preserve">
+    <value>Собственост чрез CreatedByUserId</value>
+  </data>
+  <data name="Card_Lab_L3" xml:space="preserve">
+    <value>Одобрение преди глобална видимост</value>
+  </data>
+  <data name="Card_Lab_P" xml:space="preserve">
+    <value>Учените създават референтни последователности; редактират се само собствените записи.</value>
+  </data>
+  <data name="Card_Lab_T" xml:space="preserve">
+    <value>Scientist Lab (Area)</value>
+  </data>
+  <data name="Card_Roles_L1" xml:space="preserve">
+    <value>Поток Потребител → Учен</value>
+  </data>
+  <data name="Card_Roles_L2" xml:space="preserve">
+    <value>Изчакваща / Одобрена / Отказана</value>
+  </data>
+  <data name="Card_Roles_L3" xml:space="preserve">
+    <value>Времеви печати на решенията</value>
+  </data>
+  <data name="Card_Roles_P" xml:space="preserve">
+    <value>Потребителите могат да заявяват промени по ролята Scientist с бележка и защита от дублиращи заявки.</value>
+  </data>
+  <data name="Card_Roles_T" xml:space="preserve">
+    <value>Роли и заявки</value>
+  </data>
+  <data name="Card_Sim_A" xml:space="preserve">
+    <value>Отвори симулации →</value>
+  </data>
+  <data name="Card_Sim_L1" xml:space="preserve">
+    <value>Tick-базирана симулация</value>
+  </data>
+  <data name="Card_Sim_L2" xml:space="preserve">
+    <value>Пауза/Продължи + контрол на скоростта</value>
+  </data>
+  <data name="Card_Sim_L3" xml:space="preserve">
+    <value>Организми + survival score</value>
+  </data>
+  <data name="Card_Sim_P" xml:space="preserve">
+    <value>Симулирай популации при температура, радиация, натиск от болести и ресурси.</value>
+  </data>
+  <data name="Card_Sim_T" xml:space="preserve">
+    <value>Симулационна лаборатория</value>
+  </data>
+  <data name="Glyph_S" xml:space="preserve">
+    <value>Конструктор • 2D/3D • Ремонт • Симулации • Роли</value>
+  </data>
+  <data name="Glyph_T" xml:space="preserve">
+    <value>Един ДНК модел</value>
+  </data>
+  <data name="Hero_ArchLine" xml:space="preserve">
+    <value>Проектирана като чиста слоеста система: Infrastructure (EF Core) → Core (услуги) → Web (MVC + Areas), върху ASP.NET Identity.</value>
+  </data>
+  <data name="Hero_Badge" xml:space="preserve">
+    <value>ASP.NET Core MVC • EF Core • Identity • Three.js</value>
+  </data>
+  <data name="Hero_Lead" xml:space="preserve">
+    <value>Създавай биологично валидна двуверижна ДНК, прилагай мутации с мигновена обратна връзка, визуализирай базовото сдвояване в 2D и спиралната структура в 3D, а после симулирай как условията влияят на преживяемостта и популациите във времето.</value>
+  </data>
+  <data name="Hero_Title" xml:space="preserve">
+    <value>ГеномЛаб: твоята насочена платформа.</value>
+  </data>
+  <data name="Metric_K_2D3D" xml:space="preserve">
+    <value>2D + 3D</value>
+  </data>
+  <data name="Metric_K_Roles" xml:space="preserve">
+    <value>Роли</value>
+  </data>
+  <data name="Metric_K_Strict" xml:space="preserve">
+    <value>Строга</value>
+  </data>
+  <data name="Metric_V_RoleList" xml:space="preserve">
+    <value>Потребител • Учен • Администратор</value>
+  </data>
+  <data name="Metric_V_Validation" xml:space="preserve">
+    <value>ДНК валидация</value>
+  </data>
+  <data name="Metric_V_Views" xml:space="preserve">
+    <value>Молекулни изгледи</value>
+  </data>
+  <data name="PageTitle" xml:space="preserve">
+    <value>Начало</value>
+  </data>
+  <data name="Sec_How_Title" xml:space="preserve">
+    <value>Как работи</value>
+  </data>
+  <data name="Sec_Modules_Sub" xml:space="preserve">
+    <value>ГеномЛаб е изграден около една идея: ДНК моделът да преминава през редактиране, визуализация, модерация и симулация без дублиране на инструменти или логика.</value>
+  </data>
+  <data name="Sec_Modules_Title" xml:space="preserve">
+    <value>Модули, които работят заедно</value>
+  </data>
+  <data name="Sec_Workflows_Sub" xml:space="preserve">
+    <value>ГеномЛаб поддържа реално платформено поведение: потребителите създават съдържание, учените добавят референции, а администраторите модерират чрез отделни Areas.</value>
+  </data>
+  <data name="Sec_Workflows_Title" xml:space="preserve">
+    <value>Научен работен процес с роли</value>
+  </data>
+  <data name="Step1_P" xml:space="preserve">
+    <value>Избери референтен шаблон или създай собствен двуверижен ДНК модел.</value>
+  </data>
+  <data name="Step1_T" xml:space="preserve">
+    <value>Създай</value>
+  </data>
+  <data name="Step2_P" xml:space="preserve">
+    <value>Вмъквай, изтривай или заменяй бази — със строга валидация и правила за комплементарност.</value>
+  </data>
+  <data name="Step2_T" xml:space="preserve">
+    <value>Редактирай</value>
+  </data>
+  <data name="Step3_P" xml:space="preserve">
+    <value>Провери базовото сдвояване в 2D и разгледай структурата в реално време в 3D спирала.</value>
+  </data>
+  <data name="Step3_T" xml:space="preserve">
+    <value>Визуализирай</value>
+  </data>
+  <data name="Step4_P" xml:space="preserve">
+    <value>Пусни популации при фактори на средата и наблюдавай как се променя преживяемостта във времето.</value>
+  </data>
+  <data name="Step4_T" xml:space="preserve">
+    <value>Симулирай</value>
+  </data>
+</root>

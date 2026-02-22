@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="BackToModels" xml:space="preserve">
+    <value>Назад към моделите</value>
+  </data>
+  <data name="BasicMode" xml:space="preserve">
+    <value>Основен режим</value>
+  </data>
+  <data name="Exit" xml:space="preserve">
+    <value>Изход</value>
+  </data>
+  <data name="History" xml:space="preserve">
+    <value>История</value>
+  </data>
+  <data name="Kicker" xml:space="preserve">
+    <value>ДНК Конструктор</value>
+  </data>
+  <data name="Label_Model" xml:space="preserve">
+    <value>Модел</value>
+  </data>
+  <data name="Legend_C" xml:space="preserve">
+    <value>C (Въглерод)</value>
+  </data>
+  <data name="Legend_H" xml:space="preserve">
+    <value>H (Водород)</value>
+  </data>
+  <data name="Legend_HBond" xml:space="preserve">
+    <value>Водородна връзка</value>
+  </data>
+  <data name="Legend_N" xml:space="preserve">
+    <value>N (Азот)</value>
+  </data>
+  <data name="Legend_O" xml:space="preserve">
+    <value>O (Кислород)</value>
+  </data>
+  <data name="Legend_P" xml:space="preserve">
+    <value>P (Фосфор)</value>
+  </data>
+  <data name="Pill_2D" xml:space="preserve">
+    <value>2D стълба</value>
+  </data>
+  <data name="Pill_3D" xml:space="preserve">
+    <value>3D спирала</value>
+  </data>
+  <data name="Pill_Inspector" xml:space="preserve">
+    <value>Инспектор</value>
+  </data>
+  <data name="Redo" xml:space="preserve">
+    <value>Повтори</value>
+  </data>
+  <data name="RepairDNA" xml:space="preserve">
+    <value>Поправи ДНК</value>
+  </data>
+  <data name="SaveModel" xml:space="preserve">
+    <value>Запази модела</value>
+  </data>
+  <data name="ScanDNA" xml:space="preserve">
+    <value>Сканирай ДНК</value>
+  </data>
+  <data name="ScientificMode" xml:space="preserve">
+    <value>Научен режим</value>
+  </data>
+  <data name="Title" xml:space="preserve">
+    <value>ДНК Конструктор</value>
+  </data>
+  <data name="Undo" xml:space="preserve">
+    <value>Отмени</value>
+  </data>
+  <data name="ViewerHint" xml:space="preserve">
+    <value>Използвай ⟨ ⟩ за местене на база; кликни по лентата за напредъка, за да прескочиш.</value>
+  </data>
+  <data name="WorkspaceTitle" xml:space="preserve">
+    <value>Работно пространство</value>
+  </data>
+</root>

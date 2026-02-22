@@ -1,4 +1,7 @@
-﻿@{
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer L
+
+@{
     ViewData["Title"] = "Custom DNA Builder";
     ViewData["ActiveNav"] = "dna";
 }
@@ -15,21 +18,21 @@
                 <div class="gx-dna__kicker">DNA Builder</div>
                 <h1 class="gx-dna__title">Create a new model</h1>
                 <p class="gx-dna__subtitle">
-                    Paste <strong>one strand</strong> (we generate the complement) or <strong>two strands</strong> on separate lines.
-                    Then we'll create the model and open it in the workspace.
+                    @L["Sub_PastePrefix"] <strong>@L["Sub_OneStrand"]</strong> @L["Sub_GenComplement"] <strong>@L["Sub_TwoStrands"]</strong> @L["Sub_OnSeparateLines"]
+                    @L["Sub_ThenCreateOpen"]
                 </p>
             </div>
 
             <div class="gx-dna__head-right">
-                <a class="btn ghost btn--lg" href="/dna/choose">Back</a>
+                <a class="btn ghost btn--lg" href="/dna/choose">@L["Back"]</a>
             </div>
         </header>
 
         <div class="gx-dna__topbar">
             <div class="gx-dna__hintbar">
-                <span class="gx-pill">A • C • G • T only</span>
-                <span class="gx-pill">Two lines = double strand</span>
-                <span class="gx-pill">Import .txt / .json</span>
+                <span class="gx-pill">@L["Pill_ACGT"]</span>
+                <span class="gx-pill">@L["Pill_TwoLines"]</span>
+                <span class="gx-pill">@L["Pill_Import"]</span>
             </div>
         </div>
 
@@ -37,15 +40,15 @@
 
         <section class="gx-dna__input">
             <div class="gx-card gx-card--pad">
-                <label for="modelName" class="gx-label">Model name</label>
+                <label for="modelName" class="gx-label">@L["Lbl_ModelName"]</label>
                 <input id="modelName"
                        class="gx-input"
                        type="text"
                        maxlength="80"
-                       placeholder="e.g. Human β-globin demo"
+                       placeholder="@L["Ph_ModelName"]"
                        autocomplete="off" />
 
-                <label for="sequence" class="gx-label">DNA input</label>
+                <label for="sequence" class="gx-label">@L["Lbl_DNAInput"]</label>
 
                 <form method="post" action="/dna/custom/create" id="customCreateForm" class="gx-hidden">
                     @Html.AntiForgeryToken()
@@ -57,18 +60,15 @@
                 <textarea id="sequence"
                           class="gx-textarea gx-textarea--xl mono"
                           rows="7"
-                          placeholder="ATGCGTACG...
-(optional second line = complement)"
+                          placeholder="@L["Ph_Sequence"]"
                           spellcheck="false"></textarea>
 
-                <div class="gx-dna__help">
-                    Tip: If you provide one strand, the complementary strand is generated automatically.
-                </div>
+                <div class="gx-dna__help">@L["Tip_AutoComplement"]</div>
 
                 <div class="gx-actions gx-actions--split">
                     <div class="gx-actions__left">
-                        <button id="import-btn" class="btn ghost btn--lg" type="button">Import</button>
-                        <button id="create-btn" class="btn primary btn--lg" type="button">Create & Open</button>
+                        <button id="import-btn" class="btn ghost btn--lg" type="button">@L["Btn_Import"]</button>
+                        <button id="create-btn" class="btn primary btn--lg" type="button">@L["Btn_CreateOpen"]</button>
                     </div>
                 </div>
             </div>

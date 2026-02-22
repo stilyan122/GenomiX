@@ -1,5 +1,8 @@
-﻿@{
-    ViewData["Title"] = "Welcome";
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer L
+
+@{
+    ViewData["Title"] = L["PageTitle"];
     ViewData["ActiveNav"] = "home";
 }
 
@@ -7,27 +10,44 @@
     <div class="container container--wide">
         <div class="home-hero__grid">
             <div class="home-hero__copy reveal reveal--up">
-                <h1 class="home-h1 reveal-item">Edit DNA in 3D. Watch mutations ripple across life.</h1>
+                <div class="badge reveal-item">@L["Hero_Badge"]</div>
+
+                <h1 class="home-h1 reveal-item">
+                    @L["Hero_Title"]
+                </h1>
+
                 <p class="home-lead reveal-item">
-                    Two-strand editing, instant mutation feedback, and population simulations -
-                    all in one place.
+                    @L["Hero_Lead"]
                 </p>
 
                 <div class="home-cta reveal-item">
-                    <a class="btn ghost btn--lg" href="/dna/choose">Start DNA Builder</a>
-                    <a class="btn ghost btn--lg" href="#features">Explore features</a>
+                    <a class="btn primary btn--lg" href="/dna/choose">@L["CTA_StartBuilder"]</a>
+                    <a class="btn ghost btn--lg" href="#features">@L["CTA_ExploreModules"]</a>
+
+                    @if (User?.Identity?.IsAuthenticated ?? false)
+                    {
+                        <a class="btn ghost btn--lg" href="/simulations">@L["CTA_MySimulations"]</a>
+                    }
                 </div>
 
                 <div class="home-metrics reveal-stagger">
                     <div class="metric reveal-item">
-                        <div class="metric__k">2</div>
-                        <div class="metric__v">Core panels</div>
+                        <div class="metric__k">@L["Metric_K_2D3D"]</div>
+                        <div class="metric__v">@L["Metric_V_Views"]</div>
                     </div>
                     <div class="metric reveal-item">
-                        <div class="metric__k">2</div>
-                        <div class="metric__v">Modes: Basic & Scientific</div>
+                        <div class="metric__k">@L["Metric_K_Strict"]</div>
+                        <div class="metric__v">@L["Metric_V_Validation"]</div>
+                    </div>
+                    <div class="metric reveal-item">
+                        <div class="metric__k">@L["Metric_K_Roles"]</div>
+                        <div class="metric__v">@L["Metric_V_RoleList"]</div>
                     </div>
                 </div>
+
+                <p class="home-sub reveal-item" style="margin-top:12px">
+                    @L["Hero_ArchLine"]
+                </p>
             </div>
 
             <div class="home-hero__visual reveal reveal--fade" aria-hidden="true">
@@ -84,8 +104,8 @@
                     </svg>
 
                     <div class="glyph-caption">
-                        <div class="glyph-caption__t">One model</div>
-                        <div class="glyph-caption__s">Builder • Simulations • AI Learning</div>
+                        <div class="glyph-caption__t">@L["Glyph_T"]</div>
+                        <div class="glyph-caption__s">@L["Glyph_S"]</div>
                     </div>
                 </div>
             </div>
@@ -94,65 +114,136 @@
 </section>
 
 <section class="home-section reveal reveal--up" id="features">
-    <h2 class="home-h2 reveal-item">Two panels. One mental model.</h2>
-    <p class="home-sub reveal-item">Build, simulate, and learn - without switching tools.</p>
+    <h2 class="home-h2 reveal-item">@L["Sec_Modules_Title"]</h2>
+    <p class="home-sub reveal-item">
+        @L["Sec_Modules_Sub"]
+    </p>
 
     <div class="tri-grid reveal-stagger">
         <article class="glass-card reveal-item">
-            <h3>DNA Builder</h3>
-            <p>Design sequences and apply mutations with instant visual feedback.</p>
+            <h3>@L["Card_Builder_T"]</h3>
+            <p>@L["Card_Builder_P"]</p>
             <ul class="bullets">
-                <li>Two-strand editing</li>
-                <li>Basic & Scientific modes</li>
-                <li>Mutation timeline</li>
+                <li>@L["Card_Builder_L1"]</li>
+                <li>@L["Card_Builder_L2"]</li>
+                <li>@L["Card_Builder_L3"]</li>
             </ul>
-            <a class="card-link" href="/dna/choose">Open Builder →</a>
+            <a class="card-link" href="/dna/choose">@L["Card_Builder_A"]</a>
         </article>
 
         <article class="glass-card reveal-item">
-            <h3>Simulations</h3>
-            <p>See how edits change repair pathways and populations over time.</p>
+            <h3>@L["Card_2D_T"]</h3>
+            <p>@L["Card_2D_P"]</p>
             <ul class="bullets">
-                <li>DNA repair visualization</li>
-                <li>Population evolution</li>
-                <li>Disease mapping (planned)</li>
+                <li>@L["Card_2D_L1"]</li>
+                <li>@L["Card_2D_L2"]</li>
+                <li>@L["Card_2D_L3"]</li>
             </ul>
-            <a class="card-link" href="/simulations">Explore Simulations →</a>
+            <a class="card-link" href="/dna/choose">@L["Card_2D_A"]</a>
+        </article>
+
+        <article class="glass-card reveal-item">
+            <h3>@L["Card_3D_T"]</h3>
+            <p>@L["Card_3D_P"]</p>
+            <ul class="bullets">
+                <li>@L["Card_3D_L1"]</li>
+                <li>@L["Card_3D_L2"]</li>
+                <li>@L["Card_3D_L3"]</li>
+            </ul>
+            <a class="card-link" href="/dna/choose">@L["Card_3D_A"]</a>
+        </article>
+
+        <article class="glass-card reveal-item">
+            <h3>@L["Card_Sim_T"]</h3>
+            <p>@L["Card_Sim_P"]</p>
+            <ul class="bullets">
+                <li>@L["Card_Sim_L1"]</li>
+                <li>@L["Card_Sim_L2"]</li>
+                <li>@L["Card_Sim_L3"]</li>
+            </ul>
+            <a class="card-link" href="/simulations">@L["Card_Sim_A"]</a>
+        </article>
+    </div>
+</section>
+
+<section class="home-section reveal reveal--up" id="workflows">
+    <h2 class="home-h2 reveal-item">@L["Sec_Workflows_Title"]</h2>
+    <p class="home-sub reveal-item">
+        @L["Sec_Workflows_Sub"]
+    </p>
+
+    <div class="tri-grid reveal-stagger">
+        <article class="glass-card reveal-item">
+            <h3>@L["Card_Roles_T"]</h3>
+            <p>@L["Card_Roles_P"]</p>
+            <ul class="bullets">
+                <li>@L["Card_Roles_L1"]</li>
+                <li>@L["Card_Roles_L2"]</li>
+                <li>@L["Card_Roles_L3"]</li>
+            </ul>
+        </article>
+
+        <article class="glass-card reveal-item">
+            <h3>@L["Card_Lab_T"]</h3>
+            <p>@L["Card_Lab_P"]</p>
+            <ul class="bullets">
+                <li>@L["Card_Lab_L1"]</li>
+                <li>@L["Card_Lab_L2"]</li>
+                <li>@L["Card_Lab_L3"]</li>
+            </ul>
         </article>
     </div>
 </section>
 
 <section class="home-section reveal reveal--up" id="how">
-    <h2 class="home-h2 reveal-item">How it works</h2>
+    <h2 class="home-h2 reveal-item">@L["Sec_How_Title"]</h2>
 
     <div class="steps reveal-stagger">
         <div class="step reveal-item">
             <div class="step__n">1</div>
             <div class="step__b">
-                <h4>Create</h4>
-                <p>Start from templates or build DNA from scratch.</p>
+                <h4>@L["Step1_T"]</h4>
+                <p>@L["Step1_P"]</p>
             </div>
         </div>
+
         <div class="step reveal-item">
             <div class="step__n">2</div>
             <div class="step__b">
-                <h4>Edit</h4>
-                <p>Insert, delete, substitute - watch effects instantly.</p>
+                <h4>@L["Step2_T"]</h4>
+                <p>@L["Step2_P"]</p>
             </div>
         </div>
- 
+
+        <div class="step reveal-item">
+            <div class="step__n">3</div>
+            <div class="step__b">
+                <h4>@L["Step3_T"]</h4>
+                <p>@L["Step3_P"]</p>
+            </div>
+        </div>
+
+        <div class="step reveal-item">
+            <div class="step__n">4</div>
+            <div class="step__b">
+                <h4>@L["Step4_T"]</h4>
+                <p>@L["Step4_P"]</p>
+            </div>
+        </div>
     </div>
 </section>
 
 <section class="home-cta-strip reveal reveal--fade" id="cta">
     <div class="home-cta-strip__inner">
         <div class="reveal-item">
-            <h2 class="home-h2">Ready to experiment?</h2>
-            <p class="home-sub">Open the DNA Builder demo or check out your simulations for stimulating learning.</p>
+            <h2 class="home-h2">@L["CTA_Title"]</h2>
+            <p class="home-sub">
+                @L["CTA_Sub"]
+            </p>
         </div>
         <div class="home-cta reveal-item">
-            <a class="btn ghost btn--lg" href="/dna">Open DNA Builder</a>
-            <a class="btn ghost btn--lg" href="/simulations">Open Simulations</a>
+            <a class="btn primary btn--lg" href="/dna/choose">@L["CTA_OpenBuilder"]</a>
+            <a class="btn ghost btn--lg" href="/simulations">@L["CTA_OpenSimulations"]</a>
         </div>
     </div>
 </section>

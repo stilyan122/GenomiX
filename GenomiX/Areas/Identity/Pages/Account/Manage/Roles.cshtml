@@ -1,4 +1,5 @@
-﻿@page
+@page
+
 @model GenomiX.Areas.Identity.Pages.Account.Manage.RolesModel
 
 @{
@@ -9,7 +10,7 @@
 @if (Model.CurrentRoles.Count > 1)
 {
     <div class="roles-row roles-row--compact">
-        <div class="roles-row__label">Current roles</div>
+        <div class="roles-row__label"><span data-i18n="Roles_CurrentRoles">Current roles</span></div>
 
         <div class="roles-row__chips">
             @foreach (var r in Model.CurrentRoles)
@@ -22,28 +23,29 @@
 else
 {
     <div class="gx-hint gx-hint--spaced">
-        Current role:
+        <span data-i18n="Roles_CurrentRole">Current role:</span>
         <span class="role-inline">@Model.CurrentRoles.FirstOrDefault()</span>
     </div>
 }
 
 <form method="get" class="gx-form" id="rolesStateForm">
     <div class="auth-field">
-        <label class="auth-label auth-label--muted">Action</label>
+        <label class="auth-label auth-label--muted"><span data-i18n="Lbl_Action">Action</span></label>
+
         <select asp-for="Input.Type" class="auth-input" onchange="this.form.submit()">
-            <option value="Add">Request add role</option>
-            <option value="Remove">Request remove role</option>
+            <option value="Add" data-i18n="Roles_RequestAdd">Request add role</option>
+            <option value="Remove" data-i18n="Roles_RequestRemove">Request remove role</option>
         </select>
     </div>
 
     <p class="gx-hint">
-        @(Model.Input.Type == "Add"
-                ? "Request an additional role. An admin must approve it."
-                : "Request removal of an existing role. An admin must approve it.")
+        @Html.Raw(Model.Input.Type == "Add"
+                ? "<span data-i18n=\"Roles_Help_Add\">Request an additional role. An admin must approve it.</span>"
+                : "<span data-i18n=\"Roles_Help_Remove\">Request removal of an existing role. An admin must approve it.</span>")
     </p>
 
     <div class="auth-field">
-        <label class="auth-label">Role</label>
+        <label class="auth-label"><span data-i18n="Lbl_Role">Role</span></label>
 
         <select asp-for="Input.Role" class="auth-input" onchange="this.form.submit()">
             @if (Model.Input.Type == "Remove")
@@ -71,9 +73,10 @@ else
     <input type="hidden" asp-for="Input.Role" />
 
     <div class="auth-field">
-        <label class="auth-label">Message to admin (optional)</label>
+        <label class="auth-label"><span data-i18n="Roles_MessageOptional">Message to admin (optional)</span></label>
         <input asp-for="Input.Note" class="auth-input"
-               placeholder="Why do you want this role? What will you use it for?" />
+               placeholder="Why do you want this role? What will you use it for?"
+               data-i18n-placeholder="Roles_NotePlaceholder" />
         <span class="auth-error" asp-validation-for="Input.Note"></span>
     </div>
 
@@ -85,20 +88,20 @@ else
     @if ((Model.Input.Type == "Add" && !Model.AvailableAddRoles.Any()) ||
         (Model.Input.Type == "Remove" && !Model.AvailableRemoveRoles.Any()))
     {
-        <p class="gx-hint">No roles available for this action.</p>
+        <p class="gx-hint"><span data-i18n="Roles_NoRolesAvailable">No roles available for this action.</span></p>
     }
     else
     {
-        <button class="auth-button" type="submit">Send request</button>
+        <button class="auth-button" type="submit"><span data-i18n="Roles_SendRequest">Send request</span></button>
     }
 </form>
 
-    @if (Model.MyRequests.Any())
+@if (Model.MyRequests.Any())
 {
     <hr class="gx-divider" />
 
     <div class="auth-note">
-        <strong>Your requests</strong>
+        <strong><span data-i18n="Roles_YourRequests">Your requests</span></strong>
         <span class="gx-hint">(@Model.MyRequests.Count)</span>
     </div>
 
@@ -114,7 +117,7 @@ else
 
                     <div class="role-req-meta">
                         <span class="role-req-status role-req-status--@r.Status.ToLower()">@r.Status</span>
-                        <span class="role-req-dot">•</span>
+                        <span class="role-req-dot">�</span>
                         <span>@r.CreatedAt.ToLocalTime()</span>
                     </div>
                 </div>
@@ -124,7 +127,7 @@ else
                     {
                         <form method="post" asp-page-handler="Cancel">
                             <input type="hidden" name="id" value="@r.Id" />
-                            <button class="auth-button auth-button--ghost" type="submit">Cancel</button>
+                            <button class="auth-button auth-button--ghost" type="submit"><span data-i18n="Roles_Cancel">Cancel</span></button>
                         </form>
                     }
                 </div>
@@ -135,5 +138,9 @@ else
 else
 {
     <hr class="gx-divider" />
-    <p class="gx-hint">No requests yet.</p>
+    <p class="gx-hint"><span data-i18n="Roles_NoRequestsYet">No requests yet.</span></p>
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
 }

@@ -1,7 +1,10 @@
-﻿@model DNABuilderViewModel
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer L
+
+@model DNABuilderViewModel
 
 @{
-    ViewData["Title"] = "DNA Builder";
+    ViewData["Title"] = L["Title"];
     ViewData["ActiveNav"] = "dna";
 }
 
@@ -9,16 +12,16 @@
     <div class="container container--wide gx-dna">
         <header class="gx-dna__header">
             <div class="gx-dna__head-left">
-                <div class="gx-dna__kicker">DNA Builder</div>
-                <h1 class="gx-dna__title">Model workspace</h1>
+                <div class="gx-dna__kicker">@L["Kicker"]</div>
+                <h1 class="gx-dna__title">@L["WorkspaceTitle"]</h1>
                 <p class="gx-dna__subtitle">
-                    <span class="mono">Model</span> <span class="mono">@Model.Name</span>
+                    <span class="mono">@L["Label_Model"]</span> <span class="mono">@Model.Name</span>
                     • <strong>@Model.Length</strong> bp
                 </p>
             </div>
 
             <div class="gx-dna__head-right">
-                <a class="btn ghost btn--lg" href="/dna/models">Back to models</a>
+                <a class="btn ghost btn--lg" href="/dna/models">@L["BackToModels"]</a>
             </div>
         </header>
 
@@ -26,18 +29,18 @@
             <div class="gx-dna__modes" role="group" aria-label="Mode switch">
                 <label class="gx-toggle">
                     <input type="radio" name="mode" id="basicMode" checked />
-                    <span>Basic Mode</span>
+                    <span>@L["BasicMode"]</span>
                 </label>
                 <label class="gx-toggle">
                     <input type="radio" name="mode" id="scientificMode" />
-                    <span>Scientific Mode</span>
+                    <span>@L["ScientificMode"]</span>
                 </label>
             </div>
 
             <div class="gx-dna__hintbar">
-                <span class="gx-pill">2D ladder</span>
-                <span class="gx-pill">3D helix</span>
-                <span class="gx-pill">Inspector</span>
+                <span class="gx-pill">@L["Pill_2D"]</span>
+                <span class="gx-pill">@L["Pill_3D"]</span>
+                <span class="gx-pill">@L["Pill_Inspector"]</span>
             </div>
         </div>
 
@@ -50,37 +53,35 @@
 
         <section id="dna-visualizer-section" class="gx-dna__viewer">
             <div class="gx-dna__viewerbar">
-                <a id="exit-btn" class="gx-btn gx-btn--ghost gx-btn-exit" href="/dna/models">Exit</a>
+                <a id="exit-btn" class="gx-btn gx-btn--ghost gx-btn-exit" href="/dna/models">@L["Exit"]</a>
 
-                <button id="save-btn" type="button" class="gx-btn gx-btn--accent">
-                    Save model
-                </button>
+                <button id="save-btn" type="button" class="gx-btn gx-btn--accent">@L["SaveModel"]</button>
 
-                <button id="history-btn" class="gx-btn gx-btn--ghost" type="button">
-                    History
-                </button>
+                <button id="history-btn" class="gx-btn gx-btn--ghost" type="button">@L["History"]</button>
 
-                <div class="gx-dna__viewerhint">
-                    Use ⟨ ⟩ to move base, click the progress bar to jump.
-                </div>
+                <div class="gx-dna__viewerhint">@L["ViewerHint"]</div>
 
                 <div class="gx-dna__vieweractions">
-                    <button id="scan-dna-btn" type="button" class="gx-btn gx-btn--accent">
-                        Scan DNA
-                    </button>
+                    <button id="scan-dna-btn" type="button" class="gx-btn gx-btn--accent">@L["ScanDNA"]</button>
 
-                    <button id="repair-dna-btn" type="button" class="gx-btn gx-btn--danger is-hidden">
-                        Repair DNA
-                    </button>
+                    <button id="repair-dna-btn" type="button" class="gx-btn gx-btn--danger is-hidden">@L["RepairDNA"]</button>
 
-                    <button id="undo-btn" class="gx-btn gx-btn--soft" type="button" aria-label="Undo" title="Undo">
+                    <button id="undo-btn"
+                            class="gx-btn gx-btn--soft"
+                            type="button"
+                            aria-label="@L["Undo"]"
+                            title="@L["Undo"]">
                         <span class="gx-action__icon">↶</span>
-                        <span class="gx-action__text">Undo</span>
+                        <span class="gx-action__text">@L["Undo"]</span>
                     </button>
 
-                    <button id="redo-btn" class="gx-btn gx-btn--soft" type="button" aria-label="Redo" title="Redo">
+                    <button id="redo-btn"
+                            class="gx-btn gx-btn--soft"
+                            type="button"
+                            aria-label="@L["Redo"]"
+                            title="@L["Redo"]">
                         <span class="gx-action__icon">↷</span>
-                        <span class="gx-action__text">Redo</span>
+                        <span class="gx-action__text">@L["Redo"]</span>
                     </button>
 
                     <div id="gx-helix-actions"></div>
@@ -96,12 +97,12 @@
 
           <div id="dna-visual" class="gx-dna__canvas">
                 <div id="gx-legend-3d" class="gx-dna-legend gx-hidden">
-                    <div class="row"><span class="dot c"></span><span>C (Carbon)</span></div>
-                    <div class="row"><span class="dot n"></span><span>N (Nitrogen)</span></div>
-                    <div class="row"><span class="dot o"></span><span>O (Oxygen)</span></div>
-                    <div class="row"><span class="dot p"></span><span>P (Phosphorus)</span></div>
-                    <div class="row"><span class="dot h"></span><span>H (Hydrogen)</span></div>
-                    <div class="row"><span class="hbond"></span><span>H-bond</span></div>
+                    <div class="row"><span class="dot c"></span><span>@L["Legend_C"]</span></div>
+                    <div class="row"><span class="dot n"></span><span>@L["Legend_N"]</span></div>
+                    <div class="row"><span class="dot o"></span><span>@L["Legend_O"]</span></div>
+                    <div class="row"><span class="dot p"></span><span>@L["Legend_P"]</span></div>
+                    <div class="row"><span class="dot h"></span><span>@L["Legend_H"]</span></div>
+                    <div class="row"><span class="hbond"></span><span>@L["Legend_HBond"]</span></div>
                 </div>
           </div>
         </section>

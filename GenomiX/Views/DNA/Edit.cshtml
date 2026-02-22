@@ -1,18 +1,21 @@
-﻿@model EditDNAModelInputModel
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer L
+
+@model EditDNAModelInputModel
 @{
-    ViewData["Title"] = "Edit DNA Model";
+    ViewData["Title"] = L["Title"];
     ViewData["ActiveNav"] = "dna";
 }
 
 <div class="container gx-edit">
     <div class="gx-edit__head">
         <div>
-            <div class="gx-edit__kicker">DNA Models</div>
-            <h1 class="gx-edit__title">Edit model</h1>
-            <p class="gx-edit__sub">Rename your model and keep your library organized.</p>
+            <div class="gx-edit__kicker">@L["Kicker"]</div>
+            <h1 class="gx-edit__title">@L["Header"]</h1>
+            <p class="gx-edit__sub">@L["Sub"]</p>
         </div>
 
-        <a class="btn ghost btn--sm" href="/dna/models">← Back</a>
+        <a class="btn ghost btn--sm" href="/dna/models">@L["Back"]</a>
     </div>
 
     <div class="gx-edit__grid">
@@ -22,57 +25,55 @@
                 <input type="hidden" asp-for="Id" />
 
                 <div class="gx-field">
-                    <label class="gx-label" asp-for="Name">Model name</label>
+                    <label class="gx-label" asp-for="Name">@L["Lbl_ModelName"]</label>
 
                     <div class="gx-inputwrap">
                         <input asp-for="Name"
                                class="gx-input"
                                maxlength="60"
                                autocomplete="off"
-                               placeholder="e.g. Human demo – BRCA region" />
+                               placeholder="@L["Ph_Name"]" />
                         <div class="gx-inputglow"></div>
                     </div>
 
-                    <div class="gx-hint">
-                        Keep it short and descriptive (max 60 chars).
-                    </div>
+                    <div class="gx-hint">@L["Hint_Max60"]</div>
                     <span asp-validation-for="Name" class="gx-error"></span>
                 </div>
 
                 <div class="gx-divider"></div>
 
                 <div class="gx-actions">
-                    <button class="btn btn--lg" type="submit">Save changes</button>
-                    <a class="btn ghost btn--lg" href="/dna/models">Cancel</a>
+                    <button class="btn btn--lg" type="submit">@L["Btn_Save"]</button>
+                    <a class="btn ghost btn--lg" href="/dna/models">@L["Btn_Cancel"]</a>
                 </div>
             </form>
         </section>
 
         <aside class="gx-card gx-card--tips">
             <div class="gx-tips">
-                <div class="gx-tips__title">Tips</div>
+                <div class="gx-tips__title">@L["TipsTitle"]</div>
 
                 <div class="gx-tip">
                     <div class="gx-dot"></div>
                     <div>
-                        <div class="gx-tip__h">Use species + purpose</div>
-                        <div class="gx-tip__p">Example: “Mouse – UV mutation test”.</div>
+                        <div class="gx-tip__h">@L["Tip1_H"]</div>
+                        <div class="gx-tip__p">@L["Tip1_P"]</div>
                     </div>
                 </div>
 
                 <div class="gx-tip">
                     <div class="gx-dot"></div>
                     <div>
-                        <div class="gx-tip__h">Keep versions clear</div>
-                        <div class="gx-tip__p">Add “v1 / v2” when you experiment with edits.</div>
+                        <div class="gx-tip__h">@L["Tip2_H"]</div>
+                        <div class="gx-tip__p">@L["Tip2_P"]</div>
                     </div>
                 </div>
 
                 <div class="gx-tip">
                     <div class="gx-dot"></div>
                     <div>
-                        <div class="gx-tip__h">Avoid super long names</div>
-                        <div class="gx-tip__p">Short names look better on the models grid.</div>
+                        <div class="gx-tip__h">@L["Tip3_H"]</div>
+                        <div class="gx-tip__p">@L["Tip3_P"]</div>
                     </div>
                 </div>
             </div>

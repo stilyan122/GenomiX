@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+
+  <data name="SimCreate_PageTitle" xml:space="preserve">
+    <value>Създай симулация</value>
+  </data>
+  <data name="SimCreate_Kicker_Simulations" xml:space="preserve">
+    <value>Симулации</value>
+  </data>
+  <data name="SimCreate_Title" xml:space="preserve">
+    <value>Създай популация</value>
+  </data>
+  <data name="SimCreate_Subtitle" xml:space="preserve">
+    <value>Избери базов ДНК модел, задай размер и стартирай еволюция на живо.</value>
+  </data>
+
+  <data name="Common_Back" xml:space="preserve">
+    <value>Назад</value>
+  </data>
+
+  <data name="SimCreate_SimulationName_Label" xml:space="preserve">
+    <value>Име на симулацията</value>
+  </data>
+  <data name="SimCreate_SimulationName_Placeholder" xml:space="preserve">
+    <value>напр. Тест: арктика и радиация</value>
+  </data>
+
+  <data name="SimCreate_OrganismType_Label" xml:space="preserve">
+    <value>Тип организъм</value>
+  </data>
+
+  <data name="SimCreate_Species_Mouse" xml:space="preserve">
+    <value>🐭 Мишка</value>
+  </data>
+  <data name="SimCreate_Species_Pig" xml:space="preserve">
+    <value>🐷 Прасе</value>
+  </data>
+  <data name="SimCreate_Species_Cow" xml:space="preserve">
+    <value>🐮 Крава</value>
+  </data>
+  <data name="SimCreate_Species_Rabbit" xml:space="preserve">
+    <value>🐰 Заек</value>
+  </data>
+  <data name="SimCreate_Species_Fox" xml:space="preserve">
+    <value>🦊 Лисица</value>
+  </data>
+  <data name="SimCreate_Species_Bird" xml:space="preserve">
+    <value>🐦 Птица</value>
+  </data>
+  <data name="SimCreate_Species_Mixed" xml:space="preserve">
+    <value>🌍 Смесена екосистема</value>
+  </data>
+
+  <data name="SimCreate_BaseModel_Label" xml:space="preserve">
+    <value>Базов ДНК модел</value>
+  </data>
+  <data name="SimCreate_BaseModel_Placeholder" xml:space="preserve">
+    <value>— избери модел —</value>
+  </data>
+
+  <data name="SimCreate_PopulationSize_Label" xml:space="preserve">
+    <value>Размер на популацията</value>
+  </data>
+  <data name="SimCreate_PopulationSize_Help" xml:space="preserve">
+    <value>2–5000 организма (по-голямо = по-тежко)</value>
+  </data>
+
+  <data name="SimCreate_InitialEnvironment_Title" xml:space="preserve">
+    <value>Начална среда</value>
+  </data>
+  <data name="SimCreate_Temperature_Label" xml:space="preserve">
+    <value>Температура</value>
+  </data>
+  <data name="SimCreate_Radiation_Label" xml:space="preserve">
+    <value>Радиация</value>
+  </data>
+  <data name="SimCreate_DiseasePressure_Label" xml:space="preserve">
+    <value>Натиск от болести</value>
+  </data>
+  <data name="SimCreate_Resources_Label" xml:space="preserve">
+    <value>Ресурси</value>
+  </data>
+
+  <data name="SimCreate_StartSimulation_Button" xml:space="preserve">
+    <value>Стартирай симулация</value>
+  </data>
+  <data name="SimCreate_LiveEnvironment_Note" xml:space="preserve">
+    <value>Можеш да променяш средата на живо след създаване.</value>
+  </data>
+
+  <data name="SimCreate_Tip_Kicker" xml:space="preserve">
+    <value>Съвет</value>
+  </data>
+  <data name="SimCreate_Tip_Title" xml:space="preserve">
+    <value>Как да избереш настройките?</value>
+  </data>
+
+  <data name="SimCreate_Tip_Line1" xml:space="preserve">
+    <value>&lt;strong&gt;Висока радиация&lt;/strong&gt; + малко ресурси → бърз срив на популацията</value>
+  </data>
+  <data name="SimCreate_Tip_Line2" xml:space="preserve">
+    <value>&lt;strong&gt;Топло&lt;/strong&gt; + много ресурси → бързи избухвания на растеж</value>
+  </data>
+  <data name="SimCreate_Tip_Line3" xml:space="preserve">
+    <value>&lt;strong&gt;Натиск от болести&lt;/strong&gt; създава видими селекционни промени</value>
+  </data>
+
+  <data name="SimCreate_Tip_Note" xml:space="preserve">
+    <value>Дръж симулациите около 200–800 организма за плавни визуализации на живо.</value>
+  </data>
+</root>

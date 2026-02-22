@@ -1,6 +1,7 @@
-﻿@page
+@page
 @using Microsoft.AspNetCore.Authentication
 @model GenomiX.Areas.Identity.Pages.Account.RegisterModel
+
 @{
     ViewData["Title"] = "Create account";
 
@@ -14,10 +15,10 @@
 
 <div class="auth-wrap">
     <div class="auth-card">
-        <h1 class="auth-title">Create your account</h1>
+        <h1 class="auth-title"><span data-i18n="Reg_Title">Create your account</span></h1>
         <p class="auth-sub">
-            Join GenomiX to build and save your own DNA models.
-            We'll send you a confirmation email to activate your account.
+            <span data-i18n="Reg_JoinLine1">Join GenomiX to build and save your own DNA models.</span>
+            <span data-i18n="Reg_JoinLine2">We'll send you a confirmation email to activate your account.</span>
         </p>
 
         <form id="registerForm"
@@ -36,25 +37,28 @@
                        asp-for="Input.Email"
                        type="email"
                        autocomplete="email"
-                       placeholder="your-email@example.com" />
+                       placeholder="your-email@example.com"
+                       data-i18n-placeholder="Reg_Placeholder_Email" />
                 <span class="auth-error" asp-validation-for="Input.Email"></span>
             </div>
 
             <div class="auth-field">
-                <label class="auth-label" asp-for="Input.FirstName">First Name</label>
+                <label class="auth-label" asp-for="Input.FirstName"><span data-i18n="Reg_FirstName">First Name</span></label>
                 <input class="auth-input"
                        asp-for="Input.FirstName"
                        autocomplete="given-name"
-                       placeholder="Michael" />
+                       placeholder="Michael"
+                       data-i18n-placeholder="Reg_Placeholder_FirstName" />
                 <span class="auth-error" asp-validation-for="Input.FirstName"></span>
             </div>
 
             <div class="auth-field">
-                <label class="auth-label" asp-for="Input.LastName">Last Name</label>
+                <label class="auth-label" asp-for="Input.LastName"><span data-i18n="Reg_LastName">Last Name</span></label>
                 <input class="auth-input"
                        asp-for="Input.LastName"
                        autocomplete="family-name"
-                       placeholder="Smith" />
+                       placeholder="Smith"
+                       data-i18n-placeholder="Reg_Placeholder_LastName" />
                 <span class="auth-error" asp-validation-for="Input.LastName"></span>
             </div>
 
@@ -69,7 +73,7 @@
             </div>
 
             <div class="auth-field">
-                <label class="auth-label" asp-for="Input.ConfirmPassword">Repeat Password</label>
+                <label class="auth-label" asp-for="Input.ConfirmPassword"><span data-i18n="Reg_RepeatPass">Repeat Password</span></label>
                 <input class="auth-input"
                        asp-for="Input.ConfirmPassword"
                        type="password"
@@ -79,16 +83,16 @@
             </div>
 
             <button id="registerSubmit" type="submit" class="auth-button">
-                Create account
+                <span data-i18n="Reg_Submit">Create account</span>
             </button>
 
             <div class="auth-foot">
-                <span>Already have an account?</span>
+                <span><span data-i18n="Reg_Already">Already have an account?</span></span>
                 <a class="auth-link"
                    asp-area="Identity"
                    asp-page="/Account/Login"
                    asp-route-returnUrl="@Model.ReturnUrl">
-                    Sign in
+                    <span data-i18n="Reg_SignIn">Sign in</span>
                 </a>
             </div>
         </form>
@@ -97,13 +101,13 @@
         {
             <div class="auth-sep">
                 <div class="auth-sep-line"></div>
-                <div class="auth-sep-text">or</div>
+                <div class="auth-sep-text"><span data-i18n="Reg_Or">or</span></div>
                 <div class="auth-sep-line"></div>
             </div>
 
             <form asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="ext-login">
                 @Html.AntiForgeryToken()
-                
+
                 @foreach (var provider in providers)
                 {
                     var name = provider.Name?.ToLowerInvariant() ?? "";
@@ -116,9 +120,10 @@
                     };
 
                     <button type="submit"
-                        class="btn-ext @btnClass"
-                        name="provider" value="@provider.Name"
-                        title="Register with @provider.DisplayName">
+                            class="btn-ext @btnClass"
+                            name="provider" value="@provider.Name"
+                            title="Register with @provider.DisplayName"
+                            data-i18n-title="Reg_With">
                         <span class="ico">
                             @if (name == "google")
                             {
@@ -136,7 +141,7 @@
                                 <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#fff" d="M12 .5C5.73.5.99 5.23.99 11.5c0 4.86 3.15 8.98 7.52 10.43.55.1.75-.24.75-.53 0-.26-.01-1.1-.02-1.99-3.06.66-3.7-1.3-3.7-1.3-.5-1.27-1.22-1.61-1.22-1.61-.99-.67.07-.66.07-.66 1.1.08 1.67 1.12 1.67 1.12.98 1.67 2.58 1.19 3.2.91.1-.71.38-1.19.69-1.46-2.44-.28-5-1.22-5-5.43 0-1.2.43-2.18 1.13-2.95-.11-.28-.49-1.42.11-2.96 0 0 .93-.3 3.05 1.13a10.5 10.5 0 0 1 5.56 0c2.12-1.43 3.05-1.13 3.05-1.13.6 1.54.22 2.68.11 2.96.7.77 1.13 1.75 1.13 2.95 0 4.22-2.57 5.14-5.02 5.41.39.33.74.97.74 1.96 0 1.42-.01 2.57-.01 2.92 0 .29.2.64.76.53A10.99 10.99 0 0 0 23 11.5C23 5.23 18.27.5 12 .5z" /></svg>
                             }
                         </span>
-                        <span>Register with @provider.DisplayName</span>
+                        <span><span data-i18n="Reg_With">Register with </span>@provider.DisplayName</span>
                     </button>
                 }
             </form>
@@ -146,5 +151,6 @@
 </div>
 
 @section Scripts {
+    <script src="~/js/identity-i18n.js" asp-append-version="true"></script>
     <partial name="_ValidationScriptsPartial" />
 }

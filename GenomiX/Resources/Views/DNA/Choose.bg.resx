@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="BrowseTemplates" xml:space="preserve">
+    <value>Разгледай шаблоните</value>
+  </data>
+  <data name="CreateCustom" xml:space="preserve">
+    <value>Създай персонално</value>
+  </data>
+  <data name="CustomDesc" xml:space="preserve">
+    <value>Постави 1 нишка (ние генерираме другата) или постави и двете нишки.</value>
+  </data>
+  <data name="CustomTitle" xml:space="preserve">
+    <value>Персонализирана ДНК</value>
+  </data>
+  <data name="MyModels" xml:space="preserve">
+    <value>Моите модели</value>
+  </data>
+  <data name="PredefDesc" xml:space="preserve">
+    <value>Започни с Човек / Мишка / и др. Ние автоматично генерираме комплемента.</value>
+  </data>
+  <data name="PredefTitle" xml:space="preserve">
+    <value>Готови шаблони</value>
+  </data>
+  <data name="Subtitle" xml:space="preserve">
+    <value>Избери шаблон или създай своя собствена последователност.</value>
+  </data>
+  <data name="Title" xml:space="preserve">
+    <value>ДНК Конструктор</value>
+  </data>
+  <data name="TitleText" xml:space="preserve">
+    <value>Започни ДНК модел</value>
+  </data>
+</root>

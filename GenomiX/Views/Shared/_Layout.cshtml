@@ -1,9 +1,12 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer L
+
+<!DOCTYPE html>
+<html lang="@System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - GenomiX</title>
+    <title>@ViewData["Title"] - @L["Brand_Name"]</title>
 
     <link rel="icon" href="~/images/icons/favicon.ico" sizes="any">
     <link rel="icon" type="image/png" sizes="32x32" href="~/images/icons/favicon-32x32.png">
@@ -23,25 +26,31 @@
         <div class="wrap__inner">
             <nav class="nav" aria-label="Main">
                 <a class="brand" href="/">
-                    <img src="~/images/brand/gx-logo.png" alt="GenomiX" class="brand__logo" />
-                    <strong>GenomiX</strong>
+                    <img src="~/images/brand/gx-logo.png" alt="@L["Brand_Name"]" class="brand__logo" />
+                    <strong>@L["Brand_Name"]</strong>
                 </a>
 
                 <div class="navlinks navlinks--primary">
-                    <a class="navlink @(ViewData["ActiveNav"] as string == "dna" ? "is-active" : "")" href="/dna">DNA Builder</a>
-                    <a class="navlink @(ViewData["ActiveNav"] as string == "sim" ? "is-active" : "")" href="/simulations">Simulations</a>
+                    <a class="navlink @(ViewData["ActiveNav"] as string == "dna" ? "is-active" : "")" href="/dna">@L["Nav_DnaBuilder"]</a>
+                    <a class="navlink @(ViewData["ActiveNav"] as string == "sim" ? "is-active" : "")" href="/simulations">@L["Nav_Simulations"]</a>
 
                     @if (User?.Identity?.IsAuthenticated == true && (User.IsInRole("Scientist") || User.IsInRole("Admin")))
                     {
-                        <a class="navlink @(ViewData["ActiveNav"] as string == "lab" ? "is-active" : "")" href="/lab/sequences">Lab</a>
+                        <a class="navlink @(ViewData["ActiveNav"] as string == "lab" ? "is-active" : "")" href="/lab/sequences">@L["Nav_Lab"]</a>
                     }
 
                     @if (User?.Identity?.IsAuthenticated == true && User.IsInRole("Admin"))
                     {
-                        <a class="navlink @(ViewData["ActiveNav"] as string == "admin" ? "is-active" : "")" href="/admin/sequences">Sequences Panel</a>
-                        <a class="navlink @(ViewData["ActiveNav"] as string == "admin" ? "is-active" : "")" href="/admin/users">Users Panel</a>
+                        <a class="navlink @(ViewData["ActiveNav"] as string == "admin" ? "is-active" : "")" href="/admin/sequences">@L["Nav_SequencesPanel"]</a>
+                        <a class="navlink @(ViewData["ActiveNav"] as string == "admin" ? "is-active" : "")" href="/admin/users">@L["Nav_UsersPanel"]</a>
                     }
                 </div>
+
+                <form asp-controller="Culture" asp-action="Set" method="post" class="lang-switch">
+                    <input type="hidden" name="returnUrl" value="@Context.Request.Path@Context.Request.QueryString" />
+                    <button type="submit" name="culture" value="en">EN</button>
+                    <button type="submit" name="culture" value="bg">BG</button>
+                </form>
 
                 <div class="auth">
                     <partial name="_LoginPartial" />
@@ -61,17 +70,19 @@
         <div class="container">
             <div class="footer-bar">
                 <nav class="footer-nav" aria-label="Footer">
-                    <a href="/dna">DNA Builder</a>
-                    <a href="/simulations">Simulations</a>
+                    <a href="/dna">@L["Nav_DnaBuilder"]</a>
+                    <a href="/simulations">@L["Nav_Simulations"]</a>
                 </nav>
 
-                <div class="footer-copy">© @DateTime.UtcNow.Year GenomiX - Built for learning genetics</div>
+                <div class="footer-copy">© @DateTime.UtcNow.Year @L["Brand_Name"] - @L["Footer_Tagline"]</div>
             </div>
         </div>
     </footer>
 
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script type="module" src="~/js/reveal.js" asp-append-version="true"></script>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
 
     @await RenderSectionAsync("Scripts", required: false)
 </body>

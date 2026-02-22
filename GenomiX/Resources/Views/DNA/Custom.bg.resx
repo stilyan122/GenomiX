@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Back" xml:space="preserve">
+    <value>Назад</value>
+  </data>
+  <data name="Btn_CreateOpen" xml:space="preserve">
+    <value>Създай и отвори</value>
+  </data>
+  <data name="Btn_Import" xml:space="preserve">
+    <value>Импорт</value>
+  </data>
+  <data name="Lbl_DNAInput" xml:space="preserve">
+    <value>ДНК вход</value>
+  </data>
+  <data name="Lbl_ModelName" xml:space="preserve">
+    <value>Име на модела</value>
+  </data>
+  <data name="Ph_ModelName" xml:space="preserve">
+    <value>напр. Човек β-глобин демо</value>
+  </data>
+  <data name="Ph_Sequence" xml:space="preserve">
+    <value>ATGCGTACG...
+(втори ред по избор = комплемент)</value>
+  </data>
+  <data name="Pill_ACGT" xml:space="preserve">
+    <value>Само A • C • G • T</value>
+  </data>
+  <data name="Pill_Import" xml:space="preserve">
+    <value>Импорт .txt / .json</value>
+  </data>
+  <data name="Pill_TwoLines" xml:space="preserve">
+    <value>Два реда = двойна нишка</value>
+  </data>
+  <data name="Sub_GenComplement" xml:space="preserve">
+    <value>(ние генерираме комплемента) или</value>
+  </data>
+  <data name="Sub_OnSeparateLines" xml:space="preserve">
+    <value>на отделни редове.</value>
+  </data>
+  <data name="Sub_OneStrand" xml:space="preserve">
+    <value>една нишка</value>
+  </data>
+  <data name="Sub_PastePrefix" xml:space="preserve">
+    <value>Постави</value>
+  </data>
+  <data name="Sub_ThenCreateOpen" xml:space="preserve">
+    <value>След това ще създадем модела и ще го отворим в работното пространство.</value>
+  </data>
+  <data name="Sub_TwoStrands" xml:space="preserve">
+    <value>две нишки</value>
+  </data>
+  <data name="Tip_AutoComplement" xml:space="preserve">
+    <value>Съвет: Ако дадеш една нишка, комплементарната се генерира автоматично.</value>
+  </data>
+  <data name="Title" xml:space="preserve">
+    <value>Персонален ДНК Конструктор</value>
+  </data>
+</root>

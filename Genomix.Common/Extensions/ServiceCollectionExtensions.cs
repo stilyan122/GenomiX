@@ -5,11 +5,14 @@ using GenomiX.Infrastructure;
 using GenomiX.Infrastructure.Models;
 using GenomiX.Infrastructure.Repo;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System.Globalization;
 
 namespace GenomiX.Common.Extensions
 {
@@ -58,6 +61,45 @@ namespace GenomiX.Common.Extensions
             services.Configure<EmailSettings>(emailSection);
 
             services.AddTransient<IEmailSender, EmailSender>();
+
+            return services;
+        }
+
+        // Localization services
+        public static IServiceCollection AddLocalizationServices(this IServiceCollection services)
+        {
+            services
+                .AddControllersWithViews()
+                .AddViewLocalization()
+                .AddDataAnnotationsLocalization();
+
+            services
+                .AddRazorPages()
+                .AddViewLocalization()
+                .AddDataAnnotationsLocalization();
+
+            services.AddLocalization(options =>
+            {
+                options.ResourcesPath = "Resources";
+            });
+
+            var supportedCultures = new[] { "en", "bg" }
+                .Select(c => new CultureInfo(c))
+                .ToList();
+
+            services.Configure<RequestLocalizationOptions>(options =>
+            {
+                options.DefaultRequestCulture = new RequestCulture("en");
+                options.SupportedCultures = supportedCultures;
+                options.SupportedUICultures = supportedCultures;
+
+                options.RequestCultureProviders = new IRequestCultureProvider[]
+                {
+                    new CookieRequestCultureProvider(),
+                    new QueryStringRequestCultureProvider(),
+                    new AcceptLanguageHeaderRequestCultureProvider()
+                };
+            });
 
             return services;
         }

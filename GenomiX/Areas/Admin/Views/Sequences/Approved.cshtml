@@ -7,14 +7,14 @@
 <div class="gx-admin-page">
     <div class="gx-admin-head">
         <div>
-            <h1 class="gx-admin-title">Approved</h1>
-            <div class="gx-admin-sub">These sequences are available in the app as predefined templates.</div>
+            <h1 class="gx-admin-title"><span data-i18n="AdminApproved_Title">Approved</span></h1>
+            <div class="gx-admin-sub"><span data-i18n="AdminApproved_Subtitle">These sequences are available in the app as predefined templates.</span></div>
         </div>
 
         <div class="gx-admin-tabs">
-            <a class="gx-admin-tab" href="/admin/sequences">Pending</a>
-            <a class="gx-admin-tab is-active" href="/admin/sequences/approved">Approved</a>
-            <a class="gx-admin-tab" href="/admin/sequences/rejected">Rejected</a>
+            <a class="gx-admin-tab" href="/admin/sequences"><span data-i18n="AdminTabs_Pending">Pending</span></a>
+            <a class="gx-admin-tab is-active" href="/admin/sequences/approved"><span data-i18n="AdminTabs_Approved">Approved</span></a>
+            <a class="gx-admin-tab" href="/admin/sequences/rejected"><span data-i18n="AdminTabs_Rejected">Rejected</span></a>
         </div>
     </div>
 
@@ -22,8 +22,8 @@
         @if (Model.Count == 0)
         {
             <div class="gx-admin-empty">
-                <div class="gx-admin-empty__title">No approved items</div>
-                <div class="gx-admin-empty__text">Approve sequences from the Pending tab.</div>
+                <div class="gx-admin-empty__title"><span data-i18n="AdminApproved_EmptyTitle">No approved items</span></div>
+                <div class="gx-admin-empty__text"><span data-i18n="AdminApproved_EmptyText">Approve sequences from the Pending tab.</span></div>
             </div>
         }
         else
@@ -32,12 +32,12 @@
                 <table class="gx-admin-table">
                     <thead>
                         <tr>
-                            <th>Species</th>
-                            <th>Name</th>
-                            <th class="gx-admin-col--num">Length</th>
-                            <th class="gx-admin-col--num">Created On</th>
-                            <th class="gx-admin-col--num">Created By</th>
-                            <th class="gx-admin-col--actions">Details</th>
+                            <th><span data-i18n="Admin_Th_Species">Species</span></th>
+                            <th><span data-i18n="Admin_Th_Name">Name</span></th>
+                            <th class="gx-admin-col--num"><span data-i18n="Admin_Th_Length">Length</span></th>
+                            <th class="gx-admin-col--num"><span data-i18n="Admin_Th_CreatedOn">Created On</span></th>
+                            <th class="gx-admin-col--num"><span data-i18n="Admin_Th_CreatedBy">Created By</span></th>
+                            <th class="gx-admin-col--actions"><span data-i18n="Admin_Th_Details">Details</span></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -50,7 +50,7 @@
                                 <td class="gx-admin-col--num gx-admin-muted">@s.CreatedAt</td>
                                 <td class="gx-admin-col--num gx-admin-muted">@s.CreatedBy</td>
                                 <td class="gx-admin-col--actions">
-                                    <a class="gx-admin-link" href="/admin/sequences/review/@s.Id">Open</a>
+                                    <a class="gx-admin-link" href="/admin/sequences/review/@s.Id"><span data-i18n="Common_Open">Open</span></a>
                                 </td>
                             </tr>
                         }
@@ -60,3 +60,7 @@
         }
     </div>
 </div>
+
+@section Scripts {
+    <script src="~/js/admin-i18n.js" asp-append-version="true"></script>
+}

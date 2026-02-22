@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="All" xml:space="preserve">
+    <value>Всички</value>
+  </data>
+  <data name="Back" xml:space="preserve">
+    <value>Назад</value>
+  </data>
+  <data name="Badge_Template" xml:space="preserve">
+    <value>Шаблон</value>
+  </data>
+  <data name="Btn_UseTemplate" xml:space="preserve">
+    <value>Използвай шаблона</value>
+  </data>
+  <data name="CreatesIn" xml:space="preserve">
+    <value>Създава модел в </value>
+  </data>
+  <data name="Empty_H" xml:space="preserve">
+    <value>Все още няма шаблони</value>
+  </data>
+  <data name="Empty_P1" xml:space="preserve">
+    <value>Съжаляваме! Засега създай собствена последователност! Очаквай </value>
+  </data>
+  <data name="Empty_P2" xml:space="preserve">
+    <value>съвсем скоро!</value>
+  </data>
+  <data name="Empty_Ref" xml:space="preserve">
+    <value>референтни последователности</value>
+  </data>
+  <data name="Header" xml:space="preserve">
+    <value>Готови ДНК шаблони</value>
+  </data>
+  <data name="Hint_Filter" xml:space="preserve">
+    <value>Пиши за филтър</value>
+  </data>
+  <data name="Meta_CreatedBy" xml:space="preserve">
+    <value>Създадено от: </value>
+  </data>
+  <data name="MyModels" xml:space="preserve">
+    <value>Моите модели</value>
+  </data>
+  <data name="Ph_ModelNameReq" xml:space="preserve">
+    <value>Име на модела (задължително)</value>
+  </data>
+  <data name="Ph_Search" xml:space="preserve">
+    <value>Търси вид...</value>
+  </data>
+  <data name="Sub" xml:space="preserve">
+    <value>Избери шаблон, за да създадеш нов модел за редакция. Комплементарната нишка се генерира автоматично.</value>
+  </data>
+  <data name="Title" xml:space="preserve">
+    <value>Готова ДНК</value>
+  </data>
+  <data name="Title_Template" xml:space="preserve">
+    <value>Референтен шаблон</value>
+  </data>
+</root>

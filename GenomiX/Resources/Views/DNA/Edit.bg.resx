@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Back" xml:space="preserve">
+    <value>← Назад</value>
+  </data>
+  <data name="Btn_Cancel" xml:space="preserve">
+    <value>Отказ</value>
+  </data>
+  <data name="Btn_Save" xml:space="preserve">
+    <value>Запази промените</value>
+  </data>
+  <data name="Header" xml:space="preserve">
+    <value>Редакция на модел</value>
+  </data>
+  <data name="Hint_Max60" xml:space="preserve">
+    <value>Кратко и описателно (макс 60 символа).</value>
+  </data>
+  <data name="Kicker" xml:space="preserve">
+    <value>ДНК модели</value>
+  </data>
+  <data name="Lbl_ModelName" xml:space="preserve">
+    <value>Име на модела</value>
+  </data>
+  <data name="Ph_Name" xml:space="preserve">
+    <value>напр. Човек демо – BRCA регион</value>
+  </data>
+  <data name="Sub" xml:space="preserve">
+    <value>Преименувай модела си и поддържай библиотеката подредена.</value>
+  </data>
+  <data name="Tip1_H" xml:space="preserve">
+    <value>Вид + цел</value>
+  </data>
+  <data name="Tip1_P" xml:space="preserve">
+    <value>Пример: „Мишка – тест UV мутация“.</value>
+  </data>
+  <data name="Tip2_H" xml:space="preserve">
+    <value>Поддържай версии</value>
+  </data>
+  <data name="Tip2_P" xml:space="preserve">
+    <value>Добавяй „v1 / v2“, когато експериментираш с промени.</value>
+  </data>
+  <data name="Tip3_H" xml:space="preserve">
+    <value>Избягвай много дълги имена</value>
+  </data>
+  <data name="Tip3_P" xml:space="preserve">
+    <value>Късите имена изглеждат по-добре в списъка с модели.</value>
+  </data>
+  <data name="TipsTitle" xml:space="preserve">
+    <value>Съвети</value>
+  </data>
+  <data name="Title" xml:space="preserve">
+    <value>Редакция на ДНК модел</value>
+  </data>
+</root>

@@ -1,4 +1,4 @@
-﻿@page
+@page
 @model RegisterConfirmationModel
 @{
     ViewData["Title"] = "Check your email";
@@ -6,9 +6,9 @@
 
 <div class="auth-wrap">
     <div class="auth-card">
-        <h1 class="auth-title">Check your inbox</h1>
+        <h1 class="auth-title"><span data-i18n="RegConf_Title">Check your inbox</span></h1>
         <p class="auth-sub">
-            We sent a confirmation email to <strong>@Model.Email</strong>.
+            <span data-i18n="RegConf_Sent_Pre">We sent a confirmation email to </span><strong>@Model.Email</strong><span data-i18n="FPConf_Dot">.</span>
             Click the link inside to activate your account.
         </p>
 
@@ -19,8 +19,11 @@
         </p>
 
         <div class="auth-foot">
-            <a class="auth-link" asp-page="./Login">Back to sign in</a>
-            <a class="auth-link" asp-page="./Register">Use a different email</a>
+            <a class="auth-link" asp-page="./Login"><span data-i18n="RegConf_BackLogin">Back to sign in</span></a>
+            <a class="auth-link" asp-page="./Register"><span data-i18n="RegConf_DiffEmail">Use a different email</span></a>
         </div>
     </div>
 </div>
+
+
+<script src="~/js/identity-i18n.js" asp-append-version="true"></script>

@@ -1,11 +1,11 @@
-﻿@page
+@page
 @model ResendEmailConfirmationModel
 @{
     ViewData["Title"] = "Resend email confirmation";
 }
 
 <h1>@ViewData["Title"]</h1>
-<h2>Enter your email.</h2>
+<h2><span data-i18n="Resend_Title">Enter your email.</span></h2>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -16,11 +16,12 @@
                 <label asp-for="Input.Email" class="form-label"></label>
                 <span asp-validation-for="Input.Email" class="text-danger"></span>
             </div>
-            <button type="submit" class="w-100 btn btn-lg btn-primary">Resend</button>
+            <button type="submit" class="w-100 btn btn-lg btn-primary"><span data-i18n="Resend_Btn">Resend</span></button>
         </form>
     </div>
 </div>
 
 @section Scripts {
-    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/identity-i18n.js" asp-append-version="true"></script>
+<partial name="_ValidationScriptsPartial" />
 }

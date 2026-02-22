@@ -37,5 +37,9 @@
     <ProjectReference Include="..\GenomiX.Infrastructure\GenomiX.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+  	<EmbeddedResource Update="Resources\**\*.resx" />
+  </ItemGroup>
+
 </Project>
         

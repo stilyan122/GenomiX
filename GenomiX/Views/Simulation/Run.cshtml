@@ -1,7 +1,8 @@
 ﻿@model PopulationViewModel
+@inject Microsoft.AspNetCore.Mvc.Localization.IViewLocalizer L
 
 @{
-    ViewData["Title"] = "Run simulation";
+    ViewData["Title"] = L["SimRun_PageTitle"].Value;
     ViewData["ActiveNav"] = "simulations";
 }
 
@@ -10,30 +11,30 @@
 
         <header class="gx-runhdr">
             <div class="gx-runhdr__left">
-                <div class="gx-sim__kicker">Simulation</div>
+                <div class="gx-sim__kicker">@L["SimRun_Kicker_Simulation"]</div>
                 <h1 class="gx-runhdr__title">@Model.Name</h1>
                 <div class="gx-runhdr__sub">
-                    Live environment control • <span class="mono">DNA</span>
+                    @L["SimRun_Sub_LiveEnvironment"] • <span class="mono">@L["SimRun_Sub_DNA"]</span>
                     <span class="mono">@((Model.BaseModelName ?? Model.BaseModelId?.ToString().Substring(0, 8)) ?? "—")</span>
-                    • <span class="mono">Run</span> <span class="mono">@Model.Id.ToString().Substring(0, 8)</span>
+                    • <span class="mono">@L["SimRun_Sub_Run"]</span> <span class="mono">@Model.Id.ToString().Substring(0, 8)</span>
                 </div>
             </div>
 
             <div class="gx-runhdr__right">
-                <a class="gx-btn gx-btn--ghost" href="/simulations">Back</a>
+                <a class="gx-btn gx-btn--ghost" href="/simulations">@L["Common_Back"]</a>
 
-                <button class="gx-btn gx-btn--primary" id="sim-run" type="button">Start</button>
-                <button class="gx-btn" id="sim-step" type="button">Tick ×10</button>
-                <button class="gx-btn gx-btn--ghost" id="sim-pause" type="button" disabled>Pause</button>
+                <button class="gx-btn gx-btn--primary" id="sim-run" type="button">@L["SimRun_Btn_Start"]</button>
+                <button class="gx-btn" id="sim-step" type="button">@L["SimRun_Btn_Tick10"]</button>
+                <button class="gx-btn gx-btn--ghost" id="sim-pause" type="button" disabled>@L["SimRun_Btn_Pause"]</button>
             </div>
 
             <div class="gx-runhdr__scenario">
                 <select class="gx-select gx-select--sm" id="gx-scenario">
-                    <option value="">Scenario…</option>
+                    <option value="">@L["SimRun_Scenario_Placeholder"]</option>
                 </select>
 
                 <button type="button" class="gx-btn gx-btn--ghost" id="gx-scenario-apply">
-                    Apply
+                    @L["SimRun_Btn_Apply"]
                 </button>
             </div>
         </header>
@@ -43,34 +44,34 @@
                 <div class="gx-runmain__top">
                     <div class="gx-hud">
                         <div class="gx-hudchip">
-                            <div class="gx-hudchip__k">Alive</div>
+                            <div class="gx-hudchip__k">@L["SimRun_Hud_Alive"]</div>
                             <div class="gx-hudchip__v mono" id="v-alive">@(@Model.Organisms?.Count ?? 0)</div>
                         </div>
 
                         <div class="gx-hudchip">
-                            <div class="gx-hudchip__k">Dead</div>
+                            <div class="gx-hudchip__k">@L["SimRun_Hud_Dead"]</div>
                             <div class="gx-hudchip__v mono" id="v-dead">0</div>
                         </div>
 
                         <div class="gx-hudchip">
-                            <div class="gx-hudchip__k">Reproduced</div>
+                            <div class="gx-hudchip__k">@L["SimRun_Hud_Reproduced"]</div>
                             <div class="gx-hudchip__v mono" id="v-rep">0</div>
                         </div>
 
                         <div class="gx-hudchip">
-                            <div class="gx-hudchip__k">Avg fitness</div>
+                            <div class="gx-hudchip__k">@L["SimRun_Hud_AvgFitness"]</div>
                             <div class="gx-hudchip__v mono" id="v-avg">0.000</div>
                         </div>
 
                         <div class="gx-hudchip">
-                            <div class="gx-hudchip__k">Tick</div>
+                            <div class="gx-hudchip__k">@L["SimRun_Hud_Tick"]</div>
                             <div class="gx-hudchip__v mono" id="v-tick">0</div>
                         </div>
                     </div>
 
                     <div class="gx-statusrow">
                         <div class="gx-statusdot"></div>
-                        <div class="gx-status" id="sim-status">Ready.</div>
+                        <div class="gx-status" id="sim-status">@L["SimRun_Status_Ready"]</div>
                     </div>
                 </div>
 
@@ -79,7 +80,7 @@
                         <canvas id="sim-canvas"></canvas>
 
                         <button type="button" class="gx-canvasfs" id="gx-canvasfs">
-                            Fullscreen
+                            @L["SimRun_Btn_Fullscreen"]
                         </button>
                     </div>
 
@@ -97,9 +98,9 @@
                     </script>
 
                     <div class="gx-runlog" id="gx-run-log">
-                        <div class="gx-runlog__title">Live log</div>
+                        <div class="gx-runlog__title">@L["SimRun_Log_Title"]</div>
                         <div class="gx-runlog__body" id="gx-run-logBody">
-                            <div class="gx-logline">Ready.</div>
+                            <div class="gx-logline">@L["SimRun_Status_Ready"]</div>
                         </div>
                     </div>
                 </div>
@@ -109,14 +110,14 @@
                 @Html.AntiForgeryToken()
 
                 <div class="gx-runside__hd">
-                    <div class="gx-sim__kicker">Environment</div>
+                    <div class="gx-sim__kicker">@L["SimRun_Kicker_Environment"]</div>
 
                     <div class="gx-runside__hdrow">
                         <div>
-                            <div class="gx-runside__title">Control panel</div>
-                            <div class="gx-muted">Changes apply live (no reload).</div>
+                            <div class="gx-runside__title">@L["SimRun_ControlPanel_Title"]</div>
+                            <div class="gx-muted">@L["SimRun_ControlPanel_Subtitle"]</div>
                         </div>
-                        <button type="button" class="gx-envtoggle" id="gx-envtoggle" aria-label="Toggle environment panel">⇤</button>
+                        <button type="button" class="gx-envtoggle" id="gx-envtoggle" aria-label="@L["SimRun_Aria_ToggleEnvironment"].Value">⇤</button>
                     </div>
                 </div>
 
@@ -124,7 +125,7 @@
                     <div class="gx-simsliders gx-simsliders--run">
                         <div class="gx-slider">
                             <div class="gx-slider__top">
-                                <div class="gx-label">Temperature</div>
+                                <div class="gx-label">@L["SimRun_Temperature_Label"]</div>
                                 <div class="gx-chip mono"><span id="out-temp">0</span>°C</div>
                             </div>
                             <input class="gx-range" id="f-temp" type="range" min="-20" max="60" step="1" value="@Model.Temperature" />
@@ -132,7 +133,7 @@
 
                         <div class="gx-slider">
                             <div class="gx-slider__top">
-                                <div class="gx-label">Radiation</div>
+                                <div class="gx-label">@L["SimRun_Radiation_Label"]</div>
                                 <div class="gx-chip mono" id="out-rad">0.00</div>
                             </div>
                             <input class="gx-range" id="f-rad" type="range" min="0" max="1" step="0.01" value="@Model.Radiation" />
@@ -140,7 +141,7 @@
 
                         <div class="gx-slider">
                             <div class="gx-slider__top">
-                                <div class="gx-label">Disease pressure</div>
+                                <div class="gx-label">@L["SimRun_DiseasePressure_Label"]</div>
                                 <div class="gx-chip mono" id="out-dis">0.00</div>
                             </div>
                             <input class="gx-range" id="f-dis" type="range" min="0" max="1" step="0.01" value="@Model.DiseasePressure" />
@@ -148,7 +149,7 @@
 
                         <div class="gx-slider">
                             <div class="gx-slider__top">
-                                <div class="gx-label">Resources</div>
+                                <div class="gx-label">@L["SimRun_Resources_Label"]</div>
                                 <div class="gx-chip mono" id="out-res">0.00</div>
                             </div>
                             <input class="gx-range" id="f-res" type="range" min="0" max="1" step="0.01" value="@Model.Resources" />
@@ -156,7 +157,7 @@
 
                         <div class="gx-slider">
                             <div class="gx-slider__top">
-                                <div class="gx-label">Speed</div>
+                                <div class="gx-label">@L["SimRun_Speed_Label"]</div>
                                 <div class="gx-chip mono" id="out-speed">1</div>
                             </div>
                             <input class="gx-range" id="f-speed" type="range" min="1" max="50" step="1" value="@Model.Speed" />

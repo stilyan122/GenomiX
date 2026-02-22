@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace GenomiX.Common.Extensions
 {
@@ -25,6 +26,14 @@ namespace GenomiX.Common.Extensions
             await Verify(um, "alice", "User!123");
             await Verify(um, "ivan", "User!123");
             await Verify(um, "georgi.scientist", "Scientist!123");
+        }
+
+        public static void Localize(this WebApplication app)
+        {
+            var locOptions = app.Services
+                .GetRequiredService<IOptions<RequestLocalizationOptions>>();
+
+            app.UseRequestLocalization(locOptions.Value);
         }
 
         public static void MapAppRoutes(this WebApplication app)

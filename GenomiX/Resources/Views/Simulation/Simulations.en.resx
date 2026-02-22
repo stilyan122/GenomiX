@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+
+  <data name="SimIndex_PageTitle" xml:space="preserve">
+    <value>Simulations</value>
+  </data>
+
+  <data name="SimIndex_Kicker_Simulations" xml:space="preserve">
+    <value>Simulations</value>
+  </data>
+
+  <data name="SimIndex_Title" xml:space="preserve">
+    <value>Population lab</value>
+  </data>
+
+  <data name="SimIndex_Subtitle" xml:space="preserve">
+    <value>Live evolution runs with real-time environment control.</value>
+  </data>
+
+  <data name="SimIndex_Btn_CreateSimulation" xml:space="preserve">
+    <value>Create simulation</value>
+  </data>
+
+  <data name="SimIndex_Empty_Badge" xml:space="preserve">
+    <value>New</value>
+  </data>
+
+  <data name="SimIndex_Empty_Title" xml:space="preserve">
+    <value>No simulations yet</value>
+  </data>
+
+  <data name="SimIndex_Empty_Text" xml:space="preserve">
+    <value>Create your first population and start changing the environment while it evolves.</value>
+  </data>
+
+  <data name="SimIndex_Runs_Label" xml:space="preserve">
+    <value>runs</value>
+  </data>
+
+  <data name="SimIndex_Legend_Organisms" xml:space="preserve">
+    <value>Organisms</value>
+  </data>
+
+  <data name="SimIndex_Legend_Environment" xml:space="preserve">
+    <value>Environment</value>
+  </data>
+
+  <data name="SimIndex_Legend_Ticks" xml:space="preserve">
+    <value>Ticks</value>
+  </data>
+
+  <data name="SimIndex_Created_Label" xml:space="preserve">
+    <value>Created</value>
+  </data>
+
+  <data name="SimIndex_Stat_Organisms" xml:space="preserve">
+    <value>Organisms</value>
+  </data>
+
+  <data name="SimIndex_Stat_BaseModel" xml:space="preserve">
+    <value>Base model</value>
+  </data>
+
+  <data name="SimIndex_Stat_BaseModel_Hint" xml:space="preserve">
+    <value>DNA snapshot for this run</value>
+  </data>
+
+  <data name="SimIndex_Btn_OpenLab" xml:space="preserve">
+    <value>Open lab</value>
+  </data>
+
+  <data name="SimIndex_Btn_ViewDNA" xml:space="preserve">
+    <value>View DNA</value>
+  </data>
+
+  <data name="SimIndex_Btn_Edit" xml:space="preserve">
+    <value>Edit</value>
+  </data>
+
+  <data name="SimIndex_DeleteConfirm" xml:space="preserve">
+    <value>Delete this simulation? This cannot be undone.</value>
+  </data>
+
+  <data name="SimIndex_Btn_Delete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+
+</root>

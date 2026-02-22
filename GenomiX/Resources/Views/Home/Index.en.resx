@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="CTA_ExploreModules" xml:space="preserve">
+    <value>Explore modules</value>
+  </data>
+  <data name="CTA_MySimulations" xml:space="preserve">
+    <value>My Simulations</value>
+  </data>
+  <data name="CTA_OpenBuilder" xml:space="preserve">
+    <value>Open DNA Builder</value>
+  </data>
+  <data name="CTA_OpenSimulations" xml:space="preserve">
+    <value>Open Simulations</value>
+  </data>
+  <data name="CTA_StartBuilder" xml:space="preserve">
+    <value>Start DNA Builder</value>
+  </data>
+  <data name="CTA_Sub" xml:space="preserve">
+    <value>Start with the DNA Builder, then jump into simulations. If you’re a Scientist or Admin, use the Lab and moderation tools too.</value>
+  </data>
+  <data name="CTA_Title" xml:space="preserve">
+    <value>Ready to experiment?</value>
+  </data>
+  <data name="Card_2D_A" xml:space="preserve">
+    <value>View DNA →</value>
+  </data>
+  <data name="Card_2D_L1" xml:space="preserve">
+    <value>SVG pairing visualization</value>
+  </data>
+  <data name="Card_2D_L2" xml:space="preserve">
+    <value>Hydrogen bonds &amp; mismatch cues</value>
+  </data>
+  <data name="Card_2D_L3" xml:space="preserve">
+    <value>Instant mutation feedback</value>
+  </data>
+  <data name="Card_2D_P" xml:space="preserve">
+    <value>See base pairing, hydrogen bonds, and mismatches clearly.</value>
+  </data>
+  <data name="Card_2D_T" xml:space="preserve">
+    <value>2D Complement View</value>
+  </data>
+  <data name="Card_3D_A" xml:space="preserve">
+    <value>Open 3D →</value>
+  </data>
+  <data name="Card_3D_L1" xml:space="preserve">
+    <value>Atoms, bonds, backbone</value>
+  </data>
+  <data name="Card_3D_L2" xml:space="preserve">
+    <value>Hydrogen dashed bonds</value>
+  </data>
+  <data name="Card_3D_L3" xml:space="preserve">
+    <value>Dynamic quality scaling by length</value>
+  </data>
+  <data name="Card_3D_P" xml:space="preserve">
+    <value>Explore DNA structure in 3D with orbit controls and scalable detail.</value>
+  </data>
+  <data name="Card_3D_T" xml:space="preserve">
+    <value>3D Helix (Three.js)</value>
+  </data>
+  <data name="Card_Builder_A" xml:space="preserve">
+    <value>Open Builder →</value>
+  </data>
+  <data name="Card_Builder_L1" xml:space="preserve">
+    <value>Two-strand editing (equal length, valid bases)</value>
+  </data>
+  <data name="Card_Builder_L2" xml:space="preserve">
+    <value>Complementarity enforced server-side</value>
+  </data>
+  <data name="Card_Builder_L3" xml:space="preserve">
+    <value>Save / rename / delete models</value>
+  </data>
+  <data name="Card_Builder_P" xml:space="preserve">
+    <value>Create models from templates or custom sequences, then mutate safely.</value>
+  </data>
+  <data name="Card_Builder_T" xml:space="preserve">
+    <value>DNA Builder</value>
+  </data>
+  <data name="Card_Lab_L1" xml:space="preserve">
+    <value>ReferenceSequence: species, name, sequence</value>
+  </data>
+  <data name="Card_Lab_L2" xml:space="preserve">
+    <value>CreatedByUserId ownership</value>
+  </data>
+  <data name="Card_Lab_L3" xml:space="preserve">
+    <value>Approval gate before global visibility</value>
+  </data>
+  <data name="Card_Lab_P" xml:space="preserve">
+    <value>Scientists create reference sequences; only their own entries are editable.</value>
+  </data>
+  <data name="Card_Lab_T" xml:space="preserve">
+    <value>Scientist Lab (Area)</value>
+  </data>
+  <data name="Card_Roles_L1" xml:space="preserve">
+    <value>User → Scientist request flow</value>
+  </data>
+  <data name="Card_Roles_L2" xml:space="preserve">
+    <value>Pending / Approved / Declined</value>
+  </data>
+  <data name="Card_Roles_L3" xml:space="preserve">
+    <value>Decision timestamps</value>
+  </data>
+  <data name="Card_Roles_P" xml:space="preserve">
+    <value>Users can request Scientist role changes with notes and duplicate-pending protection.</value>
+  </data>
+  <data name="Card_Roles_T" xml:space="preserve">
+    <value>Roles &amp; Requests</value>
+  </data>
+  <data name="Card_Sim_A" xml:space="preserve">
+    <value>Open Simulations →</value>
+  </data>
+  <data name="Card_Sim_L1" xml:space="preserve">
+    <value>Tick-based simulation</value>
+  </data>
+  <data name="Card_Sim_L2" xml:space="preserve">
+    <value>Pause/Resume + speed control</value>
+  </data>
+  <data name="Card_Sim_L3" xml:space="preserve">
+    <value>Organisms + survival score</value>
+  </data>
+  <data name="Card_Sim_P" xml:space="preserve">
+    <value>Run populations under temperature, radiation, disease pressure, and resources.</value>
+  </data>
+  <data name="Card_Sim_T" xml:space="preserve">
+    <value>Simulation Lab</value>
+  </data>
+  <data name="Glyph_S" xml:space="preserve">
+    <value>Builder • 2D/3D • Repair • Simulation • Roles</value>
+  </data>
+  <data name="Glyph_T" xml:space="preserve">
+    <value>One DNA model</value>
+  </data>
+  <data name="Hero_ArchLine" xml:space="preserve">
+    <value>Designed as a clean layered system: Infrastructure (EF Core) → Core (services) → Web (MVC + Areas), powered by ASP.NET Identity.</value>
+  </data>
+  <data name="Hero_Badge" xml:space="preserve">
+    <value>ASP.NET Core MVC • EF Core • Identity • Three.js</value>
+  </data>
+  <data name="Hero_Lead" xml:space="preserve">
+    <value>Build biologically valid double-stranded DNA, apply mutations with instant feedback, visualize base pairing in 2D and helix structure in 3D, then simulate how conditions affect survival and populations over time.</value>
+  </data>
+  <data name="Hero_Title" xml:space="preserve">
+    <value>GenomiX: your guided platform.</value>
+  </data>
+  <data name="Metric_K_2D3D" xml:space="preserve">
+    <value>2D + 3D</value>
+  </data>
+  <data name="Metric_K_Roles" xml:space="preserve">
+    <value>Roles</value>
+  </data>
+  <data name="Metric_K_Strict" xml:space="preserve">
+    <value>Strict</value>
+  </data>
+  <data name="Metric_V_RoleList" xml:space="preserve">
+    <value>User • Scientist • Admin</value>
+  </data>
+  <data name="Metric_V_Validation" xml:space="preserve">
+    <value>DNA validation</value>
+  </data>
+  <data name="Metric_V_Views" xml:space="preserve">
+    <value>Molecular views</value>
+  </data>
+  <data name="PageTitle" xml:space="preserve">
+    <value>Welcome</value>
+  </data>
+  <data name="Sec_How_Title" xml:space="preserve">
+    <value>How it works</value>
+  </data>
+  <data name="Sec_Modules_Sub" xml:space="preserve">
+    <value>GenomiX is built around a single idea: a DNA model should flow through editing, visualization, moderation, and simulation without duplicating tools or logic.</value>
+  </data>
+  <data name="Sec_Modules_Title" xml:space="preserve">
+    <value>Modules that fit together</value>
+  </data>
+  <data name="Sec_Workflows_Sub" xml:space="preserve">
+    <value>GenomiX supports real platform behavior: users create content, scientists contribute references, and admins moderate everything through dedicated Areas.</value>
+  </data>
+  <data name="Sec_Workflows_Title" xml:space="preserve">
+    <value>Role-based scientific workflow</value>
+  </data>
+  <data name="Step1_P" xml:space="preserve">
+    <value>Choose a reference template or build your own two-strand DNA model.</value>
+  </data>
+  <data name="Step1_T" xml:space="preserve">
+    <value>Create</value>
+  </data>
+  <data name="Step2_P" xml:space="preserve">
+    <value>Insert, delete, or substitute bases - with strict validation and complement rules.</value>
+  </data>
+  <data name="Step2_T" xml:space="preserve">
+    <value>Edit</value>
+  </data>
+  <data name="Step3_P" xml:space="preserve">
+    <value>Inspect base pairing in 2D and explore structure in a real-time 3D helix.</value>
+  </data>
+  <data name="Step3_T" xml:space="preserve">
+    <value>Visualize</value>
+  </data>
+  <data name="Step4_P" xml:space="preserve">
+    <value>Run populations under environment factors and watch survival change over time.</value>
+  </data>
+  <data name="Step4_T" xml:space="preserve">
+    <value>Simulate</value>
+  </data>
+</root>

@@ -1,19 +1,21 @@
-﻿@model IEnumerable<DNAModelListViewModel>
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer L
+@model IEnumerable<DNAModelListViewModel>
 
 @{
-    ViewData["Title"] = "My DNA Models";
+    ViewData["Title"] = L["Title"];
     ViewData["ActiveNav"] = "dna";
 }
 
 <div class="container">
     <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;">
         <div>
-            <div class="gx-sim__kicker">DNA Models</div>
-            <h1 class="home-h2">My DNA Models</h1>
-            <p class="home-sub">Continue where you left off or create a new model.</p>
+            <div class="gx-sim__kicker">@L["Kicker"]</div>
+            <h1 class="home-h2">@L["Header"]</h1>
+            <p class="home-sub">@L["Sub"]</p>
         </div>
         <div class="home-cta">
-            <a class="btn ghost btn--lg" href="/dna/choose">+ New model</a>
+            <a class="btn ghost btn--lg" href="/dna/choose">@L["Btn_New"]</a>
         </div>
     </div>
 
@@ -22,9 +24,9 @@
     @if (!Model.Any())
     {
         <article class="glass-card">
-            <h3>No models yet</h3>
-            <p>Create a model from a predefined template or your own DNA string.</p>
-            <a class="card-link" href="/dna/choose">Create model →</a>
+            <h3>@L["Empty_H"]</h3>
+            <p>@L["Empty_P"]</p>
+            <a class="card-link" href="/dna/choose">@L["Empty_A"]</a>
         </article>
     }
     else
@@ -37,14 +39,12 @@
                     <p>@m.Length bp • Updated @m.UpdatedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</p>
 
                     <div class="gx-card-actions">
-                        <a class="btn link" href="/dna/builder/@m.Id">Continue →</a>
-                        <a class="btn ghost btn--sm" href="/dna/models/edit/@m.Id">Edit</a>
+                        <a class="btn link" href="/dna/builder/@m.Id">@L["Btn_Continue"]</a>
+                        <a class="btn ghost btn--sm" href="/dna/models/edit/@m.Id">@L["Btn_Edit"]</a>
                         <form method="post" action="/dna/models/delete/@m.Id">
                             @Html.AntiForgeryToken()
                             <button class="btn danger btn--sm" type="submit"
-                                    onclick="return confirm('Delete this model? This cannot be undone.');">
-                                Delete
-                            </button>
+                                    onclick="return confirm('@L["ConfirmDelete"]');">@L["Btn_Delete"]</button>
                         </form>
                     </div>
                 </article>

@@ -9,32 +9,32 @@
     <div class="manage-tabs">
         <a class="manage-tab @ManageNavPages.IndexNavClass(ViewContext)"
            asp-page="./Index">
-            Profile
+            <span data-i18n="Tab_Profile">Profile</span>
         </a>
 
         <a class="manage-tab @ManageNavPages.EmailNavClass(ViewContext)"
            asp-page="./Email">
-            Email
+            <span data-i18n="Tab_Email">Email</span>
         </a>
 
         @if (ViewContext.ViewData["HasPassword"] as bool? == true)
         {
             <a class="manage-tab @ManageNavPages.ChangePasswordNavClass(ViewContext)"
                asp-page="./ChangePassword">
-                Password
+                <span data-i18n="Tab_Password">Password</span>
             </a>
         }
         else
         {
             <a class="manage-tab @ManageNavPages.SetPasswordNavClass(ViewContext)"
                asp-page="./SetPassword">
-                Set password
+                <span data-i18n="Tab_SetPassword">Set password</span>
             </a>
         }
 
         <a class="manage-tab @ManageNavPages.RolesNavClass(ViewContext)"
            asp-page="./Roles">
-            Roles
+            <span data-i18n="Tab_Roles">Roles</span>
         </a>
     </div>
 </nav>

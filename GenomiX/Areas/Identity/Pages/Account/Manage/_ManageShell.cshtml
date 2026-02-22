@@ -1,4 +1,4 @@
-﻿@{
+@{
     Layout = "/Views/Shared/_Layout.cshtml";
 
     var roles = User?.Claims?
@@ -7,10 +7,10 @@
         .Distinct(StringComparer.OrdinalIgnoreCase)
         .ToList() ?? new List<string>();
 
-    if (roles.Count == 0) 
-    roles.Add("User");
+    if (roles.Count == 0)
+        roles.Add("User");
 
-    var primary = roles.First(); 
+    var primary = roles.First();
     var extraCount = Math.Max(0, roles.Count - 2);
     var shown = roles.Take(2).ToList();
 }
@@ -19,9 +19,9 @@
     <div class="auth-card auth-card--wide">
         <div class="manage-head">
             <div class="manage-head__row">
-                <h1 class="auth-title">Account</h1>
+                <h1 class="auth-title"><span data-i18n="Shell_Title">Account</span></h1>
 
-                <div class="role-chips" title="Your roles">
+                <div class="role-chips" title="Your roles" data-i18n-title="Shell_RolesTooltip">
                     @foreach (var r in shown)
                     {
                         <span class="role-chip">@r</span>
@@ -33,7 +33,7 @@
                 </div>
             </div>
 
-            <p class="auth-subtitle">Manage your profile, email and password.</p>
+            <p class="auth-subtitle"><span data-i18n="Shell_Subtitle">Manage your profile, email and password.</span></p>
         </div>
 
         <div class="manage-tabs">
@@ -47,3 +47,5 @@
 </div>
 
 @await RenderSectionAsync("Scripts", required: false)
+
+<script src="~/js/identity-i18n.js" asp-append-version="true"></script>

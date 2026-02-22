@@ -8,22 +8,22 @@
 <section class="admin-page">
     <header class="admin-head">
         <div>
-            <h1 class="admin-title">Role Requests</h1>
-            <p class="admin-subtitle">Approve or decline user role changes.</p>
+            <h1 class="admin-title"><span data-i18n="UsersReq_Title">Role Requests</span></h1>
+            <p class="admin-subtitle"><span data-i18n="UsersReq_Subtitle">Approve or decline user role changes.</span></p>
         </div>
 
         <div class="admin-actions">
-            <a class="admin-btn admin-btn--ghost" href="/admin/users">All users</a>
+            <a class="admin-btn admin-btn--ghost" href="/admin/users"><span data-i18n="UsersReq_Btn_AllUsers">All users</span></a>
         </div>
     </header>
 
     <div class="admin-card admin-card--pad">
         <div class="admin-filter">
             <div class="admin-filter__tabs">
-                <a class="admin-tab @(status == "Pending" ? "is-active" : "")" href="/admin/users/requests?status=Pending">Pending</a>
-                <a class="admin-tab @(status == "Approved" ? "is-active" : "")" href="/admin/users/requests?status=Approved">Approved</a>
-                <a class="admin-tab @(status == "Declined" ? "is-active" : "")" href="/admin/users/requests?status=Declined">Declined</a>
-                <a class="admin-tab @(string.IsNullOrWhiteSpace(status) ? "is-active" : "")" href="/admin/users/requests">All</a>
+                <a class="admin-tab @(status == "Pending" ? "is-active" : "")" href="/admin/users/requests?status=Pending"><span data-i18n="UsersReq_Tab_Pending">Pending</span></a>
+                <a class="admin-tab @(status == "Approved" ? "is-active" : "")" href="/admin/users/requests?status=Approved"><span data-i18n="UsersReq_Tab_Approved">Approved</span></a>
+                <a class="admin-tab @(status == "Declined" ? "is-active" : "")" href="/admin/users/requests?status=Declined"><span data-i18n="UsersReq_Tab_Declined">Declined</span></a>
+                <a class="admin-tab @(string.IsNullOrWhiteSpace(status) ? "is-active" : "")" href="/admin/users/requests"><span data-i18n="UsersReq_Tab_All">All</span></a>
             </div>
         </div>
     </div>
@@ -34,7 +34,7 @@
             {
                 <table>
                     <tbody>
-                        <tr><td colspan="6" class="admin-empty">No requests.</td></tr>
+                        <tr><td colspan="6" class="admin-empty"><span data-i18n="UsersReq_Empty">No requests.</span></td></tr>
                     </tbody>
                 </table>
             }
@@ -43,17 +43,18 @@
                 <table class="admin-table is-wide admin-table--grid">
                     <thead>
                         <tr>
-                            <th>User</th>
-                            <th>Request</th>
-                            <th>Note</th>
-                            <th>Created</th>
-                            <th>Status</th>
-                            <th class="admin-col-actions">Actions</th>
+                            <th><span data-i18n="UsersReq_Th_User">User</span></th>
+                            <th><span data-i18n="UsersReq_Th_Request">Request</span></th>
+                            <th><span data-i18n="UsersReq_Th_Note">Note</span></th>
+                            <th><span data-i18n="UsersReq_Th_Created">Created</span></th>
+                            <th><span data-i18n="UsersReq_Th_Status">Status</span></th>
+                            <th class="admin-col-actions"><span data-i18n="UsersReq_Th_Actions">Actions</span></th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach (var r in Model)
                         {
+                            var statusKey = r.Status == "Approved" ? "Users_Status_Approved" : (r.Status == "Declined" ? "Users_Status_Declined" : "Users_Status_Pending");
                             <tr>
                                 <td>
                                     <div class="admin-user">
@@ -78,7 +79,7 @@
                                 <td class="admin-muted">@r.CreatedAt.ToLocalTime()</td>
 
                                 <td>
-                                    <span class="admin-status admin-status--@r.Status.ToLower()">@r.Status</span>
+                                    <span class="admin-status admin-status--@r.Status.ToLower()" data-i18n="@statusKey">@r.Status</span>
                                 </td>
 
                                 <td class="admin-col-actions">
@@ -87,19 +88,19 @@
                                         <div class="admin-row-actions">
                                             <form method="post" action="/admin/users/requests/approve/@r.Id">
                                                 @Html.AntiForgeryToken()
-                                                <button type="submit" class="admin-btn admin-btn--ok">Approve</button>
+                                                <button type="submit" class="admin-btn admin-btn--ok"><span data-i18n="Common_Approve">Approve</span></button>
                                             </form>
 
                                             <form method="post" action="/admin/users/requests/decline/@r.Id" class="admin-decline">
                                                 @Html.AntiForgeryToken()
-                                                <input class="admin-input" name="reason" placeholder="Reason (optional)" />
-                                                <button type="submit" class="admin-btn admin-btn--danger">Decline</button>
+                                                <input class="admin-input" name="reason" data-i18n-placeholder="UsersReq_ReasonPlaceholder" placeholder="Reason (optional)" />
+                                                <button type="submit" class="admin-btn admin-btn--danger"><span data-i18n="Common_Decline">Decline</span></button>
                                             </form>
                                         </div>
                                     }
                                     else
                                     {
-                                        <span class="admin-muted">—</span>
+                                        <span class="admin-muted"><span data-i18n="Common_Dash">—</span></span>
                                     }
                                 </td>
                             </tr>
@@ -110,3 +111,7 @@
         </div>
     </div>
 </section>
+
+@section Scripts {
+    <script src="~/js/users-i18n.js" asp-append-version="true"></script>
+}

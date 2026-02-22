@@ -1,27 +1,29 @@
 ﻿@using GenomiX.Infrastructure.Models
 @using Microsoft.AspNetCore.Identity
 @inject SignInManager<GenUser> SignInManager
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer L
 
 <ul class="auth-nav" role="list">
     @if (SignInManager.IsSignedIn(User))
     {
         <li>
-            <a class="btn ghost btn--sm" asp-area="Identity" asp-page="/Account/Manage/Index">Account</a>
+            <a class="btn ghost btn--sm" asp-area="Identity" asp-page="/Account/Manage/Index">@L["Auth_Account"]</a>
         </li>
 
         <li>
             <form class="auth-nav__logout" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="~/" method="post">
-                <button type="submit" class="btn ghost btn--sm btn-logout">Log out</button>
+                <button type="submit" class="btn ghost btn--sm btn-logout">@L["Auth_Logout"]</button>
             </form>
         </li>
     }
     else
     {
         <li>
-            <a class="btn ghost btn--sm" asp-area="Identity" asp-page="/Account/Login">Log in</a>
+            <a class="btn ghost btn--sm" asp-area="Identity" asp-page="/Account/Login">@L["Auth_Login"]</a>
         </li>
         <li>
-            <a class="btn ghost btn--sm" asp-area="Identity" asp-page="/Account/Register">Register</a>
+            <a class="btn ghost btn--sm" asp-area="Identity" asp-page="/Account/Register">@L["Auth_Register"]</a>
         </li>
     }
 </ul>

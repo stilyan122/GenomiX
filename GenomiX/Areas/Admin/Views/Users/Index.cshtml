@@ -7,12 +7,12 @@
 <section class="admin-page">
     <header class="admin-head">
         <div>
-            <h1 class="admin-title">Users</h1>
-            <p class="admin-subtitle">Overview of accounts and roles.</p>
+            <h1 class="admin-title"><span data-i18n="UsersIndex_Title">Users</span></h1>
+            <p class="admin-subtitle"><span data-i18n="UsersIndex_Subtitle">Overview of accounts and roles.</span></p>
         </div>
 
         <div class="admin-actions">
-            <a class="admin-btn admin-btn--ghost" href="/admin/users/requests">Role requests</a>
+            <a class="admin-btn admin-btn--ghost" href="/admin/users/requests"><span data-i18n="UsersIndex_Btn_RoleRequests">Role requests</span></a>
         </div>
     </header>
 
@@ -23,7 +23,7 @@
                 <table>
                     <tbody>
                         <tr>
-                            <td colspan="6" class="admin-empty">No users found.</td>
+                            <td colspan="6" class="admin-empty"><span data-i18n="UsersIndex_Empty">No users found.</span></td>
                         </tr>
                     </tbody>
                 </table>
@@ -33,12 +33,12 @@
                 <table class="admin-table is-wide admin-table--grid">
                     <thead>
                         <tr>
-                            <th>User</th>
-                            <th>Email</th>
-                            <th>Roles</th>
-                            <th class="admin-col-num">DNAs</th>
-                            <th class="admin-col-num">Sims</th>
-                            <th class="admin-col-actions">Actions</th>
+                            <th><span data-i18n="UsersIndex_Th_User">User</span></th>
+                            <th><span data-i18n="UsersIndex_Th_Email">Email</span></th>
+                            <th><span data-i18n="UsersIndex_Th_Roles">Roles</span></th>
+                            <th class="admin-col-num"><span data-i18n="UsersIndex_Th_DNAs">DNAs</span></th>
+                            <th class="admin-col-num"><span data-i18n="UsersIndex_Th_Sims">Sims</span></th>
+                            <th class="admin-col-actions"><span data-i18n="UsersIndex_Th_Actions">Actions</span></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -48,7 +48,7 @@
                                 <td>
                                     <div class="admin-user">
                                         <div class="admin-user__name">@u.UserName</div>
-                                        <div class="admin-user__id">ID: @u.UserId</div>
+                                        <div class="admin-user__id"><span data-i18n="Common_IdLabel">ID:</span> @u.UserId</div>
                                     </div>
                                 </td>
                                 <td class="admin-muted">@u.Email</td>
@@ -63,7 +63,7 @@
                                 <td class="admin-col-num">@u.DnaModels</td>
                                 <td class="admin-col-num">@u.Simulations</td>
                                 <td class="admin-col-actions">
-                                    <a class="admin-link" href="/admin/users/@u.UserId">Details</a>
+                                    <a class="admin-link" href="/admin/users/@u.UserId"><span data-i18n="Common_Details">Details</span></a>
                                 </td>
                             </tr>
                         }
@@ -73,3 +73,7 @@
         </div>
     </div>
 </section>
+
+@section Scripts {
+    <script src="~/js/users-i18n.js" asp-append-version="true"></script>
+}

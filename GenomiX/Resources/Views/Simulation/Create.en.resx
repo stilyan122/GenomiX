@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+
+  <data name="SimCreate_PageTitle" xml:space="preserve">
+    <value>Create simulation</value>
+  </data>
+  <data name="SimCreate_Kicker_Simulations" xml:space="preserve">
+    <value>Simulations</value>
+  </data>
+  <data name="SimCreate_Title" xml:space="preserve">
+    <value>Create population</value>
+  </data>
+  <data name="SimCreate_Subtitle" xml:space="preserve">
+    <value>Pick a base DNA model, set size, and start a live evolution run.</value>
+  </data>
+
+  <data name="Common_Back" xml:space="preserve">
+    <value>Back</value>
+  </data>
+
+  <data name="SimCreate_SimulationName_Label" xml:space="preserve">
+    <value>Simulation name</value>
+  </data>
+  <data name="SimCreate_SimulationName_Placeholder" xml:space="preserve">
+    <value>e.g. Arctic radiation test</value>
+  </data>
+
+  <data name="SimCreate_OrganismType_Label" xml:space="preserve">
+    <value>Organism type</value>
+  </data>
+
+  <data name="SimCreate_Species_Mouse" xml:space="preserve">
+    <value>🐭 Mouse</value>
+  </data>
+  <data name="SimCreate_Species_Pig" xml:space="preserve">
+    <value>🐷 Pig</value>
+  </data>
+  <data name="SimCreate_Species_Cow" xml:space="preserve">
+    <value>🐮 Cow</value>
+  </data>
+  <data name="SimCreate_Species_Rabbit" xml:space="preserve">
+    <value>🐰 Rabbit</value>
+  </data>
+  <data name="SimCreate_Species_Fox" xml:space="preserve">
+    <value>🦊 Fox</value>
+  </data>
+  <data name="SimCreate_Species_Bird" xml:space="preserve">
+    <value>🐦 Bird</value>
+  </data>
+  <data name="SimCreate_Species_Mixed" xml:space="preserve">
+    <value>🌍 Mixed ecosystem</value>
+  </data>
+
+  <data name="SimCreate_BaseModel_Label" xml:space="preserve">
+    <value>Base DNA model</value>
+  </data>
+  <data name="SimCreate_BaseModel_Placeholder" xml:space="preserve">
+    <value>— choose model —</value>
+  </data>
+
+  <data name="SimCreate_PopulationSize_Label" xml:space="preserve">
+    <value>Population size</value>
+  </data>
+  <data name="SimCreate_PopulationSize_Help" xml:space="preserve">
+    <value>2-5000 organisms (bigger = heavier)</value>
+  </data>
+
+  <data name="SimCreate_InitialEnvironment_Title" xml:space="preserve">
+    <value>Initial environment</value>
+  </data>
+  <data name="SimCreate_Temperature_Label" xml:space="preserve">
+    <value>Temperature</value>
+  </data>
+  <data name="SimCreate_Radiation_Label" xml:space="preserve">
+    <value>Radiation</value>
+  </data>
+  <data name="SimCreate_DiseasePressure_Label" xml:space="preserve">
+    <value>Disease pressure</value>
+  </data>
+  <data name="SimCreate_Resources_Label" xml:space="preserve">
+    <value>Resources</value>
+  </data>
+
+  <data name="SimCreate_StartSimulation_Button" xml:space="preserve">
+    <value>Start simulation</value>
+  </data>
+  <data name="SimCreate_LiveEnvironment_Note" xml:space="preserve">
+    <value>You can change the environment live after creation.</value>
+  </data>
+
+  <data name="SimCreate_Tip_Kicker" xml:space="preserve">
+    <value>Tip</value>
+  </data>
+  <data name="SimCreate_Tip_Title" xml:space="preserve">
+    <value>How to choose options?</value>
+  </data>
+
+  <data name="SimCreate_Tip_Line1" xml:space="preserve">
+    <value>&lt;strong&gt;High radiation&lt;/strong&gt; + low resources → fast population collapse</value>
+  </data>
+  <data name="SimCreate_Tip_Line2" xml:space="preserve">
+    <value>&lt;strong&gt;Warm&lt;/strong&gt; + high resources → rapid growth bursts</value>
+  </data>
+  <data name="SimCreate_Tip_Line3" xml:space="preserve">
+    <value>&lt;strong&gt;Disease pressure&lt;/strong&gt; creates visible selection shifts</value>
+  </data>
+
+  <data name="SimCreate_Tip_Note" xml:space="preserve">
+    <value>Keep runs around 200-800 organisms for smooth live visuals.</value>
+  </data>
+</root>

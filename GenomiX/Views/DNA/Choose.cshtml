@@ -1,5 +1,8 @@
-﻿@{
-    ViewData["Title"] = "DNA Builder";
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer L
+
+@{
+    ViewData["Title"] = L["Title"];
     ViewData["ActiveNav"] = "dna";
 }
 
@@ -7,28 +10,28 @@
     <div class="container">
         <header class="gx-choose__head">
             <div>
-                <h1 class="gx-choose__title">Start a DNA model</h1>
-                <p class="gx-choose__sub">Create from a template or build your own custom sequence.</p>
+                <h1 class="gx-choose__title">@L["TitleText"]</h1>
+                <p class="gx-choose__sub">@L["Subtitle"]</p>
             </div>
 
             <div class="gx-choose__actions">
-                <a class="btn ghost btn--lg" href="/dna/models">My models</a>
+                <a class="btn ghost btn--lg" href="/dna/models">@L["MyModels"]</a>
             </div>
         </header>
 
         <div class="gx-choose__grid">
             <article class="glass-card gx-choose__card">
                 <div class="gx-choose__icon" aria-hidden="true">🧬</div>
-                <h3 class="gx-choose__h">Predefined templates</h3>
-                <p class="gx-choose__p">Start from Human / Mouse / etc. We auto-generate the complement.</p>
-                <a class="btn primary btn--lg gx-choose__btn" href="/dna/predefined">Browse templates</a>
+                <h3 class="gx-choose__h">@L["PredefTitle"]</h3>
+                <p class="gx-choose__p">@L["PredefDesc"]</p>
+                <a class="btn primary btn--lg gx-choose__btn" href="/dna/predefined">@L["BrowseTemplates"]</a>
             </article>
 
             <article class="glass-card gx-choose__card">
                 <div class="gx-choose__icon" aria-hidden="true">✍️</div>
-                <h3 class="gx-choose__h">Custom DNA</h3>
-                <p class="gx-choose__p">Paste 1 strand (we generate the other) or paste both strands.</p>
-                <a class="btn ghost btn--lg gx-choose__btn" href="/dna/custom">Create custom</a>
+                <h3 class="gx-choose__h">@L["CustomTitle"]</h3>
+                <p class="gx-choose__p">@L["CustomDesc"]</p>
+                <a class="btn ghost btn--lg gx-choose__btn" href="/dna/custom">@L["CreateCustom"]</a>
             </article>
         </div>
     </div>

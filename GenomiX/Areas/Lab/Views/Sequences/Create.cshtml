@@ -8,12 +8,12 @@
 <div class="gx-lab-page">
     <div class="gx-lab-head">
         <div>
-            <h1 class="gx-lab-title">Create reference sequence</h1>
-            <div class="gx-lab-sub">Your submission will be pending until an admin approves it.</div>
+            <h1 class="gx-lab-title"><span data-i18n="LabCreate_Title">Create reference sequence</span></h1>
+            <div class="gx-lab-sub"><span data-i18n="LabCreate_Subtitle">Your submission will be pending until an admin approves it.</span></div>
         </div>
 
         <div class="gx-lab-actions">
-            <a class="gx-lab-btn" href="/lab/sequences">Back</a>
+            <a class="gx-lab-btn" href="/lab/sequences"><span data-i18n="Common_Back">Back</span></a>
         </div>
     </div>
 
@@ -38,18 +38,19 @@
             <div class="gx-lab-field">
                 <label class="gx-lab-label" asp-for="Sequence"></label>
                 <textarea class="gx-lab-textarea" asp-for="Sequence" rows="8" spellcheck="false"></textarea>
-                <div class="gx-lab-hint">Allowed: A, C, G, T (whitespace ignored by your controller/service normalization).</div>
+                <div class="gx-lab-hint"><span data-i18n="LabCreate_HintAllowed">Allowed: A, C, G, T (whitespace ignored by your controller/service normalization).</span></div>
                 <span class="gx-lab-val" asp-validation-for="Sequence"></span>
             </div>
 
             <div class="gx-lab-footer">
-                <button type="submit" class="gx-lab-btn gx-lab-btn--primary">Submit</button>
-                <a class="gx-lab-btn" href="/lab/sequences">Cancel</a>
+                <button type="submit" class="gx-lab-btn gx-lab-btn--primary"><span data-i18n="Common_Submit">Submit</span></button>
+                <a class="gx-lab-btn" href="/lab/sequences"><span data-i18n="Common_Cancel">Cancel</span></a>
             </div>
         </form>
     </div>
 </div>
 
 @section Scripts {
+    <script src="~/js/lab-i18n.js" asp-append-version="true"></script>
     <partial name="_ValidationScriptsPartial" />
 }

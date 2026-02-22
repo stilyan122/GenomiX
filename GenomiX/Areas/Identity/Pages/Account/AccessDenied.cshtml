@@ -1,4 +1,4 @@
-﻿@page
+@page
 @model AccessDeniedModel
 @{
     ViewData["Title"] = "Access denied";
@@ -6,5 +6,8 @@
 
 <header>
     <h1 class="text-danger">@ViewData["Title"]</h1>
-    <p class="text-danger">You do not have access to this resource.</p>
+    <p class="text-danger"><span data-i18n="AccDeny_Message">You do not have access to this resource.</span></p>
 </header>
+
+
+<script src="~/js/identity-i18n.js" asp-append-version="true"></script>

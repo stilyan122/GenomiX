@@ -1,7 +1,8 @@
-﻿@model GenomiX.ViewModels.Population.EditPopulationInputModel
+@model GenomiX.ViewModels.Population.EditPopulationInputModel
+@inject Microsoft.AspNetCore.Mvc.Localization.IViewLocalizer L
 
 @{
-    ViewData["Title"] = "Edit simulation";
+    ViewData["Title"] = L["SimEdit_PageTitle"];
     ViewData["ActiveNav"] = "simulations";
 }
 
@@ -9,13 +10,13 @@
     <div class="container container--wide gx-sim">
         <header class="gx-sim__header">
             <div class="gx-sim__head-left">
-                <div class="gx-sim__kicker">Simulations</div>
-                <h1 class="gx-sim__title">Edit simulation</h1>
-                <p class="gx-sim__subtitle">Rename your population run.</p>
+                <div class="gx-sim__kicker">@L["SimEdit_Kicker_Simulations"]</div>
+                <h1 class="gx-sim__title">@L["SimEdit_Title"]</h1>
+                <p class="gx-sim__subtitle">@L["SimEdit_Subtitle"]</p>
             </div>
 
             <div class="gx-sim__head-right">
-                <a class="gx-btn gx-btn--ghost" href="/simulations">Back</a>
+                <a class="gx-btn gx-btn--ghost" href="/simulations">@L["Common_Back"]</a>
             </div>
         </header>
 
@@ -25,14 +26,14 @@
                 <input type="hidden" asp-for="Id" />
 
                 <div class="gx-field">
-                    <label class="gx-label" asp-for="Name">Name</label>
+                    <label class="gx-label" asp-for="Name">@L["SimEdit_Name_Label"]</label>
                     <input class="gx-input" asp-for="Name" maxlength="60" autocomplete="off" />
                     <span class="gx-val" asp-validation-for="Name"></span>
                 </div>
 
                 <div class="gx-formactions">
-                    <button type="submit" class="gx-btn gx-btn--primary">Save</button>
-                    <a class="gx-btn" href="/simulations">Cancel</a>
+                    <button type="submit" class="gx-btn gx-btn--primary">@L["Common_Save"]</button>
+                    <a class="gx-btn" href="/simulations">@L["Common_Cancel"]</a>
                 </div>
             </form>
         </article>

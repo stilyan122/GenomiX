@@ -1,4 +1,4 @@
-﻿@page
+@page
 @using Microsoft.AspNetCore.Authentication
 @model GenomiX.Areas.Identity.Pages.Account.LoginModel
 @{
@@ -14,8 +14,8 @@
 
 <div class="auth-wrap">
     <div class="auth-card">
-        <h1 class="auth-title">Log in your account</h1>
-        <p class="auth-sub">Welcome back to GenomiX.</p>
+        <h1 class="auth-title"><span data-i18n="Login_Title">Log in your account</span></h1>
+        <p class="auth-sub"><span data-i18n="Login_Welcome">Welcome back to GenomiX.</span></p>
 
         <form id="loginForm" method="post" class="auth-form" novalidate>
             @Html.AntiForgeryToken()
@@ -23,7 +23,7 @@
             <div asp-validation-summary="ModelOnly" class="auth-validation" role="alert"></div>
 
             <div class="auth-field">
-                <label class="auth-label" asp-for="Input.EmailOrUserName">Email or username</label>
+                <label class="auth-label" asp-for="Input.EmailOrUserName"><span data-i18n="Login_EmailOrUser">Email or username</span></label>
                 <input class="auth-input"
                        asp-for="Input.EmailOrUserName"
                        autocomplete="username"
@@ -32,7 +32,7 @@
             </div>
 
             <div class="auth-field">
-                <label class="auth-label" asp-for="Input.Password">Password</label>
+                <label class="auth-label" asp-for="Input.Password"><span data-i18n="Tab_Password">Password</span></label>
                 <input class="auth-input"
                        asp-for="Input.Password"
                        type="password"
@@ -45,24 +45,24 @@
                 <label class="auth-remember">
                     <input class="auth-remember__input" asp-for="Input.RememberMe" />
                     <span class="auth-remember__box" aria-hidden="true"></span>
-                    <span class="auth-remember__text">Remember me</span>
+                    <span class="auth-remember__text"><span data-i18n="Login_Remember">Remember me</span></span>
                 </label>
 
                 <div class="auth-links">
-                    <a id="forgot-password" class="link" asp-page="./ForgotPassword">Forgot password?</a>
+                    <a id="forgot-password" class="link" asp-page="./ForgotPassword"><span data-i18n="Login_Forgot">Forgot password?</span></a>
                     <span class="auth-dot">·</span>
-                    <a class="link" asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">Create account</a>
+                    <a class="link" asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl"><span data-i18n="Login_Create">Create account</span></a>
                 </div>
             </div>
 
-            <button id="login-submit" type="submit" class="auth-button">Sign in</button>
+            <button id="login-submit" type="submit" class="auth-button"><span data-i18n="Login_SignIn">Sign in</span></button>
         </form>
 
         @if (providers.Count > 0)
         {
             <div class="auth-sep">
                 <div class="auth-sep-line"></div>
-                <div class="auth-sep-text">or</div>
+                <div class="auth-sep-text"><span data-i18n="Login_Or">or</span></div>
                 <div class="auth-sep-line"></div>
             </div>
 
@@ -117,5 +117,6 @@
 </div>
 
 @section Scripts {
-    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/identity-i18n.js" asp-append-version="true"></script>
+<partial name="_ValidationScriptsPartial" />
 }

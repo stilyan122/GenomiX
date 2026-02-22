@@ -1,7 +1,8 @@
 ﻿@model IEnumerable<PopulationViewModel>
+@inject Microsoft.AspNetCore.Mvc.Localization.IViewLocalizer L
 
 @{
-    ViewData["Title"] = "Simulations";
+    ViewData["Title"] = L["SimIndex_PageTitle"];
     ViewData["ActiveNav"] = "simulations";
 }
 
@@ -10,17 +11,17 @@
 
         <header class="gx-sim__header gx-sim__header--index">
             <div class="gx-sim__head-left">
-                <div class="gx-sim__kicker">Simulations</div>
-                <h1 class="gx-sim__title">Population lab</h1>
+                <div class="gx-sim__kicker">@L["SimIndex_Kicker_Simulations"]</div>
+                <h1 class="gx-sim__title">@L["SimIndex_Title"]</h1>
                 <p class="gx-sim__subtitle">
-                    Live evolution runs with real-time environment control.
+                    @L["SimIndex_Subtitle"]
                 </p>
             </div>
 
             <div class="gx-sim__head-right gx-sim__head-right--index">
                 <a class="gx-btn gx-btn--primary gx-sim__cta" href="/simulations/create">
                     <span class="gx-cta__plus">＋</span>
-                    Create simulation
+                    @L["SimIndex_Btn_CreateSimulation"]
                 </a>
             </div>
         </header>
@@ -28,12 +29,12 @@
         @if (Model == null || Model.Count() == 0)
         {
             <div class="gx-empty gx-empty--sim">
-                <div class="gx-empty__badge">New</div>
-                <div class="gx-empty__title">No simulations yet</div>
+                <div class="gx-empty__badge">@L["SimIndex_Empty_Badge"]</div>
+                <div class="gx-empty__title">@L["SimIndex_Empty_Title"]</div>
                 <div class="gx-empty__text">
-                    Create your first population and start changing the environment while it evolves.
+                    @L["SimIndex_Empty_Text"]
                 </div>
-                <a class="gx-btn gx-btn--primary" href="/simulations/create">Create simulation</a>
+                <a class="gx-btn gx-btn--primary" href="/simulations/create">@L["SimIndex_Btn_CreateSimulation"]</a>
             </div>
         }
         else
@@ -41,13 +42,13 @@
             <div class="gx-sim__toolbar">
                 <div class="gx-sim__count">
                     <span class="gx-dot"></span>
-                    <strong>@Model?.Count()</strong> runs
+                    <strong>@Model?.Count()</strong> @L["SimIndex_Runs_Label"]
                 </div>
 
                 <div class="gx-sim__legend">
-                    <span class="gx-pill gx-pill--soft">Organisms</span>
-                    <span class="gx-pill gx-pill--soft">Environment</span>
-                    <span class="gx-pill gx-pill--soft">Ticks</span>
+                    <span class="gx-pill gx-pill--soft">@L["SimIndex_Legend_Organisms"]</span>
+                    <span class="gx-pill gx-pill--soft">@L["SimIndex_Legend_Environment"]</span>
+                    <span class="gx-pill gx-pill--soft">@L["SimIndex_Legend_Ticks"]</span>
                 </div>
             </div>
 
@@ -62,14 +63,14 @@
                         <header class="gx-simtile__top">
                             <div class="gx-simtile__title">@p.Name</div>
                             <div class="gx-simtile__meta">
-                                <span class="gx-meta__k">Created</span>
+                                <span class="gx-meta__k">@L["SimIndex_Created_Label"]</span>
                                 <span class="gx-meta__v mono">@p.CreatedAt</span>
                             </div>
                         </header>
 
                         <div class="gx-simtile__stats">
                             <div class="gx-stat">
-                                <div class="gx-stat__k">Organisms</div>
+                                <div class="gx-stat__k">@L["SimIndex_Stat_Organisms"]</div>
                                 <div class="gx-stat__v mono">@orgCount</div>
                                 <div class="gx-stat__bar">
                                     <div class="gx-stat__fill" style="width:@(Math.Min(100, 12 + orgCount / 50.0 * 88)).ToString(" 0")%"></div>
@@ -77,22 +78,22 @@
                             </div>
 
                             <div class="gx-stat">
-                                <div class="gx-stat__k">Base model</div>
+                                <div class="gx-stat__k">@L["SimIndex_Stat_BaseModel"]</div>
                                 <div class="gx-stat__v mono">@p.BaseModelName</div>
-                                <div class="gx-stat__hint">DNA snapshot for this run</div>
+                                <div class="gx-stat__hint">@L["SimIndex_Stat_BaseModel_Hint"]</div>
                             </div>
                         </div>
 
                         <div class="gx-simcard__actions">
-                            <a class="gx-btn gx-btn--primary gx-btn--block" href="/simulations/run/@p.Id">Open lab</a>
-                            <a class="gx-btn gx-btn--block" href="/dna/builder/@p.BaseModelId">View DNA</a>
+                            <a class="gx-btn gx-btn--primary gx-btn--block" href="/simulations/run/@p.Id">@L["SimIndex_Btn_OpenLab"]</a>
+                            <a class="gx-btn gx-btn--block" href="/dna/builder/@p.BaseModelId">@L["SimIndex_Btn_ViewDNA"]</a>
 
-                            <a class="gx-btn gx-btn--ghost gx-btn--block" href="/simulations/edit/@p.Id">Edit</a>
+                            <a class="gx-btn gx-btn--ghost gx-btn--block" href="/simulations/edit/@p.Id">@L["SimIndex_Btn_Edit"]</a>
 
                             <form method="post" action="/simulations/delete/@p.Id" class="gx-inlineform gx-inlineform--block"
-                                  onsubmit="return confirm('Delete this simulation? This cannot be undone.');">
+                                  onsubmit="return confirm('@L["SimIndex_DeleteConfirm"]');">
                                 @Html.AntiForgeryToken()
-                                <button type="submit" class="gx-btn gx-btn--danger gx-btn--block">Delete</button>
+                                <button type="submit" class="gx-btn gx-btn--danger gx-btn--block">@L["SimIndex_Btn_Delete"]</button>
                             </form>
                         </div>
 

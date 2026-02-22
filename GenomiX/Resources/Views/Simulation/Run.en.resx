@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+
+  <data name="SimRun_PageTitle" xml:space="preserve">
+    <value>Run simulation</value>
+  </data>
+
+  <data name="SimRun_Kicker_Simulation" xml:space="preserve">
+    <value>Simulation</value>
+  </data>
+
+  <data name="SimRun_Sub_LiveEnvironment" xml:space="preserve">
+    <value>Live environment control</value>
+  </data>
+
+  <data name="SimRun_Sub_DNA" xml:space="preserve">
+    <value>DNA</value>
+  </data>
+
+  <data name="SimRun_Sub_Run" xml:space="preserve">
+    <value>Run</value>
+  </data>
+
+  <data name="Common_Back" xml:space="preserve">
+    <value>Back</value>
+  </data>
+
+  <data name="SimRun_Btn_Start" xml:space="preserve">
+    <value>Start</value>
+  </data>
+
+  <data name="SimRun_Btn_Tick10" xml:space="preserve">
+    <value>Tick ×10</value>
+  </data>
+
+  <data name="SimRun_Btn_Pause" xml:space="preserve">
+    <value>Pause</value>
+  </data>
+
+  <data name="SimRun_Scenario_Placeholder" xml:space="preserve">
+    <value>Scenario…</value>
+  </data>
+
+  <data name="SimRun_Btn_Apply" xml:space="preserve">
+    <value>Apply</value>
+  </data>
+
+  <data name="SimRun_Hud_Alive" xml:space="preserve">
+    <value>Alive</value>
+  </data>
+
+  <data name="SimRun_Hud_Dead" xml:space="preserve">
+    <value>Dead</value>
+  </data>
+
+  <data name="SimRun_Hud_Reproduced" xml:space="preserve">
+    <value>Reproduced</value>
+  </data>
+
+  <data name="SimRun_Hud_AvgFitness" xml:space="preserve">
+    <value>Avg fitness</value>
+  </data>
+
+  <data name="SimRun_Hud_Tick" xml:space="preserve">
+    <value>Tick</value>
+  </data>
+
+  <data name="SimRun_Status_Ready" xml:space="preserve">
+    <value>Ready.</value>
+  </data>
+
+  <data name="SimRun_Btn_Fullscreen" xml:space="preserve">
+    <value>Fullscreen</value>
+  </data>
+
+  <data name="SimRun_Log_Title" xml:space="preserve">
+    <value>Live log</value>
+  </data>
+
+  <data name="SimRun_Kicker_Environment" xml:space="preserve">
+    <value>Environment</value>
+  </data>
+
+  <data name="SimRun_ControlPanel_Title" xml:space="preserve">
+    <value>Control panel</value>
+  </data>
+
+  <data name="SimRun_ControlPanel_Subtitle" xml:space="preserve">
+    <value>Changes apply live (no reload).</value>
+  </data>
+
+  <data name="SimRun_Aria_ToggleEnvironment" xml:space="preserve">
+    <value>Toggle environment panel</value>
+  </data>
+
+  <data name="SimRun_Temperature_Label" xml:space="preserve">
+    <value>Temperature</value>
+  </data>
+
+  <data name="SimRun_Radiation_Label" xml:space="preserve">
+    <value>Radiation</value>
+  </data>
+
+  <data name="SimRun_DiseasePressure_Label" xml:space="preserve">
+    <value>Disease pressure</value>
+  </data>
+
+  <data name="SimRun_Resources_Label" xml:space="preserve">
+    <value>Resources</value>
+  </data>
+
+  <data name="SimRun_Speed_Label" xml:space="preserve">
+    <value>Speed</value>
+  </data>
+
+</root>

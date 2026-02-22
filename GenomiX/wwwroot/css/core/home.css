@@ -5,10 +5,6 @@
   padding-bottom: clamp(20px, 3vw, 36px);
 }
 
-#top{
-    margin-bottom: 2em;
-}
-
 .home-hero::before{
   content:"";
   position:absolute;
@@ -333,4 +329,157 @@
 
 .home-h1 {
     text-wrap: balance;
+}
+
+.home-section {
+    padding: 0;
+}
+
+.home-section + .home-section {
+    margin-top: 40px;
+}
+
+.home-hero {
+    padding-top: 2em;
+}
+
+.home-hero__grid {
+    gap: 80px;
+}
+
+.home-h1 {
+    margin-bottom: 32px;
+    line-height: 1.25;
+}
+
+.home-lead {
+    margin-bottom: 40px;
+    font-size: 1.1rem;
+    line-height: 1.75;
+}
+
+.home-sub {
+    margin-bottom: 50px;
+    max-width: 720px;
+    line-height: 1.7;
+}
+
+.glass-card {
+    padding: 36px 32px;
+    border-radius: 18px;
+}
+
+.glass-card h3 {
+    margin-bottom: 18px;
+}
+
+.glass-card p {
+    margin-bottom: 20px;
+    line-height: 1.7;
+}
+
+.bullets li {
+    margin-bottom: 10px;
+}
+
+.tri-grid {
+    gap: 40px;
+}
+
+.home-metrics {
+    margin-top: 50px;
+    gap: 40px;
+}
+
+.steps {
+    gap: 50px;
+    margin-top: 60px;
+}
+
+.step {
+    padding: 1em 1.5em;
+}
+
+.home-cta-strip {
+    padding: 120px 0;
+}
+
+.home-cta-strip__inner {
+    gap: 60px;
+}
+
+.lang-switch{
+  display:flex;
+  gap:.4rem;
+  align-items:center;
+  padding:.25rem;
+  border-radius:999px;
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.10);
+  box-shadow:0 8px 22px rgba(0,0,0,.25);
+  backdrop-filter: blur(10px);
+}
+
+.lang-switch button{
+  appearance:none;
+  border:1px solid rgba(255,255,255,.12);
+  background:rgba(255,255,255,.06);
+  color:rgba(255,255,255,.9);
+  font:600 12px/1 system-ui,-apple-system,Segoe UI,Roboto,Arial;
+  letter-spacing:.4px;
+  border-radius:999px;
+  padding:.35rem .6rem;
+  cursor:pointer;
+  display:inline-flex;
+  align-items:center;
+  gap:.45rem;
+  transition: transform .12s ease, background .12s ease, border-color .12s ease, box-shadow .12s ease;
+}
+
+.lang-switch button::before{
+  content:"";
+  width:14px;
+  height:14px;
+  border-radius:50%;
+  display:inline-block;
+  box-shadow:0 0 0 1px rgba(255,255,255,.22) inset, 0 6px 14px rgba(0,0,0,.25);
+}
+
+.lang-switch button[value="en"]::before{
+  background:
+    linear-gradient(90deg,#c8102e 0 18%, transparent 18% 82%, #c8102e 82% 100%),
+    linear-gradient(#c8102e 0 18%, transparent 18% 82%, #c8102e 82% 100%),
+    linear-gradient(90deg,#012169 0 100%);
+}
+
+.lang-switch button[value="bg"]::before{
+  background: linear-gradient(#fff 0 33%, #00966e 33% 66%, #d62612 66% 100%);
+}
+
+.lang-switch button:hover{
+  transform: translateY(-1px);
+  background:rgba(255,255,255,.10);
+  border-color:rgba(255,255,255,.22);
+}
+
+.lang-switch button:active{
+  transform: translateY(0);
+}
+
+.lang-switch button:focus-visible{
+  outline:none;
+  box-shadow:0 0 0 3px rgba(0,255,200,.18), 0 0 0 1px rgba(0,255,200,.35) inset;
+}
+
+html[lang^="en"] .lang-switch button[value="en"],
+html[lang^="bg"] .lang-switch button[value="bg"]{
+  background: linear-gradient(180deg, rgba(0,255,200,.18), rgba(0,255,200,.06));
+  border-color: rgba(0,255,200,.40);
+  box-shadow: 0 10px 26px rgba(0,255,200,.10);
+  color:#fff;
+}
+
+html[lang^="en"] .lang-switch button[value="bg"],
+html[lang^="bg"] .lang-switch button[value="en"]{
+  opacity:.85;
 }

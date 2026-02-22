@@ -1,7 +1,7 @@
-﻿@page
+@page
 @model GenomiX.Areas.Identity.Pages.Account.Manage.EmailModel
 @{
-    ViewData["Title"] = "Email";
+    ViewData["Title"] = "";
     Layout = "_ManageShell";
 }
 
@@ -9,18 +9,31 @@
     <div asp-validation-summary="ModelOnly" class="auth-validation" role="alert"></div>
 
     <div class="auth-field">
-        <label class="auth-label">Current email</label>
+        <label class="auth-label"><span data-i18n="Lbl_CurrentEmail">Current email</span></label>
         <input class="auth-input" value="@Model.Email" disabled />
     </div>
 
+    @if (!Model.IsEmailConfirmed)
+    {
+        <div class="auth-note">
+            <span data-i18n="Msg_EmailUnconfirmed">Your email is unconfirmed.</span>
+        </div>
+
+        <button type="submit" class="btn ghost btn--lg" asp-page-handler="SendVerificationEmail">
+            <span data-i18n="Btn_SendVerification">Send verification email</span>
+        </button>
+    }
+
     <div class="auth-field">
-        <label class="auth-label" asp-for="Input.NewEmail">New email</label>
+        <label class="auth-label" asp-for="Input.NewEmail">
+            <span data-i18n="Lbl_NewEmail">New email</span>
+        </label>
         <input class="auth-input" asp-for="Input.NewEmail" autocomplete="email" />
         <span class="auth-error" asp-validation-for="Input.NewEmail"></span>
     </div>
 
-    <button type="submit" class="auth-button" asp-page-handler="ChangeEmail">
-        Send confirmation
+    <button type="submit" class="btn primary btn--lg" asp-page-handler="ChangeEmail">
+        <span data-i18n="Btn_ChangeEmail">Change email</span>
     </button>
 </form>
 

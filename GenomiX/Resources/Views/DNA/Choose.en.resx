@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="BrowseTemplates" xml:space="preserve">
+    <value>Browse templates</value>
+  </data>
+  <data name="CreateCustom" xml:space="preserve">
+    <value>Create custom</value>
+  </data>
+  <data name="CustomDesc" xml:space="preserve">
+    <value>Paste 1 strand (we generate the other) or paste both strands.</value>
+  </data>
+  <data name="CustomTitle" xml:space="preserve">
+    <value>Custom DNA</value>
+  </data>
+  <data name="MyModels" xml:space="preserve">
+    <value>My models</value>
+  </data>
+  <data name="PredefDesc" xml:space="preserve">
+    <value>Start from Human / Mouse / etc. We auto-generate the complement.</value>
+  </data>
+  <data name="PredefTitle" xml:space="preserve">
+    <value>Predefined templates</value>
+  </data>
+  <data name="Subtitle" xml:space="preserve">
+    <value>Create from a template or build your own custom sequence.</value>
+  </data>
+  <data name="Title" xml:space="preserve">
+    <value>DNA Builder</value>
+  </data>
+  <data name="TitleText" xml:space="preserve">
+    <value>Start a DNA model</value>
+  </data>
+</root>

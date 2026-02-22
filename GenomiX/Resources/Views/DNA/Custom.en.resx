@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Back" xml:space="preserve">
+    <value>Back</value>
+  </data>
+  <data name="Btn_CreateOpen" xml:space="preserve">
+    <value>Create &amp; Open</value>
+  </data>
+  <data name="Btn_Import" xml:space="preserve">
+    <value>Import</value>
+  </data>
+  <data name="Lbl_DNAInput" xml:space="preserve">
+    <value>DNA input</value>
+  </data>
+  <data name="Lbl_ModelName" xml:space="preserve">
+    <value>Model name</value>
+  </data>
+  <data name="Ph_ModelName" xml:space="preserve">
+    <value>e.g. Human β-globin demo</value>
+  </data>
+  <data name="Ph_Sequence" xml:space="preserve">
+    <value>ATGCGTACG...
+(optional second line = complement)</value>
+  </data>
+  <data name="Pill_ACGT" xml:space="preserve">
+    <value>A • C • G • T only</value>
+  </data>
+  <data name="Pill_Import" xml:space="preserve">
+    <value>Import .txt / .json</value>
+  </data>
+  <data name="Pill_TwoLines" xml:space="preserve">
+    <value>Two lines = double strand</value>
+  </data>
+  <data name="Sub_GenComplement" xml:space="preserve">
+    <value>(we generate the complement) or</value>
+  </data>
+  <data name="Sub_OnSeparateLines" xml:space="preserve">
+    <value>on separate lines.</value>
+  </data>
+  <data name="Sub_OneStrand" xml:space="preserve">
+    <value>one strand</value>
+  </data>
+  <data name="Sub_PastePrefix" xml:space="preserve">
+    <value>Paste</value>
+  </data>
+  <data name="Sub_ThenCreateOpen" xml:space="preserve">
+    <value>Then we'll create the model and open it in the workspace.</value>
+  </data>
+  <data name="Sub_TwoStrands" xml:space="preserve">
+    <value>two strands</value>
+  </data>
+  <data name="Tip_AutoComplement" xml:space="preserve">
+    <value>Tip: If you provide one strand, the complementary strand is generated automatically.</value>
+  </data>
+  <data name="Title" xml:space="preserve">
+    <value>Custom DNA Builder</value>
+  </data>
+</root>

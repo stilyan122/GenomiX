@@ -1,7 +1,10 @@
-﻿@model IEnumerable<SequenceViewModel>
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer L
+
+@model IEnumerable<SequenceViewModel>
 
 @{
-    ViewData["Title"] = "Predefined DNA";
+    ViewData["Title"] = L["Title"];
     ViewData["ActiveNav"] = "dna";
 
     var items = Model?.ToList() ?? new List<SequenceViewModel>();
@@ -17,25 +20,23 @@
     <div class="container">
         <header class="gx-predef__head">
             <div>
-                <h1 class="gx-predef__title">Predefined DNA templates</h1>
-                <p class="gx-predef__sub">
-                    Pick a template to create a new editable model. We generate the complementary strand automatically.
-                </p>
+                <h1 class="gx-predef__title">@L["Header"]</h1>
+                <p class="gx-predef__sub">@L["Sub"]</p>
             </div>
 
             <div class="gx-predef__actions">
-                <a class="btn ghost btn--lg" href="/dna/choose">Back</a>
+                <a class="btn ghost btn--lg" href="/dna/choose">@L["Back"]</a>
             </div>
         </header>
 
         <div class="gx-predef__toolbar">
             <div class="gx-predef__search">
-                <input id="gxPredefSearch" class="gx-predef__input" type="search" placeholder="Search species..." autocomplete="off" />
-                <span class="gx-predef__hint">Type to filter</span>
+                <input id="gxPredefSearch" class="gx-predef__input" type="search" placeholder="@L["Ph_Search"]" autocomplete="off" />
+                <span class="gx-predef__hint">@L["Hint_Filter"]</span>
             </div>
 
             <div class="gx-predef__chips" role="list" aria-label="Species filters">
-                <button class="gx-predef__chip is-active" type="button" data-filter="all">All</button>
+                <button class="gx-predef__chip is-active" type="button" data-filter="all">@L["All"]</button>
                 @foreach (var sp in species)
                 {
                     <button class="gx-predef__chip" type="button" data-filter="@sp">@sp</button>
@@ -46,8 +47,8 @@
         @if (!items.Any())
         {
             <article class="glass-card">
-                <h3>No templates yet</h3>
-                <p>We are sorry! Created a sequence on your own! Expect some <span class="mono">reference sequences</span> anytime soon!</p>
+                <h3>@L["Empty_H"]</h3>
+                <p>@L["Empty_P1"]<span class="mono">@L["Empty_Ref"]</span> @L["Empty_P2"]</p>
             </article>
         }
         else
@@ -62,10 +63,10 @@
                         <div class="gx-predef__top">
                             <div class="gx-predef__titleRow">
                                 <div class="gx-predef__species">@sp</div>
-                                <div class="gx-predef__meta">Created by: @seq.CreatedBy</div>
+                                <div class="gx-predef__meta">@L["Meta_CreatedBy"]@seq.CreatedBy</div>
                                 <div class="gx-predef__meta">@len bp</div>
                             </div>
-                            <div class="gx-predef__badge" title="Reference template">Template</div>
+                            <div class="gx-predef__badge" title="@L["Title_Template"]">@L["Badge_Template"]</div>
                         </div>
 
                         <div class="gx-predef__preview mono" aria-hidden="true">
@@ -84,14 +85,14 @@
                                        name="Name"
                                        maxlength="80"
                                        required
-                                       placeholder="Model name (required)"
+                                       placeholder="@L["Ph_ModelNameReq"]"
                                        autocomplete="off" />
 
-                                <button type="submit" class="btn primary btn--lg gx-predef__btn">Use template</button>
+                                <button type="submit" class="btn primary btn--lg gx-predef__btn">@L["Btn_UseTemplate"]</button>
                             </form>
 
                             <div class="gx-predef__note">
-                                Creates a model in <a class="gx-predef__link" href="/dna/models">My Models</a>
+                                @L["CreatesIn"]<a class="gx-predef__link" href="/dna/models">@L["MyModels"]</a>
                             </div>
                         </div>
                     </article>
