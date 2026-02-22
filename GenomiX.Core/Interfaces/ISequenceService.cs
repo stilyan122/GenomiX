@@ -13,11 +13,6 @@ namespace GenomiX.Core.Interfaces
         /// <returns>A task that represents the asynchronous operation. The task result contains an enumerable of Sequence entities.</returns>
         Task<IEnumerable<DNASequence>> GetAllUserSequencesAsync();
 
-        /// <summary>
-        /// Retrieves all Reference Sequence entities.
-        /// </summary>
-        /// <returns>A task that represents the asynchronous operation. The task result contains an enumerable of Reference Sequence entities.</returns>
-        Task<IEnumerable<ReferenceSequence>> GetAllReferenceSequencesAsync();
 
         /// <summary>
         /// Retrieves a Sequence entity by its identifier.
@@ -41,13 +36,6 @@ namespace GenomiX.Core.Interfaces
         Task AddUserSequenceAsync(DNASequence dna);
 
         /// <summary>
-        /// Adds a new Reference Sequence entity.
-        /// </summary>
-        /// <param name="dna">The Reference Sequence entity to add.</param>
-        /// <returns>A task that represents the asynchronous operation.</returns>
-        Task AddReferenceSequenceAsync(ReferenceSequence dna);
-
-        /// <summary>
         /// Updates an existing Sequence entity.
         /// </summary>
         /// <param name="dna">The Sequence entity to update.</param>
@@ -55,25 +43,11 @@ namespace GenomiX.Core.Interfaces
         Task UpdateUserSequenceAsync(DNASequence dna);
 
         /// <summary>
-        /// Updates an existing Reference Sequence entity.
-        /// </summary>
-        /// <param name="dna">The Reference Sequence entity to update.</param>
-        /// <returns>A task that represents the asynchronous operation.</returns>
-        Task UpdateReferenceSequenceAsync(ReferenceSequence dna);
-
-        /// <summary>
         /// Deletes a Sequence entity by its identifier.
         /// </summary>
         /// <param name="id">The identifier of the Sequence entity to delete.</param>
         /// <returns>A task that represents the asynchronous operation.</returns>
         Task DeleteUserSequenceAsync(object id);
-
-        /// <summary>
-        /// Deletes a Reference Sequence entity by its identifier.
-        /// </summary>
-        /// <param name="id">The identifier of the Reference Sequence entity to delete.</param>
-        /// <returns>A task that represents the asynchronous operation.</returns>
-        Task DeleteReferenceSequenceAsync(object id);
 
         /// <summary>
         /// Asynchronously retrieves a read-only list of approved reference sequences.

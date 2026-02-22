@@ -63,13 +63,6 @@ namespace GenomiX.Core.Services
                 .ToListAsync();
         }
 
-        public async Task<ReferenceSequence?> GetReferenceByIdAsync(Guid id)
-        {
-            return await _referenceSequenceRepo.GetAll()
-                .Include(rs => rs.CreatedByUser)
-                .FirstOrDefaultAsync(x => x.Id == id);
-        }
-
         public async Task<Guid> CreateReferenceAsync(Guid userId, string species, string name, string sequence)
         {
             var now = DateTimeOffset.UtcNow;
@@ -169,50 +162,12 @@ namespace GenomiX.Core.Services
             return true;
         }
 
-        public async Task AddReferenceSequenceAsync(ReferenceSequence dna)
-        {
-            dna.Sequence = Normalize(dna.Sequence);
-            Validate(dna.Sequence);
-
-            await _referenceSequenceRepo.AddAsync(dna);
-        }
-
-        public async Task UpdateReferenceSequenceAsync(ReferenceSequence dna)
-        {
-            var existing = await _referenceSequenceRepo.GetByIdAsync(dna.Id);
-            if (existing == null)
-                throw new ArgumentException("Reference sequence not found.");
-
-            dna.Sequence = Normalize(dna.Sequence);
-            Validate(dna.Sequence);
-
-            existing.Species = dna.Species.Trim();
-            existing.Sequence = dna.Sequence;
-
-            await _referenceSequenceRepo.UpdateAsync(existing);
-        }
-
-        public async Task DeleteReferenceSequenceAsync(object id)
-        {
-            var entity = await _referenceSequenceRepo.GetByIdAsync(id);
-            if (entity == null)
-                return;
-
-            await _referenceSequenceRepo.DeleteAsync(id);
-        }
-
-        public async Task<IEnumerable<ReferenceSequence>> GetAllReferenceSequencesAsync()
+        public async Task<ReferenceSequence?> GetReferenceSequenceByIdAsync(object id)
         {
             return await _referenceSequenceRepo
                 .GetAll()
                 .Include(rs => rs.CreatedByUser)
-                .ToListAsync();
-        }
-
-        public async Task<ReferenceSequence?> GetReferenceSequenceByIdAsync(object id)
-        {
-            return await _referenceSequenceRepo
-                .GetByIdAsync(id);
+                .FirstOrDefaultAsync(x => x.Id.Equals(id));
         }
 
         public async Task AddUserSequenceAsync(DNASequence dna)
