@@ -1,0 +1,112 @@
+﻿@model List<AdminRoleRequestListItemViewModel>
+
+@{
+    ViewData["Title"] = "Role Requests";
+    var status = (ViewData["Status"] as string) ?? "";
+}
+
+<section class="admin-page">
+    <header class="admin-head">
+        <div>
+            <h1 class="admin-title">Role Requests</h1>
+            <p class="admin-subtitle">Approve or decline user role changes.</p>
+        </div>
+
+        <div class="admin-actions">
+            <a class="admin-btn admin-btn--ghost" href="/admin/users">All users</a>
+        </div>
+    </header>
+
+    <div class="admin-card admin-card--pad">
+        <div class="admin-filter">
+            <div class="admin-filter__tabs">
+                <a class="admin-tab @(status == "Pending" ? "is-active" : "")" href="/admin/users/requests?status=Pending">Pending</a>
+                <a class="admin-tab @(status == "Approved" ? "is-active" : "")" href="/admin/users/requests?status=Approved">Approved</a>
+                <a class="admin-tab @(status == "Declined" ? "is-active" : "")" href="/admin/users/requests?status=Declined">Declined</a>
+                <a class="admin-tab @(string.IsNullOrWhiteSpace(status) ? "is-active" : "")" href="/admin/users/requests">All</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="admin-card">
+        <div class="admin-table-wrap">
+            @if (Model.Count == 0)
+            {
+                <table>
+                    <tbody>
+                        <tr><td colspan="6" class="admin-empty">No requests.</td></tr>
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <table class="admin-table is-wide admin-table--grid">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Request</th>
+                            <th>Note</th>
+                            <th>Created</th>
+                            <th>Status</th>
+                            <th class="admin-col-actions">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var r in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="admin-user">
+                                        <div class="admin-user__name">
+                                            <a class="admin-link" href="/admin/users/@r.UserId">@r.UserName</a>
+                                        </div>
+                                        <div class="admin-user__meta">@r.Email</div>
+                                    </div>
+                                </td>
+
+                                <td>
+                                    <div class="admin-req">
+                                        <span class="admin-chip admin-chip--soft">@r.RequestType</span>
+                                        <span class="admin-chip">@r.RequestedRole</span>
+                                    </div>
+                                </td>
+
+                                <td class="admin-muted">
+                                    @(string.IsNullOrWhiteSpace(r.Note) ? "—" : r.Note)
+                                </td>
+
+                                <td class="admin-muted">@r.CreatedAt.ToLocalTime()</td>
+
+                                <td>
+                                    <span class="admin-status admin-status--@r.Status.ToLower()">@r.Status</span>
+                                </td>
+
+                                <td class="admin-col-actions">
+                                    @if (r.Status == "Pending")
+                                    {
+                                        <div class="admin-row-actions">
+                                            <form method="post" action="/admin/users/requests/approve/@r.Id">
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit" class="admin-btn admin-btn--ok">Approve</button>
+                                            </form>
+
+                                            <form method="post" action="/admin/users/requests/decline/@r.Id" class="admin-decline">
+                                                @Html.AntiForgeryToken()
+                                                <input class="admin-input" name="reason" placeholder="Reason (optional)" />
+                                                <button type="submit" class="admin-btn admin-btn--danger">Decline</button>
+                                            </form>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <span class="admin-muted">—</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+    </div>
+</section>

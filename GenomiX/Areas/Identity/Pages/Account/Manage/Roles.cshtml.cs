@@ -38,6 +38,9 @@ namespace GenomiX.Areas.Identity.Pages.Account.Manage
 
             [Required]
             public string Role { get; set; } = "Scientist";
+
+            [MaxLength(1000)]
+            public string Note { get; set; } = "-";
         }
 
         public async Task OnGetAsync() => await LoadAsync();
@@ -54,6 +57,7 @@ namespace GenomiX.Areas.Identity.Pages.Account.Manage
 
             var type = (Input.Type ?? "").Trim();
             var role = (Input.Role ?? "").Trim();
+            var note = (Input.Note ?? "-").Trim();
 
             if (type != "Add" && type != "Remove")
             {
@@ -105,7 +109,8 @@ namespace GenomiX.Areas.Identity.Pages.Account.Manage
                 RequestedRole = role,
                 RequestType = type,
                 Status = "Pending",
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,
+                Note = note
             });
 
             await _db.SaveChangesAsync();

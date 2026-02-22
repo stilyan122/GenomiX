@@ -5,11 +5,19 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GenomiX.Core.Services
 {
+    /// <summary>
+    /// Provides operations for managing DNA and reference sequences, including creation, retrieval, update, approval,
+    /// rejection, and deletion functionality.
+    /// </summary>
     public class SequenceService : ISequenceService
     {
         private readonly IRepository<DNASequence> _userSequenceRepo;
         private readonly IRepository<ReferenceSequence> _referenceSequenceRepo;
 
+        /// <summary>
+        /// Initializes a new instance of the SequenceService class using the specified repositories for user and
+        /// reference DNA sequences.
+        /// </summary>
         public SequenceService(
             IRepository<DNASequence> userSequenceRepo,
             IRepository<ReferenceSequence> referenceSequenceRepo)
@@ -18,6 +26,7 @@ namespace GenomiX.Core.Services
             _referenceSequenceRepo = referenceSequenceRepo;
         }
 
+        /// <inheritdoc />
         public async Task<IReadOnlyList<ReferenceSequence>> GetApprovedAsync()
         {
             return await _referenceSequenceRepo.GetAll()
@@ -27,6 +36,7 @@ namespace GenomiX.Core.Services
                 .ToListAsync();
         }
 
+        /// <inheritdoc />
         public async Task<IReadOnlyList<ReferenceSequence>> GetPendingAsync()
         {
             return await _referenceSequenceRepo.GetAll()
@@ -36,6 +46,7 @@ namespace GenomiX.Core.Services
                 .ToListAsync();
         }
 
+        /// <inheritdoc />
         public async Task<IReadOnlyList<ReferenceSequence>> GetRejectedAsync()
         {
             return await _referenceSequenceRepo.GetAll()
@@ -45,6 +56,7 @@ namespace GenomiX.Core.Services
                 .ToListAsync();
         }
 
+        /// <inheritdoc />
         public async Task<IReadOnlyList<ReferenceSequence>> GetMineAsync(Guid userId)
         {
             return await _referenceSequenceRepo.GetAll()
@@ -54,6 +66,7 @@ namespace GenomiX.Core.Services
                 .ToListAsync();
         }
 
+        /// <inheritdoc />
         public async Task<IReadOnlyList<ReferenceSequence>> GetPendingMineAsync(Guid userId)
         {
             return await _referenceSequenceRepo.GetAll()
@@ -63,6 +76,7 @@ namespace GenomiX.Core.Services
                 .ToListAsync();
         }
 
+        /// <inheritdoc />
         public async Task<Guid> CreateReferenceAsync(Guid userId, string species, string name, string sequence)
         {
             var now = DateTimeOffset.UtcNow;
@@ -87,6 +101,7 @@ namespace GenomiX.Core.Services
             return entity.Id;
         }
 
+        /// <inheritdoc />
         public async Task<bool> UpdateReferenceAsync(Guid userId, Guid id, string species, string name, string sequence)
         {
             var entity = await _referenceSequenceRepo.GetAll().FirstOrDefaultAsync(x => x.Id == id);
@@ -113,6 +128,7 @@ namespace GenomiX.Core.Services
             return true;
         }
 
+        /// <inheritdoc />
         public async Task<bool> DeleteReferenceAsync(Guid userId, Guid id)
         {
             var entity = await _referenceSequenceRepo.GetAll().FirstOrDefaultAsync(x => x.Id == id);
@@ -126,6 +142,7 @@ namespace GenomiX.Core.Services
             return true;
         }
 
+        /// <inheritdoc />
         public async Task<bool> ApproveReferenceAsync(Guid id)
         {
             var entity = await _referenceSequenceRepo.GetAll().FirstOrDefaultAsync(x => x.Id == id);
@@ -144,6 +161,7 @@ namespace GenomiX.Core.Services
             return true;
         }
 
+        /// <inheritdoc />
         public async Task<bool> RejectReferenceAsync(Guid id, string reason)
         {
             var entity = await _referenceSequenceRepo.GetAll().FirstOrDefaultAsync(x => x.Id == id);
@@ -162,6 +180,7 @@ namespace GenomiX.Core.Services
             return true;
         }
 
+        /// <inheritdoc />
         public async Task<ReferenceSequence?> GetReferenceSequenceByIdAsync(object id)
         {
             return await _referenceSequenceRepo
@@ -170,6 +189,7 @@ namespace GenomiX.Core.Services
                 .FirstOrDefaultAsync(x => x.Id.Equals(id));
         }
 
+        /// <inheritdoc />
         public async Task AddUserSequenceAsync(DNASequence dna)
         {
             dna.Sequence = Normalize(dna.Sequence);
@@ -178,6 +198,7 @@ namespace GenomiX.Core.Services
             await _userSequenceRepo.AddAsync(dna);
         }
 
+        /// <inheritdoc />
         public async Task UpdateUserSequenceAsync(DNASequence dna)
         {
             var existing = await _userSequenceRepo.GetByIdAsync(dna.Id);
@@ -192,6 +213,7 @@ namespace GenomiX.Core.Services
             await _userSequenceRepo.UpdateAsync(existing);
         }
 
+        /// <inheritdoc />
         public async Task DeleteUserSequenceAsync(object id)
         {
             var entity = await _userSequenceRepo.GetByIdAsync(id);
@@ -201,6 +223,7 @@ namespace GenomiX.Core.Services
             await _userSequenceRepo.DeleteAsync(id);
         }
 
+        /// <inheritdoc />
         public async Task<IEnumerable<DNASequence>> GetAllUserSequencesAsync()
         {
             return await _userSequenceRepo
@@ -208,6 +231,7 @@ namespace GenomiX.Core.Services
                 .ToListAsync();
         }
 
+        /// <inheritdoc />
         public async Task<DNASequence?> GetUserSequenceByIdAsync(object id)
         {
             return await _userSequenceRepo.GetByIdAsync(id);

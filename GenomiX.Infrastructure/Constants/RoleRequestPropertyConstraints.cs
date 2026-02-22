@@ -24,5 +24,10 @@
         /// The maximum length allowed for the Note property.
         /// </summary>
         public const int Note_MaxLength = 500;
+
+        /// <summary>
+        /// The maximum length allowed for the Note property.
+        /// </summary>
+        public const int DedupeKey_MaxLength = 1000;
     }
 }

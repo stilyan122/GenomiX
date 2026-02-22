@@ -70,6 +70,13 @@ else
     <input type="hidden" asp-for="Input.Type" />
     <input type="hidden" asp-for="Input.Role" />
 
+    <div class="auth-field">
+        <label class="auth-label">Message to admin (optional)</label>
+        <input asp-for="Input.Note" class="auth-input"
+               placeholder="Why do you want this role? What will you use it for?" />
+        <span class="auth-error" asp-validation-for="Input.Note"></span>
+    </div>
+
     @if (!ViewData.ModelState.IsValid)
     {
         <div asp-validation-summary="All" class="auth-validation"></div>

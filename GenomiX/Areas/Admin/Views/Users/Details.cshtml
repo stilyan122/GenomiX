@@ -1,0 +1,174 @@
+﻿@model AdminUserDetailsViewModel
+
+@{
+    ViewData["Title"] = "User Details";
+}
+
+<section class="admin-page">
+    <header class="admin-head">
+        <div>
+            <h1 class="admin-title">@Model.UserName</h1>
+            <p class="admin-subtitle">@Model.Email</p>
+        </div>
+
+        <div class="admin-actions">
+            <a class="admin-btn admin-btn--ghost" href="/admin/users">Back</a>
+            <a class="admin-btn admin-btn--ghost" href="/admin/users/requests">Requests</a>
+        </div>
+    </header>
+
+    @if (TempData["AdminOk"] is string ok && !string.IsNullOrWhiteSpace(ok))
+    {
+        <div class="admin-card admin-card--pad" style="margin-bottom:12px; border-color: rgba(75,255,136,0.25); background: rgba(75,255,136,0.08);">
+            <strong>@ok</strong>
+        </div>
+    }
+    @if (TempData["AdminErr"] is string err && !string.IsNullOrWhiteSpace(err))
+    {
+        <div class="admin-card admin-card--pad" style="margin-bottom:12px; border-color: rgba(255,75,75,0.25); background: rgba(255,75,75,0.08);">
+            <strong>@err</strong>
+        </div>
+    }
+
+    <div class="admin-grid">
+        <div class="admin-card admin-card--pad">
+            <h2 class="admin-h2">Account</h2>
+
+            <div class="admin-kv">
+                <div class="admin-kv__k">User ID</div>
+                <div class="admin-kv__v admin-mono">@Model.UserId</div>
+            </div>
+
+            <div class="admin-kv">
+                <div class="admin-kv__k">Roles</div>
+                <div class="admin-kv__v">
+                    <div class="admin-chips">
+                        @foreach (var r in Model.Roles)
+                        {
+                            <span class="admin-chip">@r</span>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <div class="admin-split">
+                <div class="admin-stat">
+                    <div class="admin-stat__label">DNA models</div>
+                    <div class="admin-stat__value">@Model.DnaModels</div>
+                </div>
+
+                <div class="admin-stat">
+                    <div class="admin-stat__label">Simulations</div>
+                    <div class="admin-stat__value">@Model.Simulations</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="admin-card admin-card--pad">
+            <h2 class="admin-h2">Role management</h2>
+
+            <div class="admin-rolebox">
+                <div class="admin-role-row">
+                    <div class="admin-role-row__left">
+                        <div class="admin-role-row__title">Scientist</div>
+                        <div class="admin-role-row__hint">Grant lab access and reference-sequence workflow.</div>
+                    </div>
+
+                    <div class="admin-role-row__actions">
+                        <form method="post" action="/admin/users/@Model.UserId/roles/add">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="role" value="Scientist" />
+                            <button class="admin-btn admin-btn--ok admin-btn--tiny" type="submit">Add</button>
+                        </form>
+
+                        <form method="post" action="/admin/users/@Model.UserId/roles/remove">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="role" value="Scientist" />
+                            <button class="admin-btn admin-btn--danger admin-btn--tiny" type="submit">Remove</button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="admin-role-row">
+                    <div class="admin-role-row__left">
+                        <div class="admin-role-row__title">User</div>
+                        <div class="admin-role-row__hint">Base role for DNA Builder + Simulations.</div>
+                    </div>
+
+                    <div class="admin-role-row__actions">
+                        <form method="post" action="/admin/users/@Model.UserId/roles/add">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="role" value="User" />
+                            <button class="admin-btn admin-btn--ok admin-btn--tiny" type="submit">Add</button>
+                        </form>
+
+                        <form method="post" action="/admin/users/@Model.UserId/roles/remove">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="role" value="User" />
+                            <button class="admin-btn admin-btn--danger admin-btn--tiny" type="submit">Remove</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div style="height:14px;"></div>
+
+    <div class="admin-card admin-card--pad">
+        <h2 class="admin-h2">Role requests</h2>
+
+        @if (Model.Requests.Count == 0)
+        {
+            <p class="admin-muted">No role requests.</p>
+        }
+        else
+        {
+            <div class="admin-req-list">
+                @foreach (var r in Model.Requests)
+                {
+                    <div class="admin-req-item">
+                        <div class="admin-req-item__top">
+                            <div class="admin-req-item__title">
+                                <span class="admin-chip admin-chip--soft">@r.RequestType</span>
+                                <span class="admin-chip">@r.RequestedRole</span>
+                            </div>
+
+                            <span class="admin-status admin-status--@r.Status.ToLower()">@r.Status</span>
+                        </div>
+
+                        <div class="admin-req-item__meta">
+                            <span class="admin-muted">@r.CreatedAt.ToLocalTime()</span>
+                            @if (r.DecidedAt != null)
+                            {
+                                <span class="admin-dot">•</span>
+                                <span class="admin-muted">Decided: @r.DecidedAt.Value.ToLocalTime()</span>
+                            }
+                        </div>
+
+                        @if (!string.IsNullOrWhiteSpace(r.Note))
+                        {
+                            <div class="admin-req-item__note">@r.Note</div>
+                        }
+
+                        @if (r.Status == "Pending")
+                        {
+                            <div class="admin-req-item__actions">
+                                <form method="post" action="/admin/users/requests/approve/@r.Id">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="admin-btn admin-btn--ok">Approve</button>
+                                </form>
+
+                                <form method="post" action="/admin/users/requests/decline/@r.Id" class="admin-decline">
+                                    @Html.AntiForgeryToken()
+                                    <input class="admin-input" name="reason" placeholder="Reason (optional)" />
+                                    <button type="submit" class="admin-btn admin-btn--danger">Decline</button>
+                                </form>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</section>
