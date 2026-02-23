@@ -15,5 +15,11 @@ namespace GenomiX.Controllers
         {
             return View();
         }
+
+        public IActionResult About()
+        {
+            ViewData["ActiveNav"] = "about";
+            return View();
+        }
     }
 }

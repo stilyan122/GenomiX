@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <data name="About_Title"><value>За мен</value></data>
+  <data name="About_Heading"><value>Създателят на GenomiX</value></data>
+  <data name="About_Subtitle"><value>Сливане на информатика и биология</value></data>
+  <data name="About_P1"><value>GenomiX е създаден като мост между софтуерното инженерство и генетичната наука.</value></data>
+  <data name="About_P2"><value>Моята цел е да превърна сложните биологични процеси в интерактивни и разбираеми симулации.</value></data>
+  <data name="About_P3"><value>Стремя се да изграждам системи, които съчетават научна логика и модерни уеб технологии.</value></data>
+  <data name="Skill_AspNet"><value>ASP.NET Core</value></data>
+  <data name="Skill_ThreeJs"><value>3D визуализация</value></data>
+  <data name="Skill_Sim"><value>Симулационни системи</value></data>
+  <data name="Skill_Bio"><value>Изчислителна биология</value></data>
+</root>

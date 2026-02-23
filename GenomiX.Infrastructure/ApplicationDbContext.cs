@@ -30,6 +30,19 @@ namespace GenomiX.Infrastructure
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
+            base.OnModelCreating(builder);
+
+            if (Environment.GetEnvironmentVariable("GENOMIX_SKIP_DB_CONFIG") == "1")
+            {
+                builder.Entity<DNAModel>()
+                    .HasMany(m => m.Sequences)
+                    .WithOne(s => s.Model)
+                    .HasForeignKey(s => s.ModelId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                return;
+            }
+
             builder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
 
             builder.Entity<DNAModel>()
@@ -38,7 +51,6 @@ namespace GenomiX.Infrastructure
                 .HasForeignKey(s => s.ModelId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            base.OnModelCreating(builder);
         }
     }
 }

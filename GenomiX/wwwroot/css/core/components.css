@@ -236,3 +236,123 @@
 @media (min-width: 980px){
   .auth-nav__hello{ display:block; }
 }
+
+@media (max-width: 1024px) {
+    .btn {
+        padding: 10px 13px
+    }
+
+    .badge {
+        font-size: .82rem;
+        padding: 6px 9px
+    }
+}
+
+@media (max-width: 720px) {
+    .auth-wrap {
+        min-height: auto;
+        place-items: stretch;
+        padding: 18px
+    }
+
+    .auth-card {
+        width: 100%;
+        padding: 22px
+    }
+
+    .auth-title {
+        font-size: 22px
+    }
+
+    .auth-form {
+        display: grid;
+        gap: 2px
+    }
+
+    .auth-input {
+        padding: 13px
+    }
+
+    .auth-button {
+        padding: 13px
+    }
+
+    .auth-foot {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px
+    }
+
+    .auth-sep {
+        gap: 8px
+    }
+
+    .auth-nav {
+        flex-wrap: wrap;
+        gap: 8px
+    }
+}
+
+@media (max-width: 520px) {
+    .btn {
+        width: 100%;
+        text-align: center
+    }
+
+    .btn--sm {
+        width: auto
+    }
+
+    .auth-wrap {
+        padding: 14px
+    }
+
+    .auth-card {
+        padding: 18px;
+        border-radius: 14px
+    }
+
+    .auth-field {
+        margin-bottom: 10px
+    }
+
+    .auth-remember {
+        flex-wrap: wrap
+    }
+
+    .auth-external-btn {
+        padding: 11px
+    }
+}
+
+@media (max-width: 420px) {
+    .auth-title {
+        font-size: 20px
+    }
+
+    .auth-input {
+        padding: 12px
+    }
+
+    .auth-button {
+        padding: 12px
+    }
+
+    .badge {
+        font-size: .78rem
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .auth-button {
+        transition: none
+    }
+
+        .auth-button:hover {
+            filter: none
+        }
+
+        .auth-button:active {
+            transform: none
+        }
+}

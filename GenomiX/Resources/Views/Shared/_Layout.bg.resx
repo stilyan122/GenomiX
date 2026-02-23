@@ -33,4 +33,7 @@
   <data name="Nav_UsersPanel" xml:space="preserve">
     <value>Панел потребители</value>
   </data>
+  <data name="Nav_About" xml:space="preserve">
+    <value>За мен</value>
+  </data>
 </root>

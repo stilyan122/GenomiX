@@ -34,6 +34,11 @@
                     <a class="navlink @(ViewData["ActiveNav"] as string == "dna" ? "is-active" : "")" href="/dna">@L["Nav_DnaBuilder"]</a>
                     <a class="navlink @(ViewData["ActiveNav"] as string == "sim" ? "is-active" : "")" href="/simulations">@L["Nav_Simulations"]</a>
 
+                    <a class="navlink @(ViewData["ActiveNav"] as string == "about" ? "is-active" : "")"
+                       href="/home/about">
+                        @L["Nav_About"]
+                    </a>
+
                     @if (User?.Identity?.IsAuthenticated == true && (User.IsInRole("Scientist") || User.IsInRole("Admin")))
                     {
                         <a class="navlink @(ViewData["ActiveNav"] as string == "lab" ? "is-active" : "")" href="/lab/sequences">@L["Nav_Lab"]</a>

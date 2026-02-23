@@ -33,4 +33,7 @@
   <data name="Nav_UsersPanel" xml:space="preserve">
     <value>Users Panel</value>
   </data>
+  <data name="Nav_About" xml:space="preserve">
+    <value>About</value>
+  </data>
 </root>

@@ -37,3 +37,33 @@ a {
 main {
     padding-bottom: 24px;
 }
+
+@media (max-width: 1024px) {
+    html, body {
+        overflow-x: hidden
+    }
+
+    .container, .container--wide {
+        width: 100%
+    }
+}
+
+@media (max-width: 720px) {
+    .container, .container--wide {
+        padding-inline: 16px
+    }
+
+    main {
+        padding-bottom: 18px
+    }
+}
+
+@media (max-width: 480px) {
+    .container, .container--wide {
+        padding-inline: 12px
+    }
+
+    main {
+        padding-bottom: 16px
+    }
+}

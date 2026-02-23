@@ -221,3 +221,54 @@
     font-size: 13px;
     line-height: 1.35;
 }
+
+@media (max-width: 1100px){
+  .gx-edit{padding:20px 0 36px}
+  .gx-edit__sub{max-width:none}
+}
+
+@media (max-width: 980px){
+  .gx-edit__grid{grid-template-columns:1fr}
+  .gx-edit__head{align-items:flex-start}
+  .gx-actions{justify-content:flex-start}
+}
+
+@media (max-width: 820px){
+  .gx-edit__head{gap:10px}
+  .gx-edit__kicker{font-size:11px}
+  .gx-edit__title{letter-spacing:-.4px}
+  .gx-edit__grid{gap:12px}
+  .gx-card{border-radius:16px}
+  .gx-card--form,.gx-card--tips{padding:14px}
+  .gx-input{height:46px;border-radius:12px}
+  .btn--lg{height:42px;border-radius:14px}
+  .gx-tip{border-radius:12px}
+}
+
+@media (max-width: 720px){
+  .gx-edit{padding:18px 0 32px}
+  .gx-actions{flex-direction:column;align-items:stretch}
+  .gx-actions .btn--lg{width:100%}
+  .gx-inputwrap{width:100%}
+  .gx-hint,.gx-error{font-size:12.5px}
+}
+
+@media (max-width: 520px){
+  .gx-edit__title{font-size:clamp(22px,7vw,30px)}
+  .gx-label{font-size:14px}
+  .gx-input{height:44px;padding:0 12px}
+  .gx-inputglow{inset:-18px -18px -22px -18px}
+  .gx-divider{margin:14px 0}
+  .gx-tip{padding:10px}
+}
+
+@media (max-width: 420px){
+  .gx-edit__kicker{font-size:10px}
+  .gx-card{border-radius:14px}
+  .gx-card--form,.gx-card--tips{padding:12px}
+  .btn--lg{height:40px;border-radius:12px}
+}
+
+@media (prefers-reduced-motion: reduce){
+  .gx-input{transition:none}
+}

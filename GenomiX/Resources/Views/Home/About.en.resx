@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <data name="About_Title"><value>About Me</value></data>
+  <data name="About_Heading"><value>About the Creator of GenomiX</value></data>
+  <data name="About_Subtitle"><value>Combining Computer Science and Biology</value></data>
+  <data name="About_P1"><value>GenomiX was created as a bridge between software engineering and genetic science.</value></data>
+  <data name="About_P2"><value>My goal is to transform complex biological processes into interactive and understandable simulations.</value></data>
+  <data name="About_P3"><value>I am passionate about building systems that merge scientific logic with modern web technologies.</value></data>
+  <data name="Skill_AspNet"><value>ASP.NET Core</value></data>
+  <data name="Skill_ThreeJs"><value>3D Visualization</value></data>
+  <data name="Skill_Sim"><value>Simulation Systems</value></data>
+  <data name="Skill_Bio"><value>Computational Biology</value></data>
+</root>

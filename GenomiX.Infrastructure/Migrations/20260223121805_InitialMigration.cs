@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace GenomiX.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class IntialMigration : Migration
+    public partial class InitialMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -233,12 +233,16 @@ namespace GenomiX.Infrastructure.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     RequestedRole = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: false),
+                    RequestType = table.Column<string>(type: "nvarchar(16)", maxLength: 16, nullable: false),
                     Status = table.Column<string>(type: "nvarchar(16)", maxLength: 16, nullable: false),
                     Note = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
-                    RequestType = table.Column<string>(type: "nvarchar(16)", maxLength: 16, nullable: false),
+                    DecisionNote = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     DecidedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DecidedByUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                    DecidedByUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CancelledAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DedupeKey = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true)
                 },
                 constraints: table =>
                 {

@@ -1,0 +1,56 @@
+﻿@inject Microsoft.AspNetCore.Mvc.Localization.IViewLocalizer L
+
+@{
+    ViewData["Title"] = L["About_Title"];
+    ViewData["ActiveNav"] = "about";
+}
+
+<section class="gx-about">
+    <div class="gx-about__bg"></div>
+
+    <div class="container gx-about__wrap">
+
+        <div class="gx-about__card reveal">
+            <h1 class="gx-about__title">@L["About_Heading"]</h1>
+            <p class="gx-about__subtitle">@L["About_Subtitle"]</p>
+
+            <div class="gx-about__content">
+                <p>@L["About_P1"]</p>
+                <p>@L["About_P2"]</p>
+                <p>@L["About_P3"]</p>
+            </div>
+
+            <div class="gx-about__skills">
+                <div class="gx-chip">@L["Skill_AspNet"]</div>
+                <div class="gx-chip">@L["Skill_ThreeJs"]</div>
+                <div class="gx-chip">@L["Skill_Sim"]</div>
+                <div class="gx-chip">@L["Skill_Bio"]</div>
+            </div>
+
+            <div class="gx-social">
+                <a href="mailto:stilyanchanev@gmail.com" class="gx-social__icon" title="Email">
+                    ✉
+                </a>
+                <a href="https://www.instagram.com/stilyan122/" target="_blank" class="gx-social__icon" title="Instagram">
+                    📸
+                </a>
+                <a href="https://www.facebook.com/stilyan.chanev" target="_blank" class="gx-social__icon" title="Facebook">
+                    f
+                </a>
+                <a href="https://github.com/stilyan122" target="_blank" class="gx-social__icon" title="GitHub">
+                    💻
+                </a>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const el = document.querySelector(".reveal");
+            setTimeout(() => el.classList.add("active"), 200);
+        });
+    </script>
+}
