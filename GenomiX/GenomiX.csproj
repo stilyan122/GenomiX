@@ -41,5 +41,9 @@
   	<EmbeddedResource Update="Resources\**\*.resx" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="SeedData\" />
+  </ItemGroup>
+
 </Project>
         

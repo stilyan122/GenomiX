@@ -83,7 +83,7 @@ namespace GenomiX.Common.Extensions
                 options.ResourcesPath = "Resources";
             });
 
-            var supportedCultures = new[] { "en", "bg" }
+            var supportedCultures = new[] { "en", "bg", "bg-BG" }
                 .Select(c => new CultureInfo(c))
                 .ToList();
 

@@ -11,15 +11,23 @@ namespace GenomiX.Common.Extensions
         public static EntityTypeBuilder SeedEntities<T>(this EntityTypeBuilder<T> entityTypeBuilder, string fileName)
             where T: class
         {
-            var workingDirectory = Environment.CurrentDirectory;
-            var projectDirectory = Directory.GetParent(workingDirectory);
-            var json = File.ReadAllText($"{projectDirectory}/GenomiX.Infrastructure/ConfigurationFiles/{fileName}");
+            var baseDir = AppContext.BaseDirectory;
 
-            var sequences = JsonConvert.DeserializeObject<List<T>>(json)
-                ?? throw new Exception("Invalid json file path");
+            var path = Path.Combine(baseDir, "SeedData", fileName);
 
-            entityTypeBuilder.HasData(sequences);
+            if (!File.Exists(path))
+            {
+                throw new FileNotFoundException(
+                    $"Seed file not found: {path}. Make sure it's marked as Content and copied to output.",
+                    path);
+            }
 
+            var json = File.ReadAllText(path);
+
+            var entities = JsonConvert.DeserializeObject<List<T>>(json)
+                           ?? throw new Exception($"Invalid JSON in seed file: {fileName}");
+
+            entityTypeBuilder.HasData(entities);
             return entityTypeBuilder;
         }
     }

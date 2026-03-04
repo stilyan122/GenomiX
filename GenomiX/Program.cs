@@ -1,5 +1,6 @@
-using Microsoft.EntityFrameworkCore;
 using GenomiX.Common.Extensions;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.EntityFrameworkCore;
 
 namespace GenomiX
 {
@@ -10,7 +11,7 @@ namespace GenomiX
             var builder = WebApplication.CreateBuilder(args);
 
             var connectionString = builder.Configuration
-                .GetConnectionString("DefaultConnection") ?? 
+                .GetConnectionString("ServerConnection") ?? 
                 throw new InvalidOperationException("Connection string not found.");
 
             builder.Services
@@ -20,6 +21,10 @@ namespace GenomiX
                 .AddAuthenticationServices(builder.Configuration);
 
             builder.Services.AddLocalizationServices();
+
+            builder.Services.AddDataProtection()
+            .PersistKeysToFileSystem(new DirectoryInfo(Path.Combine(AppContext.BaseDirectory, "dp_keys")))
+            .SetApplicationName("GenomiX");
 
             var app = builder.Build();
 
@@ -33,10 +38,14 @@ namespace GenomiX
                 app.UseHsts();
             }
 
-            app.Localize();
             app.UseHttpsRedirection();
-            app.UseRouting();
+            
             app.UseStaticFiles();
+            
+            app.Localize();
+            
+            app.UseRouting();
+            
             app.UseAuthentication();
             app.UseAuthorization();
 
