@@ -25,5 +25,9 @@ namespace GenomiX.Infrastructure.Models
 
         /// <summary> Navigation Property for mapping table. </summary>
         public ICollection<DNAModelDisease> DNAModelDiseases { get; set; } = new List<DNAModelDisease>();
+
+        /// <summary> Gets or sets the collection of mutation patterns associated with the disease. </summary>
+        public ICollection<DiseaseMutationPattern> MutationPatterns { get; set; }
+        = new List<DiseaseMutationPattern>();
     }
 }

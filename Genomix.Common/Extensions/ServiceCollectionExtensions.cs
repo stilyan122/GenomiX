@@ -54,7 +54,8 @@ namespace GenomiX.Common.Extensions
                 .AddScoped<IOrganismService, OrganismService>()
                 .AddScoped<ISequenceService, SequenceService>()
                 .AddScoped<ISimulationService, SimulationService>()
-                .AddScoped<IUserService, UserService>();
+                .AddScoped<IUserService, UserService>()
+                .AddScoped<IScanService, ScanService>();
 
             var emailSection = configuration.GetSection(emailSectionName);
 

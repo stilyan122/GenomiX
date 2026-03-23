@@ -20,6 +20,7 @@ namespace GenomiX.Infrastructure
         public DbSet<DNAModelMutation> DNA_Model_Mutations => Set<DNAModelMutation>();
         public DbSet<Disease> Diseases => Set<Disease>();
         public DbSet<DNAModelDisease> DNA_Models_Diseases => Set<DNAModelDisease>();
+        public DbSet<DiseaseMutationPattern> Disease_Mutation_Patterns => Set<DiseaseMutationPattern>();
 
         // Population & organisms
         public DbSet<Population> Populations => Set<Population>();

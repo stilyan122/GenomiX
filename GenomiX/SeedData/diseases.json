@@ -1,27 +1,27 @@
 ﻿[
   {
-    "Id": "11111111-1111-1111-1111-111111111111",
-    "Name": "Sickle Cell Anemia",
-    "Description": "Genetic disorder caused by a mutation in the HBB gene, leading to abnormal hemoglobin and sickle-shaped red blood cells."
+    "Id": "aaaaaaaa-1111-1111-1111-111111111111",
+    "Name": "Сърповидно-клетъчна анемия",
+    "Description": "Наследствено заболяване на кръвта, причинено от мутация в гена HBB, която променя структурата на хемоглобина."
   },
   {
-    "Id": "22222222-2222-2222-2222-222222222222",
-    "Name": "Cystic Fibrosis",
-    "Description": "Caused by mutations in the CFTR gene, resulting in thick mucus affecting the lungs and digestive system."
+    "Id": "bbbbbbbb-2222-2222-2222-222222222222",
+    "Name": "Кистична фиброза",
+    "Description": "Наследствено заболяване, което засяга CFTR протеина и води до натрупване на гъста слуз в различни органи."
   },
   {
-    "Id": "33333333-3333-3333-3333-333333333333",
-    "Name": "Huntington's Disease",
-    "Description": "Neurodegenerative disorder caused by expanded CAG repeats in the HTT gene."
+    "Id": "cccccccc-3333-3333-3333-333333333333",
+    "Name": "Болест на Хънтингтън",
+    "Description": "Невродегенеративно наследствено заболяване, свързано с разширени CAG повторения в гена HTT."
   },
   {
-    "Id": "44444444-4444-4444-4444-444444444444",
-    "Name": "Phenylketonuria (PKU)",
-    "Description": "Metabolic disorder due to mutations in the PAH gene, leading to inability to break down phenylalanine."
+    "Id": "dddddddd-4444-4444-4444-444444444444",
+    "Name": "Фенилкетонурия",
+    "Description": "Наследствено метаболитно заболяване, причинено от мутации в гена PAH, което води до натрупване на фенилаланин."
   },
   {
-    "Id": "55555555-5555-5555-5555-555555555555",
-    "Name": "Tay-Sachs Disease",
-    "Description": "Fatal genetic disorder caused by mutations in the HEXA gene, leading to accumulation of GM2 ganglioside in nerve cells."
+    "Id": "eeeeeeee-5555-5555-5555-555555555555",
+    "Name": "Таласемия",
+    "Description": "Група наследствени заболявания, при които е нарушено образуването на нормален хемоглобин."
   }
 ]
