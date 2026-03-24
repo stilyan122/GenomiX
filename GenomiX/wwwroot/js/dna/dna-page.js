@@ -20,6 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const saveBtn = document.getElementById("save-btn");
     const modelIdEl = document.getElementById("gx-model-id");
     const tokenEl = document.querySelector('input[name="__RequestVerificationToken"]');
+    const scanDiseaseBtn = document.getElementById("scan-disease-btn");
 
     function setModeUI(isSci) {
         currentModeSci = !!isSci;
@@ -163,10 +164,238 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-
     visualizeBtn?.addEventListener("click", runVisualize);
     modeBasic?.addEventListener("change", rerenderForMode);
     modeSci?.addEventListener("change", rerenderForMode);
+
+    function pickBestDiseaseResult(results) {
+        if (!Array.isArray(results) || results.length === 0) return null;
+
+        return [...results].sort((a, b) => {
+            if ((b.confidence ?? 0) !== (a.confidence ?? 0)) {
+                return (b.confidence ?? 0) - (a.confidence ?? 0);
+            }
+
+            return (b.matchedPatterns ?? 0) - (a.matchedPatterns ?? 0);
+        })[0];
+    }
+
+    function escapeHtml(s) {
+        return String(s ?? "")
+            .replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;")
+            .replaceAll('"', "&quot;")
+            .replaceAll("'", "&#39;");
+    }
+
+    function pickBestDiseaseResult(results) {
+        if (!Array.isArray(results) || results.length === 0) return null;
+
+        return [...results].sort((a, b) => {
+            if ((b.confidence ?? 0) !== (a.confidence ?? 0)) {
+                return (b.confidence ?? 0) - (a.confidence ?? 0);
+            }
+
+            return (b.matchedPatterns ?? 0) - (a.matchedPatterns ?? 0);
+        })[0];
+    }
+
+    function ensureDiseaseModal() {
+        let backdrop = document.getElementById("gx-disease-modal-backdrop");
+        let modal = document.getElementById("gx-disease-modal");
+
+        if (!backdrop) {
+            backdrop = document.createElement("div");
+            backdrop.id = "gx-disease-modal-backdrop";
+            backdrop.className = "gx-modal-backdrop";
+            backdrop.style.display = "none";
+            document.body.appendChild(backdrop);
+        }
+
+        if (!modal) {
+            modal = document.createElement("div");
+            modal.id = "gx-disease-modal";
+            modal.className = "gx-modal";
+            modal.style.display = "none";
+            document.body.appendChild(modal);
+        }
+
+        return { backdrop, modal };
+    }
+
+    function showNoDiseasePopup() {
+        const { backdrop, modal } = ensureDiseaseModal();
+
+        modal.innerHTML = `
+        <div class="gx-modal__hd">
+            <div class="gx-modal__title">No known markers detected</div>
+            <button type="button" class="gx-modal__close" id="gx-disease-close">✕</button>
+        </div>
+        <div style="padding:16px;">
+            <div class="gx-card">
+                <p style="margin:0;">
+                    No stored educational disease markers were detected in the current DNA model.
+                </p>
+            </div>
+        </div>
+    `;
+
+        const close = () => {
+            backdrop.style.display = "none";
+            modal.style.display = "none";
+        };
+
+        backdrop.style.display = "block";
+        modal.style.display = "block";
+        backdrop.onclick = close;
+        document.getElementById("gx-disease-close")?.addEventListener("click", close);
+    }
+
+    function showDiseasePopup(explanation, bestResult) {
+        const { backdrop, modal } = ensureDiseaseModal();
+
+        const lifestyle = Array.isArray(explanation?.lifestyleConsiderations)
+            ? explanation.lifestyleConsiderations
+            : [];
+
+        const medication = Array.isArray(explanation?.medicationConsiderations)
+            ? explanation.medicationConsiderations
+            : [];
+
+        const confidencePercent = Math.round((bestResult?.confidence ?? 0) * 100);
+
+        modal.innerHTML = `
+        <div class="gx-modal__hd">
+            <div class="gx-modal__title">${escapeHtml(explanation?.title || "Potential genetic marker detected")}</div>
+            <button type="button" class="gx-modal__close" id="gx-disease-close">✕</button>
+        </div>
+
+        <div style="padding:16px;">
+            <div class="gx-card" style="margin-bottom:14px;">
+                <h3 style="margin-top:0;">${escapeHtml(bestResult?.diseaseName || "")}</h3>
+                <p><strong>Gene:</strong> ${escapeHtml(bestResult?.matches?.[0]?.geneName || "")}</p>
+                <p><strong>Confidence:</strong> ${confidencePercent}%</p>
+                <p style="margin-bottom:0;"><strong>Matched patterns:</strong> ${bestResult?.matchedPatterns ?? 0} / ${bestResult?.totalPatterns ?? 0}</p>
+            </div>
+
+            <div class="gx-card" style="margin-bottom:14px;">
+                <h3 style="margin-top:0;">Summary</h3>
+                <p style="margin-bottom:0;">${escapeHtml(explanation?.summary || "")}</p>
+            </div>
+
+            <div class="gx-card" style="margin-bottom:14px;">
+                <h3 style="margin-top:0;">Biological context</h3>
+                <p style="margin-bottom:0;">${escapeHtml(explanation?.biologyExplanation || "")}</p>
+            </div>
+
+            <div class="gx-card" style="margin-bottom:14px;">
+                <h3 style="margin-top:0;">Lifestyle considerations</h3>
+                ${lifestyle.length
+                ? `<ul>${lifestyle.map(x => `<li>${escapeHtml(x)}</li>`).join("")}</ul>`
+                : `<p style="margin-bottom:0;">No additional notes.</p>`}
+            </div>
+
+            <div class="gx-card" style="margin-bottom:14px;">
+                <h3 style="margin-top:0;">Medication considerations</h3>
+                ${medication.length
+                ? `<ul>${medication.map(x => `<li>${escapeHtml(x)}</li>`).join("")}</ul>`
+                : `<p style="margin-bottom:0;">No additional notes.</p>`}
+            </div>
+
+            <div class="gx-card">
+                <h3 style="margin-top:0;">Important notice</h3>
+                <p style="margin-bottom:0;">${escapeHtml(explanation?.warning || "")}</p>
+            </div>
+        </div>
+    `;
+
+        const close = () => {
+            backdrop.style.display = "none";
+            modal.style.display = "none";
+        };
+
+        backdrop.style.display = "block";
+        modal.style.display = "block";
+        backdrop.onclick = close;
+        document.getElementById("gx-disease-close")?.addEventListener("click", close);
+    }
+
+    scanDiseaseBtn?.addEventListener("click", async () => {
+        const token = document.querySelector("input[name='__RequestVerificationToken']")?.value || "";
+        const modelId = document.getElementById("gx-model-id")?.value || "";
+
+        try {
+            const s1 = currentModel?.s1 ?? lastS1 ?? "";
+            const s2 = currentModel?.s2 ?? lastS2 ?? "";
+
+            if (!s1 || !s2) {
+                alert("No DNA to scan.");
+                return;
+            }
+
+            scanDiseaseBtn.disabled = true;
+            const originalText = scanDiseaseBtn.textContent;
+            scanDiseaseBtn.textContent = "Scanning...";
+
+            const scanRes = await fetch("/dna/scandiseases", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "RequestVerificationToken": token
+                },
+                body: JSON.stringify({
+                    modelId,
+                    strand1: s1,
+                    strand2: s2
+                })
+            });
+
+            if (!scanRes.ok) {
+                throw new Error("Disease scan failed.");
+            }
+
+            const scanData = await scanRes.json();
+            const bestResult = pickBestDiseaseResult(scanData.results);
+
+            if (!bestResult) {
+                showNoDiseasePopup();
+                return;
+            }
+
+            scanDiseaseBtn.textContent = "Analyzing...";
+
+            const explainRes = await fetch("/dna/explain-disease-scan", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "RequestVerificationToken": token
+                },
+                body: JSON.stringify({
+                    diseaseName: bestResult.diseaseName,
+                    description: bestResult.description,
+                    geneName: bestResult.matches?.[0]?.geneName || "",
+                    matchedPatterns: bestResult.matchedPatterns,
+                    totalPatterns: bestResult.totalPatterns,
+                    confidence: bestResult.confidence
+                })
+            });
+
+            if (!explainRes.ok) {
+                throw new Error("AI explanation failed.");
+            }
+
+            const explainData = await explainRes.json();
+            showDiseasePopup(explainData.explanation, bestResult);
+
+            scanDiseaseBtn.textContent = originalText;
+        } catch (err) {
+            console.error(err);
+            alert(err?.message || "Disease analysis failed.");
+        } finally {
+            scanDiseaseBtn.disabled = false;
+        }
+    });
 
     setModeUI(!!modeSci?.checked);
 });

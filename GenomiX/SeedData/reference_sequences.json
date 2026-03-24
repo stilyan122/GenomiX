@@ -7,7 +7,8 @@
     "Strand": 1,
     "PairIndex": 0,
     "CreatedAt": "2024-01-01T00:00:00Z",
-    "CreatedByUserId": "c2b3d8ae-2b6d-4c41-9b8e-b1c2a3d4e005"
+    "CreatedByUserId": "c2b3d8ae-2b6d-4c41-9b8e-b1c2a3d4e005",
+    "IsApproved": true
   },
   {
     "Id": "11111111-0000-0000-0000-000000000002",
@@ -27,7 +28,8 @@
     "Strand": 1,
     "PairIndex": 1,
     "CreatedAt": "2024-01-01T00:00:00Z",
-    "CreatedByUserId": "c2b3d8ae-2b6d-4c41-9b8e-b1c2a3d4e005"
+    "CreatedByUserId": "c2b3d8ae-2b6d-4c41-9b8e-b1c2a3d4e005",
+    "IsApproved": true
   },
   {
     "Id": "22222222-0000-0000-0000-000000000002",
@@ -47,7 +49,8 @@
     "Strand": 1,
     "PairIndex": 2,
     "CreatedAt": "2024-01-01T00:00:00Z",
-    "CreatedByUserId": "c2b3d8ae-2b6d-4c41-9b8e-b1c2a3d4e005"
+    "CreatedByUserId": "c2b3d8ae-2b6d-4c41-9b8e-b1c2a3d4e005",
+    "IsApproved": true
   },
   {
     "Id": "33333333-0000-0000-0000-000000000002",
@@ -57,6 +60,7 @@
     "Strand": 2,
     "PairIndex": 2,
     "CreatedAt": "2024-01-01T00:00:00Z",
-    "CreatedByUserId": "c2b3d8ae-2b6d-4c41-9b8e-b1c2a3d4e005"
+    "CreatedByUserId": "c2b3d8ae-2b6d-4c41-9b8e-b1c2a3d4e005",
+    "IsApproved": true
   }
 ]

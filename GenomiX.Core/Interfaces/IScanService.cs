@@ -1,4 +1,4 @@
-﻿using GenomiX.Core.Models;
+﻿using GenomiX.ViewModels.Disease;
 
 namespace GenomiX.Core.Interfaces
 {
@@ -10,6 +10,6 @@ namespace GenomiX.Core.Interfaces
         /// <summary>
         /// Asynchronously scans the specified DNA strands for disease-related sequence matches.
         /// </summary>
-        Task<ICollection<DiseaseScanMatchDto>> ScanAsync(string strand1, string strand2);
+        Task<ICollection<DiseaseScanResultDto>> ScanAsync(string strand1, string strand2);
     }
 }

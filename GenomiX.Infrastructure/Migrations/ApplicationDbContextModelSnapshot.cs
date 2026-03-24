@@ -329,32 +329,32 @@ namespace GenomiX.Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("aaaaaaaa-1111-1111-1111-111111111111"),
-                            Description = "Наследствено заболяване на кръвта, причинено от мутация в гена HBB, която променя структурата на хемоглобина.",
+                            Description = "Наследствено заболяване на кръвта, причинено от патогенен вариант в гена HBB, който води до образуване на хемоглобин S.",
                             Name = "Сърповидно-клетъчна анемия"
                         },
                         new
                         {
                             Id = new Guid("bbbbbbbb-2222-2222-2222-222222222222"),
-                            Description = "Наследствено заболяване, което засяга CFTR протеина и води до натрупване на гъста слуз в различни органи.",
+                            Description = "Наследствено заболяване, причинено от патогенни варианти в CFTR; най-честият вариант е F508del.",
                             Name = "Кистична фиброза"
                         },
                         new
                         {
                             Id = new Guid("cccccccc-3333-3333-3333-333333333333"),
-                            Description = "Невродегенеративно наследствено заболяване, свързано с разширени CAG повторения в гена HTT.",
+                            Description = "Невродегенеративно наследствено заболяване, причинено от експанзия на CAG повтори в гена HTT.",
                             Name = "Болест на Хънтингтън"
                         },
                         new
                         {
                             Id = new Guid("dddddddd-4444-4444-4444-444444444444"),
-                            Description = "Наследствено метаболитно заболяване, причинено от мутации в гена PAH, което води до натрупване на фенилаланин.",
+                            Description = "Наследствено метаболитно заболяване, причинено от патогенни варианти в гена PAH; един от най-известните е R408W.",
                             Name = "Фенилкетонурия"
                         },
                         new
                         {
                             Id = new Guid("eeeeeeee-5555-5555-5555-555555555555"),
-                            Description = "Група наследствени заболявания, при които е нарушено образуването на нормален хемоглобин.",
-                            Name = "Таласемия"
+                            Description = "Наследствено заболяване, свързано с патогенни варианти в HBB, които намаляват или прекъсват синтеза на бета-глобин.",
+                            Name = "Бета-таласемия"
                         });
                 });
 
@@ -418,8 +418,8 @@ namespace GenomiX.Infrastructure.Migrations
                             DiseaseId = new Guid("aaaaaaaa-1111-1111-1111-111111111111"),
                             GeneName = "HBB",
                             MatchType = "Exact",
-                            Notes = "������� ������� � ���� HBB, �������� ��� ����������-�������� ������.",
-                            PatternSequence = "GTG"
+                            Notes = "Реален вариант HbS / сърповидно-клетъчна анемия: HBB c.20A>T, p.Glu7Val (исторически често означаван като Glu6Val). Marker-ът е образователен локален sequence window, центриран върху мутантния GTG мотив.",
+                            PatternSequence = "CCTGTGGAGAAGTCTGCCGTT"
                         },
                         new
                         {
@@ -428,18 +428,18 @@ namespace GenomiX.Infrastructure.Migrations
                             DiseaseId = new Guid("bbbbbbbb-2222-2222-2222-222222222222"),
                             GeneName = "CFTR",
                             MatchType = "Exact",
-                            Notes = "�������� ������������� ������ �� �������, �������� � �������� �������.",
-                            PatternSequence = "TTT"
+                            Notes = "Реален вариант F508del: CFTR c.1521_1523delCTT, p.Phe508del. Marker-ът е образователен локален mutant window около делецията.",
+                            PatternSequence = "ATCATTGGTGTTTCCTATGATGAA"
                         },
                         new
                         {
                             Id = new Guid("33333333-cccc-cccc-cccc-333333333333"),
-                            AllowedMismatchCount = 1,
+                            AllowedMismatchCount = 0,
                             DiseaseId = new Guid("cccccccc-3333-3333-3333-333333333333"),
                             GeneName = "HTT",
                             MatchType = "Contains",
-                            Notes = "��������� �� CAG ����������������, ���������� ���� ������������� ������ �� ������ �� ����������.",
-                            PatternSequence = "CAGCAGCAG"
+                            Notes = "Реален механизъм: експанзия на CAG repeat в HTT. Тук marker-ът е 36 последователни CAG повторения, защото болестта е свързана с 36 или повече повторения.",
+                            PatternSequence = "CAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAG"
                         },
                         new
                         {
@@ -448,8 +448,8 @@ namespace GenomiX.Infrastructure.Migrations
                             DiseaseId = new Guid("dddddddd-4444-4444-4444-444444444444"),
                             GeneName = "PAH",
                             MatchType = "Exact",
-                            Notes = "�������� ������������� ������ �� ��������������.",
-                            PatternSequence = "AAT"
+                            Notes = "Реален вариант R408W: PAH c.1222C>T, codon change CGG>TGG. Този v1 marker е codon-level motif за реалния патогенен вариант.",
+                            PatternSequence = "CGGTGG"
                         },
                         new
                         {
@@ -458,8 +458,8 @@ namespace GenomiX.Infrastructure.Migrations
                             DiseaseId = new Guid("eeeeeeee-5555-5555-5555-555555555555"),
                             GeneName = "HBB",
                             MatchType = "Exact",
-                            Notes = "�������� ������������� ������ �� ���������.",
-                            PatternSequence = "TGA"
+                            Notes = "Реален класически β-таласемичен вариант: HBB c.118C>T, codon 39, CAG>TAG, p.Gln40Ter. Този v1 marker е codon-level motif за реалния nonsense вариант.",
+                            PatternSequence = "CAGTAG"
                         });
                 });
 
@@ -888,7 +888,7 @@ namespace GenomiX.Infrastructure.Migrations
                             Id = new Guid("11111111-0000-0000-0000-000000000001"),
                             CreatedAt = new DateTimeOffset(new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             CreatedByUserId = new Guid("c2b3d8ae-2b6d-4c41-9b8e-b1c2a3d4e005"),
-                            IsApproved = false,
+                            IsApproved = true,
                             IsRejected = false,
                             Name = "BRCA1 fragment",
                             Sequence = "ATGGAAGAGCTGTCAGGAGAGCTGCCAGCTGGTGAGGAAGCAGTGAGCCTGAGCAAGAGCTGAG",
@@ -910,7 +910,7 @@ namespace GenomiX.Infrastructure.Migrations
                             Id = new Guid("22222222-0000-0000-0000-000000000001"),
                             CreatedAt = new DateTimeOffset(new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             CreatedByUserId = new Guid("c2b3d8ae-2b6d-4c41-9b8e-b1c2a3d4e005"),
-                            IsApproved = false,
+                            IsApproved = true,
                             IsRejected = false,
                             Name = "TP53 fragment",
                             Sequence = "ATGGTCAGGACCTGGAGAAGGAGCTGAGGCTGGATGAAGTCAAGAGTGTCAAGCGAGCTGAGG",
@@ -932,7 +932,7 @@ namespace GenomiX.Infrastructure.Migrations
                             Id = new Guid("33333333-0000-0000-0000-000000000001"),
                             CreatedAt = new DateTimeOffset(new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             CreatedByUserId = new Guid("c2b3d8ae-2b6d-4c41-9b8e-b1c2a3d4e005"),
-                            IsApproved = false,
+                            IsApproved = true,
                             IsRejected = false,
                             Name = "COX1 mitochondrial fragment",
                             Sequence = "ATGGAAGAGGAGCTGCTGAGGAGCTGGTGAGGAAGCAGTGAGCCTGAGCAAGAGCTGAGCTA",
@@ -943,7 +943,7 @@ namespace GenomiX.Infrastructure.Migrations
                             Id = new Guid("33333333-0000-0000-0000-000000000002"),
                             CreatedAt = new DateTimeOffset(new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             CreatedByUserId = new Guid("c2b3d8ae-2b6d-4c41-9b8e-b1c2a3d4e005"),
-                            IsApproved = false,
+                            IsApproved = true,
                             IsRejected = false,
                             Name = "COX1 mitochondrial fragment (complement)",
                             Sequence = "TAGCTCAGCTCTTGCTCAGGCTCACTGCTTCCTCACCAGCTCCTCAGCAGCTCCTCTTCCAT",

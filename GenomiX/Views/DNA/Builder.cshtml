@@ -8,6 +8,10 @@
     ViewData["ActiveNav"] = "dna";
 }
 
+<form id="gx-anti-forgery-form" method="post" class="gx-hidden">
+    @Html.AntiForgeryToken()
+</form>
+
 <section class="gx-dna-page">
     <div class="container container--wide gx-dna">
         <header class="gx-dna__header">
@@ -63,6 +67,14 @@
 
                 <div class="gx-dna__vieweractions">
                     <button id="scan-dna-btn" type="button" class="gx-btn gx-btn--accent">@L["ScanDNA"]</button>
+
+                    <button id="scan-disease-btn"
+                            type="button"
+                            class="gx-btn gx-btn--accent"
+                            aria-label="@L["ScanDiseases"]"
+                            title="@L["ScanDiseases"]">
+                        @L["ScanDiseases"]
+                    </button>
 
                     <button id="repair-dna-btn" type="button" class="gx-btn gx-btn--danger is-hidden">@L["RepairDNA"]</button>
 

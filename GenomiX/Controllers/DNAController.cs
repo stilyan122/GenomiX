@@ -1,10 +1,11 @@
 ﻿using GenomiX.Core.Interfaces;
+using GenomiX.Infrastructure.Models;
+using GenomiX.ViewModels.Disease;
 using GenomiX.ViewModels.DNA;
 using GenomiX.ViewModels.Sequence;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using GenomiX.Infrastructure.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace GenomiX.Controllers
 {
@@ -13,13 +14,20 @@ namespace GenomiX.Controllers
     {
         private readonly IDNAService _DNAService;
         private readonly ISequenceService _sequenceService;
+        private readonly IScanService _scanService;
+        private readonly IAiDiseaseExplanationService _aiDiseaseExplanationService;
         private readonly UserManager<GenUser> _userManager;
 
-        public DNAController(IDNAService DNAService, ISequenceService sequenceService, 
+        public DNAController(IDNAService DNAService, 
+            ISequenceService sequenceService, 
+            IScanService scanService,
+            IAiDiseaseExplanationService aiDiseaseExplanationService,
             UserManager<GenUser> userManager)
         {
             _DNAService = DNAService;
             _sequenceService = sequenceService;
+            _scanService = scanService;
+            _aiDiseaseExplanationService = aiDiseaseExplanationService;
             _userManager = userManager;
         }
 
@@ -296,6 +304,106 @@ namespace GenomiX.Controllers
 
             await _DNAService.DeleteForUserAsync(user.Id, id);
             return RedirectToAction(nameof(Models));
+        }
+
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("/dna/scandiseases")]
+        public async Task<IActionResult> ScanDiseases([FromBody] DiseaseScanInputModel input)
+        {
+            if (input == null)
+            {
+                return BadRequest(new { ok = false, message = "Missing scan input." });
+            }
+
+            if (string.IsNullOrWhiteSpace(input.Strand1) || string.IsNullOrWhiteSpace(input.Strand2))
+            {
+                return BadRequest(new { ok = false, message = "DNA strands are required." });
+            }
+
+            var strand1 = input.Strand1.Trim().ToUpperInvariant();
+            var strand2 = input.Strand2.Trim().ToUpperInvariant();
+
+            if (strand1.Length != strand2.Length)
+            {
+                return BadRequest(new { ok = false, message = "DNA strands must be equal in length." });
+            }
+
+            if (strand1.Any(c => c is not ('A' or 'C' or 'G' or 'T')) ||
+                strand2.Any(c => c is not ('A' or 'C' or 'G' or 'T')))
+            {
+                return BadRequest(new { ok = false, message = "DNA strands may contain only A, C, G, T." });
+            }
+
+            var results = await this._scanService.ScanAsync(strand1, strand2);
+
+            return Json(new
+            {
+                ok = true,
+                count = results.Count,
+                results 
+            });
+        }
+
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("/dna/explain-disease-scan")]
+        public async Task<IActionResult> ExplainDiseaseScan([FromBody] ExplainDiseaseScanInputModel input)
+        {
+            if (input == null)
+            {
+                return BadRequest("Input is null.");
+            }
+
+            if (string.IsNullOrWhiteSpace(input.DiseaseName))
+            {
+                return BadRequest("DiseaseName is missing.");
+            }
+
+            if (string.IsNullOrWhiteSpace(input.Description))
+            {
+                return BadRequest("Description is missing.");
+            }
+
+            if (string.IsNullOrWhiteSpace(input.GeneName))
+            {
+                return BadRequest("GeneName is missing.");
+            }
+
+            if (input.TotalPatterns <= 0)
+            {
+                return BadRequest("TotalPatterns must be greater than zero.");
+            }
+
+            if (input.MatchedPatterns < 0 || input.MatchedPatterns > input.TotalPatterns)
+            {
+                return BadRequest("MatchedPatterns is invalid.");
+            }
+
+            if (input.Confidence < 0 || input.Confidence > 1)
+            {
+                return BadRequest("Confidence must be between 0 and 1.");
+            }
+
+            var dto = new DiseaseAiExplanationRequestDto
+            {
+                DiseaseName = input.DiseaseName,
+                Description = input.Description,
+                GeneName = input.GeneName,
+                MatchedPatterns = input.MatchedPatterns,
+                TotalPatterns = input.TotalPatterns,
+                Confidence = input.Confidence
+            };
+
+            var explanation = await this._aiDiseaseExplanationService.ExplainAsync(dto);
+
+            return Json(new
+            {
+                ok = true,
+                explanation
+            });
         }
         private static (bool Ok, string Error, string S1, string S2) ParseStrictServer(string raw)
         {

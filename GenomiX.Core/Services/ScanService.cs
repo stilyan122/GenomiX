@@ -2,6 +2,7 @@
 using GenomiX.Core.Models;
 using GenomiX.Infrastructure.Models;
 using GenomiX.Infrastructure.Repo;
+using GenomiX.ViewModels.Disease;
 using Microsoft.EntityFrameworkCore;
 
 namespace GenomiX.Core.Services
@@ -26,25 +27,27 @@ namespace GenomiX.Core.Services
         }
 
         /// <inheritdoc />
-        public async Task<ICollection<DiseaseScanMatchDto>> ScanAsync(string strand1, string strand2)
+        public async Task<ICollection<DiseaseScanResultDto>> ScanAsync(string strand1, string strand2)
         {
-            var result = new List<DiseaseScanMatchDto>();
-
             var diseases = await _diseaseRepo
-                .GetAll()
-                .Include(d => d.MutationPatterns)
-                .ToListAsync();
+               .GetAll()
+               .Include(d => d.MutationPatterns)
+               .ToListAsync();
+
+            var results = new List<DiseaseScanResultDto>();
 
             foreach (var disease in diseases)
             {
+                var matches = new List<DiseaseScanMatchDto>();
+
                 foreach (var pattern in disease.MutationPatterns)
                 {
-                    var match1 = strand1.IndexOf(pattern.PatternSequence, StringComparison.Ordinal);
-                    var match2 = strand2.IndexOf(pattern.PatternSequence, StringComparison.Ordinal);
+                    var idx1 = strand1.IndexOf(pattern.PatternSequence, StringComparison.Ordinal);
+                    var idx2 = strand2.IndexOf(pattern.PatternSequence, StringComparison.Ordinal);
 
-                    if (match1 >= 0)
+                    if (idx1 >= 0)
                     {
-                        result.Add(new DiseaseScanMatchDto
+                        matches.Add(new DiseaseScanMatchDto
                         {
                             DiseaseId = disease.Id,
                             DiseaseName = disease.Name,
@@ -52,14 +55,14 @@ namespace GenomiX.Core.Services
                             GeneName = pattern.GeneName,
                             PatternSequence = pattern.PatternSequence,
                             IsMatch = true,
-                            MatchedIndex = match1,
+                            MatchedIndex = idx1,
                             Strand = "strand1"
                         });
                     }
 
-                    if (match2 >= 0)
+                    if (idx2 >= 0)
                     {
-                        result.Add(new DiseaseScanMatchDto
+                        matches.Add(new DiseaseScanMatchDto
                         {
                             DiseaseId = disease.Id,
                             DiseaseName = disease.Name,
@@ -67,14 +70,31 @@ namespace GenomiX.Core.Services
                             GeneName = pattern.GeneName,
                             PatternSequence = pattern.PatternSequence,
                             IsMatch = true,
-                            MatchedIndex = match2,
+                            MatchedIndex = idx2,
                             Strand = "strand2"
                         });
                     }
                 }
+
+                if (matches.Count > 0)
+                {
+                    var total = disease.MutationPatterns.Count;
+                    var matched = matches.Count;
+
+                    results.Add(new DiseaseScanResultDto
+                    {
+                        DiseaseId = disease.Id,
+                        DiseaseName = disease.Name,
+                        Description = disease.Description,
+                        MatchedPatterns = matched,
+                        TotalPatterns = total,
+                        Confidence = total == 0 ? 0 : (double)matched / total,
+                        Matches = matches
+                    });
+                }
             }
 
-            return result;
+            return results;
         }
     }
 }

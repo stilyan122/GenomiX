@@ -392,3 +392,19 @@
     animation: none !important;
   }
 }
+
+.is-disease-hit {
+    box-shadow: 0 0 0 1px rgba(255, 90, 90, 0.7), 0 0 18px rgba(255, 70, 70, 0.45);
+    border-color: rgba(255, 110, 110, 0.9);
+    animation: gxDiseasePulse 1.2s ease-in-out infinite;
+}
+
+@keyframes gxDiseasePulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.04);
+    }
+}

@@ -442,11 +442,11 @@ namespace GenomiX.Infrastructure.Migrations
                 columns: new[] { "Id", "Description", "Name" },
                 values: new object[,]
                 {
-                    { new Guid("aaaaaaaa-1111-1111-1111-111111111111"), "Наследствено заболяване на кръвта, причинено от мутация в гена HBB, която променя структурата на хемоглобина.", "Сърповидно-клетъчна анемия" },
-                    { new Guid("bbbbbbbb-2222-2222-2222-222222222222"), "Наследствено заболяване, което засяга CFTR протеина и води до натрупване на гъста слуз в различни органи.", "Кистична фиброза" },
-                    { new Guid("cccccccc-3333-3333-3333-333333333333"), "Невродегенеративно наследствено заболяване, свързано с разширени CAG повторения в гена HTT.", "Болест на Хънтингтън" },
-                    { new Guid("dddddddd-4444-4444-4444-444444444444"), "Наследствено метаболитно заболяване, причинено от мутации в гена PAH, което води до натрупване на фенилаланин.", "Фенилкетонурия" },
-                    { new Guid("eeeeeeee-5555-5555-5555-555555555555"), "Група наследствени заболявания, при които е нарушено образуването на нормален хемоглобин.", "Таласемия" }
+                    { new Guid("aaaaaaaa-1111-1111-1111-111111111111"), "Наследствено заболяване на кръвта, причинено от патогенен вариант в гена HBB, който води до образуване на хемоглобин S.", "Сърповидно-клетъчна анемия" },
+                    { new Guid("bbbbbbbb-2222-2222-2222-222222222222"), "Наследствено заболяване, причинено от патогенни варианти в CFTR; най-честият вариант е F508del.", "Кистична фиброза" },
+                    { new Guid("cccccccc-3333-3333-3333-333333333333"), "Невродегенеративно наследствено заболяване, причинено от експанзия на CAG повтори в гена HTT.", "Болест на Хънтингтън" },
+                    { new Guid("dddddddd-4444-4444-4444-444444444444"), "Наследствено метаболитно заболяване, причинено от патогенни варианти в гена PAH; един от най-известните е R408W.", "Фенилкетонурия" },
+                    { new Guid("eeeeeeee-5555-5555-5555-555555555555"), "Наследствено заболяване, свързано с патогенни варианти в HBB, които намаляват или прекъсват синтеза на бета-глобин.", "Бета-таласемия" }
                 });
 
             migrationBuilder.InsertData(
@@ -476,11 +476,11 @@ namespace GenomiX.Infrastructure.Migrations
                 columns: new[] { "Id", "AllowedMismatchCount", "DiseaseId", "GeneName", "MatchType", "Notes", "PatternSequence", "StartIndex" },
                 values: new object[,]
                 {
-                    { new Guid("11111111-aaaa-aaaa-aaaa-111111111111"), 0, new Guid("aaaaaaaa-1111-1111-1111-111111111111"), "HBB", "Exact", "������� ������� � ���� HBB, �������� ��� ����������-�������� ������.", "GTG", null },
-                    { new Guid("22222222-bbbb-bbbb-bbbb-222222222222"), 0, new Guid("bbbbbbbb-2222-2222-2222-222222222222"), "CFTR", "Exact", "�������� ������������� ������ �� �������, �������� � �������� �������.", "TTT", null },
-                    { new Guid("33333333-cccc-cccc-cccc-333333333333"), 1, new Guid("cccccccc-3333-3333-3333-333333333333"), "HTT", "Contains", "��������� �� CAG ����������������, ���������� ���� ������������� ������ �� ������ �� ����������.", "CAGCAGCAG", null },
-                    { new Guid("44444444-dddd-dddd-dddd-444444444444"), 0, new Guid("dddddddd-4444-4444-4444-444444444444"), "PAH", "Exact", "�������� ������������� ������ �� ��������������.", "AAT", null },
-                    { new Guid("55555555-eeee-eeee-eeee-555555555555"), 0, new Guid("eeeeeeee-5555-5555-5555-555555555555"), "HBB", "Exact", "�������� ������������� ������ �� ���������.", "TGA", null }
+                    { new Guid("11111111-aaaa-aaaa-aaaa-111111111111"), 0, new Guid("aaaaaaaa-1111-1111-1111-111111111111"), "HBB", "Exact", "Реален вариант HbS / сърповидно-клетъчна анемия: HBB c.20A>T, p.Glu7Val (исторически често означаван като Glu6Val). Marker-ът е образователен локален sequence window, центриран върху мутантния GTG мотив.", "CCTGTGGAGAAGTCTGCCGTT", null },
+                    { new Guid("22222222-bbbb-bbbb-bbbb-222222222222"), 0, new Guid("bbbbbbbb-2222-2222-2222-222222222222"), "CFTR", "Exact", "Реален вариант F508del: CFTR c.1521_1523delCTT, p.Phe508del. Marker-ът е образователен локален mutant window около делецията.", "ATCATTGGTGTTTCCTATGATGAA", null },
+                    { new Guid("33333333-cccc-cccc-cccc-333333333333"), 0, new Guid("cccccccc-3333-3333-3333-333333333333"), "HTT", "Contains", "Реален механизъм: експанзия на CAG repeat в HTT. Тук marker-ът е 36 последователни CAG повторения, защото болестта е свързана с 36 или повече повторения.", "CAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAG", null },
+                    { new Guid("44444444-dddd-dddd-dddd-444444444444"), 0, new Guid("dddddddd-4444-4444-4444-444444444444"), "PAH", "Exact", "Реален вариант R408W: PAH c.1222C>T, codon change CGG>TGG. Този v1 marker е codon-level motif за реалния патогенен вариант.", "CGGTGG", null },
+                    { new Guid("55555555-eeee-eeee-eeee-555555555555"), 0, new Guid("eeeeeeee-5555-5555-5555-555555555555"), "HBB", "Exact", "Реален класически β-таласемичен вариант: HBB c.118C>T, codon 39, CAG>TAG, p.Gln40Ter. Този v1 marker е codon-level motif за реалния nonsense вариант.", "CAGTAG", null }
                 });
 
             migrationBuilder.InsertData(
@@ -488,12 +488,12 @@ namespace GenomiX.Infrastructure.Migrations
                 columns: new[] { "Id", "ApprovedAt", "CreatedAt", "CreatedByUserId", "IsApproved", "IsRejected", "Name", "RejectedAt", "RejectionReason", "Sequence", "Species", "UpdatedAt" },
                 values: new object[,]
                 {
-                    { new Guid("11111111-0000-0000-0000-000000000001"), null, new DateTimeOffset(new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("c2b3d8ae-2b6d-4c41-9b8e-b1c2a3d4e005"), false, false, "BRCA1 fragment", null, null, "ATGGAAGAGCTGTCAGGAGAGCTGCCAGCTGGTGAGGAAGCAGTGAGCCTGAGCAAGAGCTGAG", "Homo sapiens", null },
+                    { new Guid("11111111-0000-0000-0000-000000000001"), null, new DateTimeOffset(new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("c2b3d8ae-2b6d-4c41-9b8e-b1c2a3d4e005"), true, false, "BRCA1 fragment", null, null, "ATGGAAGAGCTGTCAGGAGAGCTGCCAGCTGGTGAGGAAGCAGTGAGCCTGAGCAAGAGCTGAG", "Homo sapiens", null },
                     { new Guid("11111111-0000-0000-0000-000000000002"), null, new DateTimeOffset(new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("c2b3d8ae-2b6d-4c41-9b8e-b1c2a3d4e005"), false, false, "BRCA1 fragment (complement)", null, null, "CTCAGCTCTTGCTCAGGCTCACTGCTTCCTCACCAGCTGGCAGCTCTCCTGACAGCTCTTCCAT", "Homo sapiens", null },
-                    { new Guid("22222222-0000-0000-0000-000000000001"), null, new DateTimeOffset(new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("c2b3d8ae-2b6d-4c41-9b8e-b1c2a3d4e005"), false, false, "TP53 fragment", null, null, "ATGGTCAGGACCTGGAGAAGGAGCTGAGGCTGGATGAAGTCAAGAGTGTCAAGCGAGCTGAGG", "Mus musculus", null },
+                    { new Guid("22222222-0000-0000-0000-000000000001"), null, new DateTimeOffset(new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("c2b3d8ae-2b6d-4c41-9b8e-b1c2a3d4e005"), true, false, "TP53 fragment", null, null, "ATGGTCAGGACCTGGAGAAGGAGCTGAGGCTGGATGAAGTCAAGAGTGTCAAGCGAGCTGAGG", "Mus musculus", null },
                     { new Guid("22222222-0000-0000-0000-000000000002"), null, new DateTimeOffset(new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("c2b3d8ae-2b6d-4c41-9b8e-b1c2a3d4e005"), false, false, "TP53 fragment (complement)", null, null, "CCTCAGCTCGCTTGACACTCTTGACTTCATCCAGCCTCAGCTCCTTCTCCAGGTCCTGACCAG", "Mus musculus", null },
-                    { new Guid("33333333-0000-0000-0000-000000000001"), null, new DateTimeOffset(new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("c2b3d8ae-2b6d-4c41-9b8e-b1c2a3d4e005"), false, false, "COX1 mitochondrial fragment", null, null, "ATGGAAGAGGAGCTGCTGAGGAGCTGGTGAGGAAGCAGTGAGCCTGAGCAAGAGCTGAGCTA", "Canis lupus familiaris", null },
-                    { new Guid("33333333-0000-0000-0000-000000000002"), null, new DateTimeOffset(new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("c2b3d8ae-2b6d-4c41-9b8e-b1c2a3d4e005"), false, false, "COX1 mitochondrial fragment (complement)", null, null, "TAGCTCAGCTCTTGCTCAGGCTCACTGCTTCCTCACCAGCTCCTCAGCAGCTCCTCTTCCAT", "Canis lupus familiaris", null }
+                    { new Guid("33333333-0000-0000-0000-000000000001"), null, new DateTimeOffset(new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("c2b3d8ae-2b6d-4c41-9b8e-b1c2a3d4e005"), true, false, "COX1 mitochondrial fragment", null, null, "ATGGAAGAGGAGCTGCTGAGGAGCTGGTGAGGAAGCAGTGAGCCTGAGCAAGAGCTGAGCTA", "Canis lupus familiaris", null },
+                    { new Guid("33333333-0000-0000-0000-000000000002"), null, new DateTimeOffset(new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("c2b3d8ae-2b6d-4c41-9b8e-b1c2a3d4e005"), true, false, "COX1 mitochondrial fragment (complement)", null, null, "TAGCTCAGCTCTTGCTCAGGCTCACTGCTTCCTCACCAGCTCCTCAGCAGCTCCTCTTCCAT", "Canis lupus familiaris", null }
                 });
 
             migrationBuilder.InsertData(
