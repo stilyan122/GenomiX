@@ -408,3 +408,1115 @@
         transform: scale(1.04);
     }
 }
+
+.gx-ai-modal {
+    border: 1px solid rgba(120,200,255,.16);
+    background: radial-gradient(900px 300px at 10% 0%, rgba(80,140,255,.12), transparent 55%), radial-gradient(700px 260px at 90% 10%, rgba(0,255,200,.08), transparent 50%), rgba(8,12,22,.94);
+    box-shadow: 0 24px 80px rgba(0,0,0,.58), 0 0 0 1px rgba(255,255,255,.04) inset, 0 0 42px rgba(80,140,255,.12);
+    animation: gxAiModalIn .28s ease-out;
+}
+
+.gx-ai-modal__hd {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 14px;
+}
+
+.gx-ai-modal__hero {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.gx-ai-modal__icon {
+    width: 46px;
+    height: 46px;
+    display: grid;
+    place-items: center;
+    border-radius: 14px;
+    background: linear-gradient(180deg, rgba(90,150,255,.28), rgba(50,90,255,.18));
+    box-shadow: 0 0 22px rgba(80,140,255,.18);
+    font-size: 22px;
+}
+
+.gx-ai-modal__sub {
+    margin-top: 3px;
+    color: rgba(255,255,255,.66);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.gx-ai-modal__chips {
+    margin-left: auto;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+}
+
+.gx-ai-chip {
+    display: inline-flex;
+    align-items: center;
+    min-height: 32px;
+    padding: 0 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: .02em;
+    border: 1px solid rgba(255,255,255,.10);
+    color: rgba(255,255,255,.92);
+    background: rgba(255,255,255,.05);
+}
+
+.gx-ai-chip--confidence {
+    background: linear-gradient(180deg, rgba(255,130,130,.20), rgba(190,50,80,.15));
+    border-color: rgba(255,120,120,.30);
+    box-shadow: 0 0 18px rgba(255,80,80,.14);
+}
+
+.gx-ai-chip--gene {
+    background: linear-gradient(180deg, rgba(120,220,255,.18), rgba(40,100,200,.14));
+    border-color: rgba(120,220,255,.26);
+}
+
+.gx-ai-chip--match {
+    background: linear-gradient(180deg, rgba(170,140,255,.18), rgba(90,60,180,.14));
+    border-color: rgba(170,140,255,.26);
+}
+
+.gx-ai-modal__body {
+    padding: 16px;
+}
+
+.gx-ai-card {
+    border-radius: 18px;
+    border: 1px solid rgba(255,255,255,.08);
+    background: rgba(255,255,255,.035);
+    box-shadow: 0 10px 28px rgba(0,0,0,.16);
+    padding: 16px;
+}
+
+    .gx-ai-card h3 {
+        margin: 0 0 10px;
+        font-size: 15px;
+        font-weight: 900;
+        color: rgba(255,255,255,.95);
+    }
+
+    .gx-ai-card p {
+        margin: 0;
+        color: rgba(255,255,255,.82);
+        line-height: 1.6;
+    }
+
+.gx-ai-card--hero {
+    margin-bottom: 14px;
+    background: radial-gradient(500px 180px at 0% 0%, rgba(80,140,255,.12), transparent 60%), rgba(255,255,255,.04);
+}
+
+.gx-ai-card__kicker {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .14em;
+    color: rgba(130,210,255,.78);
+    margin-bottom: 10px;
+    font-weight: 900;
+}
+
+.gx-ai-summary {
+    min-height: 68px;
+    font-size: 15px;
+    line-height: 1.7;
+    color: rgba(255,255,255,.92);
+}
+
+.gx-ai-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+.gx-ai-card--wide {
+    grid-column: 1 / -1;
+}
+
+.gx-ai-card--notice {
+    border-color: rgba(255,190,120,.20);
+    background: linear-gradient(180deg, rgba(255,190,120,.06), rgba(255,255,255,.03));
+}
+
+.gx-ai-list {
+    margin: 0;
+    padding-left: 18px;
+    display: grid;
+    gap: 8px;
+    color: rgba(255,255,255,.84);
+}
+
+.gx-ai-empty {
+    opacity: .6;
+}
+
+@keyframes gxAiModalIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, calc(-50% + 12px)) scale(.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+@media (max-width: 860px) {
+    .gx-ai-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .gx-ai-modal__chips {
+        margin-left: 0;
+    }
+}
+
+.gx-ai-modal{
+  width: min(860px, calc(100vw - 32px));
+  max-height: 88vh;
+  overflow: hidden;
+  border-radius: 28px;
+  border: 1px solid rgba(120, 170, 255, .14);
+  background:
+    radial-gradient(900px 320px at 10% 0%, rgba(70, 120, 255, .12), transparent 55%),
+    radial-gradient(700px 260px at 100% 10%, rgba(0, 255, 200, .06), transparent 50%),
+    linear-gradient(180deg, rgba(7, 13, 27, .98), rgba(4, 8, 18, .98));
+  box-shadow:
+    0 30px 100px rgba(0, 0, 0, .62),
+    0 0 0 1px rgba(255,255,255,.03) inset,
+    0 0 50px rgba(80,140,255,.10);
+  animation: gxAiModalIn .28s ease-out;
+}
+
+.gx-ai-modal__hd{
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 22px 22px 18px;
+  border-bottom: 1px solid rgba(255,255,255,.06);
+}
+
+.gx-ai-modal__hd--clean{
+  background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0));
+}
+
+.gx-ai-modal__hero{
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+.gx-ai-modal__icon{
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  display: grid;
+  place-items: center;
+  font-size: 24px;
+  background: linear-gradient(180deg, rgba(82,148,255,.26), rgba(61,89,214,.16));
+  border: 1px solid rgba(120,170,255,.14);
+  box-shadow: 0 0 26px rgba(70,130,255,.16);
+  flex: 0 0 auto;
+}
+
+.gx-ai-modal__titlewrap{
+  min-width: 0;
+}
+
+.gx-modal__title{
+  font-size: clamp(24px, 3vw, 32px);
+  line-height: 1.1;
+  font-weight: 900;
+  letter-spacing: -.02em;
+  color: rgba(255,255,255,.98);
+  margin: 0;
+}
+
+.gx-ai-modal__sub{
+  margin-top: 6px;
+  font-size: 16px;
+  font-weight: 700;
+  color: rgba(170, 215, 255, .78);
+}
+
+.gx-modal__close{
+  width: 46px;
+  height: 46px;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 14px;
+  background: rgba(255,255,255,.05);
+  color: rgba(255,255,255,.88);
+  font-size: 24px;
+  cursor: pointer;
+  transition: .2s ease;
+}
+
+.gx-modal__close:hover{
+  background: rgba(255,255,255,.10);
+  transform: translateY(-1px);
+}
+
+.gx-ai-modal__body{
+  padding: 20px;
+  max-height: calc(88vh - 100px);
+  overflow: auto;
+}
+
+.gx-ai-card{
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,.07);
+  background: linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.02));
+  box-shadow: 0 12px 32px rgba(0,0,0,.18);
+  padding: 18px 18px 16px;
+}
+
+.gx-ai-card--summary{
+  padding: 22px;
+  margin-bottom: 16px;
+  background:
+    radial-gradient(500px 180px at 0% 0%, rgba(78, 134, 255, .14), transparent 60%),
+    linear-gradient(180deg, rgba(255,255,255,.055), rgba(255,255,255,.025));
+}
+
+.gx-ai-card__kicker{
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: .18em;
+  color: rgba(122, 214, 255, .82);
+  margin-bottom: 10px;
+}
+
+.gx-ai-summary{
+  min-height: 56px;
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.75;
+  color: rgba(255,255,255,.94);
+}
+
+.gx-ai-grid{
+  display: grid;
+  gap: 14px;
+}
+
+.gx-ai-grid--single{
+  grid-template-columns: 1fr;
+}
+
+.gx-ai-card h3{
+  margin: 0 0 12px;
+  font-size: 20px;
+  font-weight: 850;
+  letter-spacing: -.01em;
+  color: rgba(255,255,255,.97);
+}
+
+.gx-ai-card p{
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.7;
+  color: rgba(255,255,255,.84);
+}
+
+.gx-ai-list{
+  margin: 0;
+  padding-left: 20px;
+  display: grid;
+  gap: 10px;
+}
+
+.gx-ai-list li{
+  color: rgba(255,255,255,.86);
+  line-height: 1.65;
+  padding-left: 4px;
+}
+
+.gx-ai-empty{
+  margin: 0;
+  color: rgba(255,255,255,.50);
+}
+
+.gx-ai-card--notice{
+  border-color: rgba(255, 191, 120, .18);
+  background:
+    linear-gradient(180deg, rgba(255, 194, 120, .06), rgba(255,255,255,.025));
+}
+
+@keyframes gxAiModalIn{
+  from{
+    opacity: 0;
+    transform: translate(-50%, calc(-50% + 18px)) scale(.985);
+  }
+  to{
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@media (max-width: 700px){
+  .gx-ai-modal{
+    width: min(100vw - 16px, 860px);
+    border-radius: 22px;
+  }
+
+  .gx-ai-modal__hd{
+    padding: 18px 18px 14px;
+  }
+
+  .gx-ai-modal__body{
+    padding: 16px;
+  }
+
+  .gx-modal__title{
+    font-size: 22px;
+  }
+
+  .gx-ai-modal__sub{
+    font-size: 14px;
+  }
+
+  .gx-ai-card h3{
+    font-size: 18px;
+  }
+}
+
+.gx-ai-card--flow{
+  background:
+    radial-gradient(500px 180px at 0% 0%, rgba(120, 90, 255, .08), transparent 60%),
+    linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.02));
+}
+
+.gx-mechanism-flow{
+  display: grid;
+  gap: 10px;
+}
+
+.gx-mechanism-step{
+  position: relative;
+  border-radius: 18px;
+  border: 1px solid rgba(255,255,255,.08);
+  background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.025));
+  padding: 14px 14px 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.14);
+}
+
+.gx-mechanism-step__top{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.gx-mechanism-step__index{
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  font-size: 13px;
+  font-weight: 900;
+  color: rgba(255,255,255,.98);
+  background: linear-gradient(180deg, rgba(84,144,255,.28), rgba(58,94,210,.18));
+  border: 1px solid rgba(120,170,255,.18);
+  box-shadow: 0 0 18px rgba(70,130,255,.12);
+  flex: 0 0 auto;
+}
+
+.gx-mechanism-step__title{
+  font-size: 15px;
+  font-weight: 850;
+  color: rgba(255,255,255,.96);
+  letter-spacing: -.01em;
+}
+
+.gx-mechanism-step__desc{
+  color: rgba(255,255,255,.80);
+  line-height: 1.65;
+  font-size: 14px;
+}
+
+.gx-mechanism-arrow{
+  text-align: center;
+  font-size: 20px;
+  line-height: 1;
+  color: rgba(135, 198, 255, .70);
+  text-shadow: 0 0 18px rgba(90, 150, 255, .22);
+  user-select: none;
+}
+
+.gx-system-chips{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.gx-system-chip{
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(120,170,255,.16);
+  background: linear-gradient(180deg, rgba(82,148,255,.16), rgba(40,70,150,.10));
+  color: rgba(230,245,255,.95);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: .01em;
+  box-shadow: 0 0 16px rgba(70,130,255,.08);
+}
+
+.gx-ai-grid--single{
+  grid-template-columns: 1fr;
+}
+
+.gx-ai-card h3{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.gx-vm{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+
+.gx-vm-step{
+  display:flex;
+  gap:14px;
+  align-items:flex-start;
+}
+
+.gx-vm-node{
+  width:42px;
+  height:42px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  background:linear-gradient(180deg, rgba(90,150,255,.3), rgba(60,100,220,.15));
+  border:1px solid rgba(120,170,255,.2);
+  box-shadow:0 0 20px rgba(90,150,255,.15);
+}
+
+.gx-vm-icon{
+  font-size:18px;
+}
+
+.gx-vm-content{
+  flex:1;
+}
+
+.gx-vm-title{
+  font-weight:800;
+  color:white;
+  margin-bottom:4px;
+}
+
+.gx-vm-desc{
+  font-size:14px;
+  color:rgba(255,255,255,.8);
+  line-height:1.6;
+}
+
+.gx-vm-arrow{
+  height:20px;
+  margin-left:21px;
+  border-left:2px dashed rgba(120,170,255,.3);
+}
+
+/* TYPE COLORS */
+
+.gx-vm-gene-mutation .gx-vm-node{
+  box-shadow:0 0 20px rgba(120,80,255,.3);
+}
+
+.gx-vm-protein-change .gx-vm-node{
+  box-shadow:0 0 20px rgba(255,120,80,.3);
+}
+
+.gx-vm-cell-change .gx-vm-node{
+  box-shadow:0 0 20px rgba(80,255,200,.3);
+}
+
+.gx-vm-flow-block .gx-vm-node{
+  box-shadow:0 0 20px rgba(255,80,80,.4);
+}
+
+.gx-vm-accumulation .gx-vm-node{
+  box-shadow:0 0 20px rgba(255,200,80,.4);
+}
+
+.gx-vm-signal-loss .gx-vm-node{
+  box-shadow:0 0 20px rgba(180,120,255,.4);
+}
+
+.gx-vm-organ-effect .gx-vm-node{
+  box-shadow:0 0 20px rgba(255,100,120,.4);
+}
+
+.gx-ai-theme-blood{
+  box-shadow:
+    0 30px 100px rgba(0,0,0,.62),
+    0 0 0 1px rgba(255,255,255,.03) inset,
+    0 0 56px rgba(255,80,80,.16);
+}
+
+.gx-ai-theme-blood .gx-ai-modal__icon,
+.gx-ai-theme-blood .gx-vm-flow-block .gx-vm-node,
+.gx-ai-theme-blood .gx-vm-organ-effect .gx-vm-node{
+  box-shadow: 0 0 26px rgba(255,90,90,.28);
+}
+
+.gx-ai-theme-lung{
+  box-shadow:
+    0 30px 100px rgba(0,0,0,.62),
+    0 0 0 1px rgba(255,255,255,.03) inset,
+    0 0 56px rgba(70,255,220,.14);
+}
+
+.gx-ai-theme-neuro{
+  box-shadow:
+    0 30px 100px rgba(0,0,0,.62),
+    0 0 0 1px rgba(255,255,255,.03) inset,
+    0 0 56px rgba(180,120,255,.16);
+}
+
+.gx-ai-theme-metabolic{
+  box-shadow:
+    0 30px 100px rgba(0,0,0,.62),
+    0 0 0 1px rgba(255,255,255,.03) inset,
+    0 0 56px rgba(255,190,90,.16);
+}
+
+.gx-ai-card--flow{
+  position: relative;
+  overflow: hidden;
+}
+
+.gx-flow-bg{
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  overflow:hidden;
+}
+
+.gx-flow-pulse{
+  position:absolute;
+  left:-20%;
+  top:0;
+  width:40%;
+  height:100%;
+  background: linear-gradient(90deg, transparent, rgba(120,170,255,.10), transparent);
+  filter: blur(10px);
+  animation: gxFlowSweep 3.8s linear infinite;
+}
+
+.gx-flow-particle{
+  position:absolute;
+  width:8px;
+  height:8px;
+  border-radius:999px;
+  background: rgba(130,210,255,.55);
+  box-shadow: 0 0 14px rgba(120,190,255,.28);
+  animation: gxFloatParticle 4.2s ease-in-out infinite;
+}
+
+.gx-flow-particle.p1{ left:12%; top:22%; animation-delay:0s; }
+.gx-flow-particle.p2{ left:72%; top:38%; animation-delay:1.1s; }
+.gx-flow-particle.p3{ left:46%; top:68%; animation-delay:2s; }
+
+@keyframes gxFlowSweep{
+  from{ transform: translateX(0); }
+  to{ transform: translateX(360%); }
+}
+
+@keyframes gxFloatParticle{
+  0%,100%{ transform: translateY(0) scale(.9); opacity:.45; }
+  50%{ transform: translateY(-12px) scale(1.08); opacity:.95; }
+}
+
+.gx-ai-reveal{
+  position: fixed;
+  inset: 0;
+  z-index: 10010;
+  display:grid;
+  place-items:center;
+  background: rgba(4,8,18,.42);
+  backdrop-filter: blur(10px);
+  opacity:0;
+  transition: opacity .25s ease;
+}
+
+.gx-ai-reveal.is-on{
+  opacity:1;
+}
+
+.gx-ai-reveal__inner{
+  min-width: 280px;
+  padding: 22px 24px;
+  border-radius: 24px;
+  border: 1px solid rgba(120,170,255,.14);
+  background:
+    radial-gradient(500px 200px at 0% 0%, rgba(82,148,255,.16), transparent 60%),
+    rgba(8,12,22,.92);
+  box-shadow: 0 28px 90px rgba(0,0,0,.44);
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+
+.gx-ai-reveal__icon{
+  width:46px;
+  height:46px;
+  border-radius:16px;
+  display:grid;
+  place-items:center;
+  font-size:24px;
+  background: linear-gradient(180deg, rgba(82,148,255,.26), rgba(61,89,214,.16));
+  box-shadow: 0 0 24px rgba(70,130,255,.16);
+}
+
+.gx-ai-reveal__text{
+  color: rgba(255,255,255,.94);
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: -.01em;
+}
+
+.gx-ai-card--scene {
+    overflow: hidden;
+    background: radial-gradient(520px 180px at 0% 0%, rgba(90,140,255,.10), transparent 60%), linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+}
+
+.gx-scene {
+    position: relative;
+    min-height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    padding: 18px 8px 6px;
+}
+
+.gx-scene__arrow {
+    width: 44px;
+    height: 2px;
+    background: linear-gradient(90deg, rgba(120,170,255,.10), rgba(130,210,255,.85), rgba(120,170,255,.10));
+    position: relative;
+    box-shadow: 0 0 18px rgba(120,170,255,.18);
+}
+
+    .gx-scene__arrow::after {
+        content: "";
+        position: absolute;
+        right: -2px;
+        top: 50%;
+        width: 10px;
+        height: 10px;
+        border-top: 2px solid rgba(130,210,255,.9);
+        border-right: 2px solid rgba(130,210,255,.9);
+        transform: translateY(-50%) rotate(45deg);
+    }
+
+.gx-scene__label {
+    position: absolute;
+    top: 0;
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: rgba(130,210,255,.72);
+}
+
+.gx-scene__label--left {
+    left: 8px;
+}
+
+/* BLOOD */
+.gx-scene__dna {
+    width: 58px;
+    height: 100px;
+    border-radius: 999px;
+    background: repeating-linear-gradient( 180deg, rgba(120,170,255,.95) 0 6px, rgba(255,255,255,.12) 6px 12px );
+    mask-image: radial-gradient(circle at 50% 50%, black 78%, transparent 100%);
+    box-shadow: 0 0 24px rgba(120,170,255,.22);
+    animation: gxDnaGlow 2.4s ease-in-out infinite;
+}
+
+.gx-rbc {
+    width: 58px;
+    height: 58px;
+    background: radial-gradient(circle at 40% 35%, rgba(255,180,180,.95), rgba(220,60,60,.88));
+    box-shadow: 0 0 20px rgba(255,90,90,.18);
+}
+
+.gx-rbc--normal {
+    border-radius: 50%;
+}
+
+.gx-rbc--sickle {
+    border-radius: 55% 45% 60% 40% / 52% 38% 62% 48%;
+    transform: rotate(-22deg);
+    animation: gxSickleMorph 2.2s ease-in-out infinite;
+}
+
+.gx-vessel {
+    width: 150px;
+    height: 54px;
+    border-radius: 999px;
+    border: 1px solid rgba(255,110,110,.18);
+    background: linear-gradient(180deg, rgba(120,20,20,.22), rgba(70,10,10,.12));
+    position: relative;
+    overflow: hidden;
+    box-shadow: inset 0 0 18px rgba(255,80,80,.10);
+}
+
+.gx-vessel__cell {
+    position: absolute;
+    top: 50%;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 40% 35%, rgba(255,190,190,.95), rgba(220,70,70,.86));
+    transform: translateY(-50%);
+    animation: gxFlowCell 3s linear infinite;
+}
+
+    .gx-vessel__cell.c1 {
+        left: -10%;
+        animation-delay: 0s;
+    }
+
+    .gx-vessel__cell.c2 {
+        left: -20%;
+        animation-delay: 1s;
+    }
+
+    .gx-vessel__cell.c3 {
+        left: -30%;
+        animation-delay: 2s;
+    }
+
+/* LUNG */
+.gx-scene__channel {
+    width: 130px;
+    height: 76px;
+    border-radius: 20px;
+    border: 1px solid rgba(120,220,255,.20);
+    background: linear-gradient(180deg, rgba(20,80,120,.18), rgba(10,30,60,.10));
+    position: relative;
+    overflow: hidden;
+}
+
+.gx-scene__gate {
+    position: absolute;
+    left: 50%;
+    top: 10px;
+    width: 16px;
+    height: 56px;
+    transform: translateX(-50%);
+    border-radius: 999px;
+    background: linear-gradient(180deg, rgba(120,220,255,.55), rgba(40,140,200,.22));
+    box-shadow: 0 0 18px rgba(120,220,255,.20);
+}
+
+.gx-ion {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(140,255,240,.92);
+    box-shadow: 0 0 14px rgba(140,255,240,.26);
+    animation: gxIonMove 2.8s linear infinite;
+}
+
+    .gx-ion.i1 {
+        left: 16px;
+        top: 18px;
+        animation-delay: 0s;
+    }
+
+    .gx-ion.i2 {
+        left: 22px;
+        top: 36px;
+        animation-delay: .9s;
+    }
+
+    .gx-ion.i3 {
+        left: 18px;
+        top: 54px;
+        animation-delay: 1.8s;
+    }
+
+.gx-mucus {
+    width: 120px;
+    height: 70px;
+    position: relative;
+}
+
+.gx-mucus__blob {
+    position: absolute;
+    border-radius: 999px;
+    background: radial-gradient(circle at 40% 35%, rgba(130,255,220,.34), rgba(40,190,160,.18));
+    filter: blur(1px);
+    animation: gxBlobPulse 2.4s ease-in-out infinite;
+}
+
+    .gx-mucus__blob.b1 {
+        width: 68px;
+        height: 32px;
+        left: 8px;
+        top: 20px;
+    }
+
+    .gx-mucus__blob.b2 {
+        width: 54px;
+        height: 26px;
+        left: 46px;
+        top: 10px;
+        animation-delay: .7s;
+    }
+
+    .gx-mucus__blob.b3 {
+        width: 62px;
+        height: 28px;
+        left: 38px;
+        top: 34px;
+        animation-delay: 1.4s;
+    }
+
+/* NEURO */
+.gx-neuron {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 40% 35%, rgba(210,180,255,.95), rgba(130,80,220,.78));
+    box-shadow: 0 0 26px rgba(180,120,255,.20);
+    position: relative;
+}
+
+    .gx-neuron::before,
+    .gx-neuron::after {
+        content: "";
+        position: absolute;
+        width: 44px;
+        height: 2px;
+        background: rgba(180,120,255,.55);
+        top: 50%;
+    }
+
+.gx-neuron--left::before {
+    right: -34px;
+}
+
+.gx-neuron--right::before {
+    left: -34px;
+}
+
+.gx-neuron.is-dim {
+    opacity: .56;
+}
+
+.gx-synapse {
+    width: 120px;
+    height: 28px;
+    position: relative;
+}
+
+.gx-signal {
+    position: absolute;
+    top: 50%;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: rgba(220,170,255,.92);
+    transform: translateY(-50%);
+    box-shadow: 0 0 16px rgba(180,120,255,.26);
+    animation: gxSignalMove 2.2s linear infinite;
+}
+
+    .gx-signal.s1 {
+        left: 10px;
+        animation-delay: 0s;
+    }
+
+    .gx-signal.s2 {
+        left: 10px;
+        animation-delay: .7s;
+    }
+
+    .gx-signal.s3 {
+        left: 10px;
+        animation-delay: 1.4s;
+    }
+
+/* METABOLIC */
+.gx-enzyme {
+    width: 72px;
+    height: 72px;
+    border-radius: 22px;
+    background: radial-gradient(circle at 40% 35%, rgba(255,225,160,.96), rgba(240,150,40,.72));
+    box-shadow: 0 0 26px rgba(255,190,90,.18);
+    animation: gxEnzymePulse 2.4s ease-in-out infinite;
+}
+
+.gx-molecule-cloud {
+    width: 120px;
+    height: 90px;
+    position: relative;
+}
+
+.gx-molecule {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: rgba(255,220,120,.95);
+    box-shadow: 0 0 14px rgba(255,210,100,.22);
+    animation: gxMoleculeFloat 2.8s ease-in-out infinite;
+}
+
+    .gx-molecule.m1 {
+        left: 10px;
+        top: 20px;
+    }
+
+    .gx-molecule.m2 {
+        left: 42px;
+        top: 10px;
+        animation-delay: .4s;
+    }
+
+    .gx-molecule.m3 {
+        left: 72px;
+        top: 24px;
+        animation-delay: .8s;
+    }
+
+    .gx-molecule.m4 {
+        left: 28px;
+        top: 52px;
+        animation-delay: 1.2s;
+    }
+
+    .gx-molecule.m5 {
+        left: 64px;
+        top: 58px;
+        animation-delay: 1.6s;
+    }
+
+@keyframes gxDnaGlow {
+    0%,100% {
+        transform: scale(1);
+        opacity: .88;
+    }
+
+    50% {
+        transform: scale(1.03);
+        opacity: 1;
+    }
+}
+
+@keyframes gxSickleMorph {
+    0%,100% {
+        transform: rotate(-22deg) scale(1);
+    }
+
+    50% {
+        transform: rotate(-28deg) scale(1.08);
+    }
+}
+
+@keyframes gxFlowCell {
+    0% {
+        transform: translateY(-50%) translateX(0);
+    }
+
+    100% {
+        transform: translateY(-50%) translateX(180px);
+    }
+}
+
+@keyframes gxIonMove {
+    0% {
+        transform: translateX(0);
+        opacity: .95;
+    }
+
+    45% {
+        transform: translateX(54px);
+        opacity: .95;
+    }
+
+    55% {
+        transform: translateX(54px);
+        opacity: .18;
+    }
+
+    100% {
+        transform: translateX(92px);
+        opacity: .10;
+    }
+}
+
+@keyframes gxBlobPulse {
+    0%,100% {
+        transform: scale(1);
+        opacity: .68;
+    }
+
+    50% {
+        transform: scale(1.08);
+        opacity: .95;
+    }
+}
+
+@keyframes gxSignalMove {
+    0% {
+        transform: translateY(-50%) translateX(0);
+        opacity: .95;
+    }
+
+    70% {
+        transform: translateY(-50%) translateX(84px);
+        opacity: .92;
+    }
+
+    100% {
+        transform: translateY(-50%) translateX(98px);
+        opacity: .16;
+    }
+}
+
+@keyframes gxEnzymePulse {
+    0%,100% {
+        transform: scale(1);
+        opacity: .88;
+    }
+
+    50% {
+        transform: scale(1.06);
+        opacity: 1;
+    }
+}
+
+@keyframes gxMoleculeFloat {
+    0%,100% {
+        transform: translateY(0) scale(.95);
+    }
+
+    50% {
+        transform: translateY(-10px) scale(1.08);
+    }
+}

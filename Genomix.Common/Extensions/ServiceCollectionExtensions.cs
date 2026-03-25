@@ -1,5 +1,6 @@
 ﻿using GenomiX.Common.Email;
 using GenomiX.Core.Interfaces;
+using GenomiX.Core.Models;
 using GenomiX.Core.Services;
 using GenomiX.Infrastructure;
 using GenomiX.Infrastructure.Models;
@@ -63,6 +64,10 @@ namespace GenomiX.Common.Extensions
             services.Configure<EmailSettings>(emailSection);
 
             services.AddTransient<IEmailSender, EmailSender>();
+
+            services.Configure<OpenAiOptions>(configuration.GetSection("OpenAI"));
+
+            services.AddHttpClient<IAiDiseaseExplanationService, AiDiseaseExplanationService>();
 
             return services;
         }
