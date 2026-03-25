@@ -22,6 +22,10 @@
 
         public List<string> HelpfulMonitoringIdeas { get; set; } = new();
 
+        public List<string> FoodPriorities { get; set; } = new();
+        public List<string> ThingsToAvoidOrDiscuss { get; set; } = new();
+        public List<string> MedicinesToDiscussWithDoctor { get; set; } = new();
+
         public string EducationalNotice { get; set; } = string.Empty;
 
         public List<DiseaseVisualMechanismStepDto> VisualMechanism { get; set; } = new();

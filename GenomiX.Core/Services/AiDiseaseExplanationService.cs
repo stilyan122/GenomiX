@@ -110,6 +110,32 @@ namespace GenomiX.Core.Services
                 Rules:
                 - steps must represent real biological progression
                 - do not invent unrealistic biology
+
+                The educational advice must be specific, practical, and disease-related.
+
+                Return concrete but safe guidance.
+
+                For food:
+                - include specific food priorities or nutritional directions when appropriate
+                - examples may include hydration, protein intake, avoiding excess phenylalanine, iron-related considerations, etc.
+                - do not prescribe a medical diet as treatment
+
+                For medicines and substances:
+                - do NOT prescribe or forbid medication absolutely
+                - instead return medicines, substances, or drug categories that should be discussed with a doctor
+                - examples: steroids, dehydration-inducing drugs, sedatives, painkillers, high-risk supplements, or disease-specific medication categories
+                - use wording like "may need medical review" or "should be discussed with a qualified clinician"
+
+                Return these additional JSON fields:
+                - foodPriorities
+                - thingsToAvoidOrDiscuss
+                - medicinesToDiscussWithDoctor
+
+                Rules:
+                - each of these arrays must contain 3 to 6 concrete items
+                - do not leave them empty
+                - do not give direct treatment orders
+                - keep everything educational and safety-aware
                 """;
 
             var payload = new
@@ -189,6 +215,21 @@ namespace GenomiX.Core.Services
                                         required = new[] { "type", "title", "description" }
                                     }
                                 },
+                                foodPriorities = new
+                                {
+                                    type = "array",
+                                    items = new { type = "string" }
+                                },
+                                thingsToAvoidOrDiscuss = new
+                                {
+                                    type = "array",
+                                    items = new { type = "string" }
+                                },
+                                medicinesToDiscussWithDoctor = new
+                                {
+                                    type = "array",
+                                    items = new { type = "string" }
+                                },
 
                                 visualTheme = new { type = "string" }
                             },
@@ -206,7 +247,10 @@ namespace GenomiX.Core.Services
         "helpfulMonitoringIdeas",
         "educationalNotice",
         "visualMechanism",
-        "visualTheme"
+        "visualTheme",
+        "foodPriorities",
+        "thingsToAvoidOrDiscuss",
+        "medicinesToDiscussWithDoctor",
     }
                         }
                     }

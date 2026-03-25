@@ -142,6 +142,72 @@ document.addEventListener("DOMContentLoaded", () => {
         step();
     }
 
+    function showScanLoading() {
+        const el = document.createElement("div");
+        el.id = "gx-scan-loading";
+        el.className = "gx-scan-loading";
+
+        el.innerHTML = `
+        <div class="gx-scan-loading__inner">
+            <div class="gx-scan-loading__hud">
+                <div class="gx-scan-loading__title">
+                    ${currentLang === "bg" ? "Сканиране на ДНК" : "DNA scan in progress"}
+                </div>
+                <div class="gx-scan-loading__sub" id="gx-scan-loading-sub">
+                    ${currentLang === "bg" ? "Търсене на генетични маркери..." : "Searching for genetic markers..."}
+                </div>
+            </div>
+
+            <div class="gx-scan-radar">
+                <div class="gx-scan-radar__ring r1"></div>
+                <div class="gx-scan-radar__ring r2"></div>
+                <div class="gx-scan-radar__ring r3"></div>
+                <div class="gx-scan-radar__beam"></div>
+                <div class="gx-scan-radar__core"></div>
+            </div>
+        </div>
+    `;
+
+        document.body.appendChild(el);
+        requestAnimationFrame(() => el.classList.add("is-on"));
+        return el;
+    }
+
+    function setScanLoadingText(el, text) {
+        const sub = el?.querySelector("#gx-scan-loading-sub");
+        if (sub) sub.textContent = text;
+    }
+
+    function hideScanLoading(el) {
+        if (!el) return;
+        el.classList.remove("is-on");
+        setTimeout(() => el.remove(), 220);
+    }
+
+    function flashDiseaseHit(bestResult) {
+    if (!bestResult?.matches?.length) return;
+
+    const first = bestResult.matches[0];
+    const start = first?.matchedIndex ?? -1;
+    const len = first?.patternSequence?.length ?? 0;
+
+    if (start < 0 || len <= 0) return;
+
+    const pairs = document.querySelectorAll(".base-pair, .gx-base-pair, [data-pair-index]");
+    if (!pairs.length) return;
+
+    for (let i = start; i < start + len; i++) {
+        const el =
+            document.querySelector(`[data-pair-index="${i}"]`) ||
+            pairs[i];
+
+        if (!el) continue;
+
+        el.classList.add("is-disease-hit");
+        setTimeout(() => el.classList.remove("is-disease-hit"), 1800);
+    }
+}
+
     function setModeUI(isSci) {
         currentModeSci = !!isSci;
         document.documentElement.classList.toggle("mode-scientific", currentModeSci);
@@ -156,6 +222,85 @@ document.addEventListener("DOMContentLoaded", () => {
             lastS2 = m.s2;
             api?.setInspectorData?.(m);
         };
+    }
+
+    function createNanobot() {
+        let nano = document.getElementById("gx-nano");
+
+        if (!nano) {
+            nano = document.createElement("div");
+            nano.id = "gx-nano";
+            nano.className = "gx-nano is-hidden";
+
+            nano.innerHTML = `
+            <div class="gx-nano-bot">
+                <div class="gx-nano-bot__core"></div>
+                <div class="gx-nano-bot__ring"></div>
+                <div class="gx-nano-bot__legs">
+                    <span class="l1"></span>
+                    <span class="l2"></span>
+                    <span class="l3"></span>
+                    <span class="l4"></span>
+                </div>
+                <div class="gx-nano-bot__beam"></div>
+            </div>
+        `;
+
+            document.body.appendChild(nano);
+        }
+
+        return nano;
+    }
+
+    async function moveNanobotToElement(nano, targetEl) {
+        const rect = targetEl.getBoundingClientRect();
+
+        const x = rect.left + rect.width / 2;
+        const y = rect.top + rect.height / 2;
+
+        nano.classList.remove("is-hidden");
+        nano.style.left = `${x}px`;
+        nano.style.top = `${y}px`;
+        nano.classList.add("is-move");
+
+        await new Promise(r => setTimeout(r, 700));
+
+        nano.classList.remove("is-move");
+    }
+
+    async function nanobotAnalyze(nano) {
+        nano.classList.add("is-scan");
+        await new Promise(r => setTimeout(r, 900));
+        nano.classList.remove("is-scan");
+    }
+
+    async function runNanobotReveal(bestResult) {
+        const nano = createNanobot();
+
+        const first = bestResult?.matches?.[0];
+        if (!first) return;
+
+        const index = first.matchedIndex;
+
+        const el =
+            document.querySelector(`[data-i="${index}"]`) ||
+            document.querySelectorAll(".base-pair")[index];
+
+        if (!el) return;
+
+        nano.classList.remove("is-hidden");
+        nano.style.left = "90px";
+        nano.style.top = "90px";
+
+        await new Promise(r => setTimeout(r, 120));
+        await moveNanobotToElement(nano, el);
+        await nanobotAnalyze(nano);
+
+        el.classList.add("is-disease-hit");
+        await new Promise(r => setTimeout(r, 800));
+        el.classList.remove("is-disease-hit");
+
+        nano.classList.add("is-hidden");
     }
 
     function ensureViewer(s1, s2) {
@@ -334,24 +479,52 @@ document.addEventListener("DOMContentLoaded", () => {
         animateVM(container);
     }
 
-    async function aiRevealSequence() {
+    async function aiRevealSequence(explanation) {
+        const theme = explanation?.visualTheme || "blood";
+
+        const themeText = currentLang === "bg"
+            ? {
+                blood: "AI анализ на кръвния механизъм...",
+                lung: "AI анализ на дихателния механизъм...",
+                neuro: "AI анализ на невронния механизъм...",
+                metabolic: "AI анализ на метаболитния механизъм..."
+            }
+            : {
+                blood: "AI blood-mechanism analysis...",
+                lung: "AI respiratory-mechanism analysis...",
+                neuro: "AI neural-mechanism analysis...",
+                metabolic: "AI metabolic-mechanism analysis..."
+            };
+
         const overlay = document.createElement("div");
-        overlay.className = "gx-ai-reveal";
+        overlay.className = `gx-ai-reveal gx-ai-reveal--${theme}`;
         overlay.innerHTML = `
         <div class="gx-ai-reveal__inner">
-            <div class="gx-ai-reveal__icon">🧬</div>
-            <div class="gx-ai-reveal__text">${currentLang === "bg" ? "AI биологичен анализ..." : "AI biological analysis..."}</div>
+            <div class="gx-ai-reveal__ring"></div>
+            <div class="gx-ai-reveal__icon">${getRevealIcon(theme)}</div>
+            <div class="gx-ai-reveal__text">${themeText[theme] || themeText.blood}</div>
         </div>
     `;
+
         document.body.appendChild(overlay);
 
         requestAnimationFrame(() => overlay.classList.add("is-on"));
 
-        await new Promise(r => setTimeout(r, 1400));
+        await new Promise(r => setTimeout(r, 1550));
 
         overlay.classList.remove("is-on");
         await new Promise(r => setTimeout(r, 260));
         overlay.remove();
+    }
+
+    function getRevealIcon(theme) {
+        switch (theme) {
+            case "blood": return "🩸";
+            case "lung": return "🫁";
+            case "neuro": return "🧠";
+            case "metabolic": return "⚗️";
+            default: return "🧬";
+        }
     }
 
     function renderDiseaseScene(container, explanation) {
@@ -528,6 +701,21 @@ document.addEventListener("DOMContentLoaded", () => {
                 </section>
 
                 <section class="gx-ai-card">
+                    <h3>${currentLang === "bg" ? "Хранителни приоритети" : "Food priorities"}</h3>
+                    ${listHtml(explanation?.foodPriorities)}
+                </section>
+
+                <section class="gx-ai-card">
+                    <h3>${currentLang === "bg" ? "Неща за избягване или обсъждане" : "Things to avoid or discuss"}</h3>
+                    ${listHtml(explanation?.thingsToAvoidOrDiscuss)}
+                </section>
+
+                <section class="gx-ai-card">
+                    <h3>${currentLang === "bg" ? "Лекарства и вещества за обсъждане с лекар" : "Medicines and substances to discuss with a doctor"}</h3>
+                    ${listHtml(explanation?.medicinesToDiscussWithDoctor)}
+                </section>
+
+                <section class="gx-ai-card">
                     <h3>${esc(T.monitoring)}</h3>
                     ${listHtml(explanation?.helpfulMonitoringIdeas)}
                 </section>
@@ -652,6 +840,7 @@ document.addEventListener("DOMContentLoaded", () => {
     scanDiseaseBtn?.addEventListener("click", async () => {
         const token = tokenEl?.value || "";
         const modelId = modelIdEl?.value || "";
+        let loadingEl = null;
 
         try {
             const s1 = currentModel?.s1 ?? lastS1 ?? "";
@@ -663,9 +852,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             scanDiseaseBtn.disabled = true;
-            const originalText = scanDiseaseBtn.textContent;
-
-            scanDiseaseBtn.textContent = T.scanning;
+            loadingEl = showScanLoading();
 
             const scanRes = await fetch("/dna/scandiseases", {
                 method: "POST",
@@ -689,12 +876,17 @@ document.addEventListener("DOMContentLoaded", () => {
             const bestResult = pickBestDiseaseResult(scanData.results);
 
             if (!bestResult) {
+                hideScanLoading(loadingEl);
                 showNoDiseasePopup();
-                scanDiseaseBtn.textContent = originalText;
                 return;
             }
 
-            scanDiseaseBtn.textContent = T.generating;
+            setScanLoadingText(
+                loadingEl,
+                currentLang === "bg"
+                    ? "Интерпретиране на биологичния механизъм..."
+                    : "Interpreting biological mechanism..."
+            );
 
             const explainRes = await fetch("/dna/explain-disease-scan", {
                 method: "POST",
@@ -718,14 +910,23 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             const explainData = await explainRes.json();
-            await aiRevealSequence();
-            showDiseasePopup(explainData.explanation, bestResult);
 
-            scanDiseaseBtn.textContent = originalText;
+            setScanLoadingText(
+                loadingEl,
+                currentLang === "bg"
+                    ? "Открит hotspot в ДНК модела..."
+                    : "Detected hotspot in DNA model..."
+            );
+
+            hideScanLoading(loadingEl);
+
+            await aiRevealSequence(explainData.explanation);
+            await runNanobotReveal(bestResult);
+
+            showDiseasePopup(explainData.explanation, bestResult);
         } catch (err) {
-            console.error(err);
+            hideScanLoading(loadingEl);
             alert(err?.message || T.analysisFailed);
-            scanDiseaseBtn.textContent = T.scanBtn;
         } finally {
             scanDiseaseBtn.disabled = false;
         }
