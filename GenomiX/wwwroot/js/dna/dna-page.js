@@ -34,10 +34,6 @@ document.addEventListener("DOMContentLoaded", () => {
             saveModel: "Запази модел",
             saving: "Запазване...",
             saved: "Запазено ✓",
-            visualScene: "Визуален механизъм",
-            mechanismFlow: "Как се развива в тялото",
-            affectedSystems: "Засегнати системи",
-            whyMatters: "Защо това е важно",
 
             noDna: "Няма ДНК за сканиране.",
             scanBtn: "Сканирай за заболявания",
@@ -52,14 +48,16 @@ document.addEventListener("DOMContentLoaded", () => {
             noMarkersText: "В текущия ДНК модел не бяха открити съхранени образователни маркери за заболявания.",
 
             aiInsight: "AI Анализ",
-            mechanism: "Биологичен механизъм",
-            symptoms: "Възможни прояви",
-            food: "Хранене и начин на живот",
-            meds: "Лекарства и вещества за внимание",
-            monitoring: "Какво да се проследява",
+            foodPriorities: "Хранителни приоритети",
+            medicinesToDiscuss: "Лекарства и вещества за обсъждане с лекар",
+            monitoring: "Изследвания и проследяване",
             notice: "Важно",
             close: "Затвори",
-            fallbackTitle: "Потенциален генетичен маркер"
+            fallbackTitle: "Потенциален генетичен маркер",
+
+            whatYouMayFeel: "Какво може да усещаш",
+            affectedSystems: "Засегнати системи",
+            whatHappensInBody: "Какво се случва в тялото",
         }
         : {
             missingModelId: "Missing model id.",
@@ -67,10 +65,6 @@ document.addEventListener("DOMContentLoaded", () => {
             saveModel: "Save model",
             saving: "Saving...",
             saved: "Saved ✓",
-
-            mechanismFlow: "How it evolves in the body",
-            affectedSystems: "Affected systems",
-            whyMatters: "Why this matters",
 
             noDna: "No DNA to scan.",
             scanBtn: "Scan for diseases",
@@ -85,15 +79,16 @@ document.addEventListener("DOMContentLoaded", () => {
             noMarkersText: "No stored educational disease markers were detected in the current DNA model.",
 
             aiInsight: "AI Insight",
-            mechanism: "Biological mechanism",
-            visualScene: "Visual mechanism",
-            symptoms: "Possible signs",
-            food: "Food and lifestyle",
-            meds: "Medication cautions",
-            monitoring: "What to monitor",
+            foodPriorities: "Food priorities",
+            medicinesToDiscuss: "Medicines and substances to discuss with a doctor",
+            monitoring: "Tests and monitoring",
             notice: "Important",
             close: "Close",
-            fallbackTitle: "Potential genetic marker detected"
+            fallbackTitle: "Potential genetic marker detected",
+
+            whatYouMayFeel: "What you may feel",
+            affectedSystems: "Affected systems",
+            whatHappensInBody: "What happens in the body",
         };
 
     function esc(s) {
@@ -119,10 +114,10 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         return `
-            <div class="gx-system-chips">
-                ${items.map(x => `<span class="gx-system-chip">${esc(x)}</span>`).join("")}
-            </div>
-        `;
+        <div class="gx-system-chips">
+            ${items.map(x => `<span class="gx-system-chip">${esc(x)}</span>`).join("")}
+        </div>
+    `;
     }
 
     function typeText(el, text, speed = 10) {
@@ -131,15 +126,15 @@ document.addEventListener("DOMContentLoaded", () => {
         let i = 0;
         el.textContent = "";
 
-        function step() {
+        function stepType() {
             if (i < text.length) {
                 el.textContent += text.charAt(i);
                 i++;
-                setTimeout(step, speed);
+                setTimeout(stepType, speed);
             }
         }
 
-        step();
+        stepType();
     }
 
     function showScanLoading() {
@@ -184,29 +179,489 @@ document.addEventListener("DOMContentLoaded", () => {
         setTimeout(() => el.remove(), 220);
     }
 
-    function flashDiseaseHit(bestResult) {
-    if (!bestResult?.matches?.length) return;
-
-    const first = bestResult.matches[0];
-    const start = first?.matchedIndex ?? -1;
-    const len = first?.patternSequence?.length ?? 0;
-
-    if (start < 0 || len <= 0) return;
-
-    const pairs = document.querySelectorAll(".base-pair, .gx-base-pair, [data-pair-index]");
-    if (!pairs.length) return;
-
-    for (let i = start; i < start + len; i++) {
-        const el =
-            document.querySelector(`[data-pair-index="${i}"]`) ||
-            pairs[i];
-
-        if (!el) continue;
-
-        el.classList.add("is-disease-hit");
-        setTimeout(() => el.classList.remove("is-disease-hit"), 1800);
+    function visualStepIcon(kind) {
+        switch (kind) {
+            case "mutation": return "🧬";
+            case "abnormal-protein": return "⚛️";
+            case "misfolded-protein": return "🧩";
+            case "blocked-channel": return "🚪";
+            case "transport-failure": return "↔️";
+            case "cell-deformation": return "🔴";
+            case "blocked-flow": return "🩸";
+            case "accumulation": return "⚠️";
+            case "signal-loss": return "🧠";
+            case "inflammation": return "🔥";
+            case "tissue-damage": return "🧫";
+            case "organ-effect": return "❤️";
+            case "pain-crisis": return "⚡";
+            case "breathing-problem": return "🫁";
+            case "infection-risk": return "🦠";
+            case "low-oxygen": return "O₂";
+            default: return "•";
+        }
     }
-}
+
+    function renderStepFrame(step, fromHtml, toHtml) {
+        return `
+        <div class="gx-stepviz">
+            <div class="gx-stepviz__from">
+                ${fromHtml}
+            </div>
+
+            <div class="gx-stepviz__arrow">
+                <div class="gx-stepviz__arrow-line"></div>
+                <div class="gx-stepviz__arrow-head"></div>
+            </div>
+
+            <div class="gx-stepviz__to">
+                ${toHtml}
+            </div>
+        </div>
+
+        <div class="gx-stepviz__labels">
+            <div class="gx-bio__from">${esc(step.fromLabel || "")}</div>
+            <div class="gx-bio__to">${esc(step.toLabel || "")}</div>
+        </div>
+    `;
+    }
+
+    function renderStepVisual(step) {
+        switch (step.kind) {
+            case "mutation":
+                return renderGeneMutationVisual(step);
+
+            case "misfolded-protein":
+            case "abnormal-protein":
+                return renderProteinFoldVisual(step);
+
+            case "accumulation":
+                return renderEnzymeReactionVisual(step);
+
+            case "blocked-channel":
+                return renderChannelVisual(step);
+
+            case "transport-failure":
+                return renderTransportFailureVisual(step);
+
+            case "cell-deformation":
+                return renderCellVisual(step);
+
+            case "blocked-flow":
+            case "low-oxygen":
+                return renderFlowVisual(step);
+
+            case "signal-loss":
+                return renderSignalLossVisual(step);
+
+            case "inflammation":
+                return renderInflammationVisual(step);
+
+            case "tissue-damage":
+                return renderTissueDamageVisual(step);
+
+            case "organ-effect":
+                return renderOrganEffectVisual(step);
+
+            case "pain-crisis":
+                return renderPainCrisisVisual(step);
+
+            case "breathing-problem":
+                return renderBreathingProblemVisual(step);
+
+            case "infection-risk":
+                return renderInfectionRiskVisual(step);
+
+            default:
+                return renderGenericVisual(step);
+        }
+    }
+
+    function renderGeneMutationVisual(step) {
+        const fromHtml = `
+        <div class="gx-geneviz gx-geneviz--normal">
+            <span class="gx-geneviz__rail gx-geneviz__rail--left"></span>
+            <span class="gx-geneviz__rail gx-geneviz__rail--right"></span>
+
+            <span class="gx-geneviz__pair p1"></span>
+            <span class="gx-geneviz__pair p2"></span>
+            <span class="gx-geneviz__pair p3"></span>
+            <span class="gx-geneviz__pair p4"></span>
+            <span class="gx-geneviz__pair p5"></span>
+
+            <span class="gx-geneviz__hotspot"></span>
+        </div>
+    `;
+
+        const toHtml = `
+        <div class="gx-geneviz gx-geneviz--mutated">
+            <span class="gx-geneviz__rail gx-geneviz__rail--left"></span>
+            <span class="gx-geneviz__rail gx-geneviz__rail--right"></span>
+
+            <span class="gx-geneviz__pair p1"></span>
+            <span class="gx-geneviz__pair p2"></span>
+            <span class="gx-geneviz__pair p3 is-broken"></span>
+            <span class="gx-geneviz__pair p4"></span>
+            <span class="gx-geneviz__pair p5"></span>
+
+            <span class="gx-geneviz__hotspot gx-geneviz__hotspot--mut"></span>
+        </div>
+    `;
+
+        return `<div class="gx-bio">${renderStepFrame(step, fromHtml, toHtml)}</div>`;
+    }
+
+    function renderProteinFoldVisual(step) {
+        const fromHtml = `
+        <div class="gx-proteinfold gx-proteinfold--ok">
+            <span class="gx-proteinfold__node n1"></span>
+            <span class="gx-proteinfold__node n2"></span>
+            <span class="gx-proteinfold__node n3"></span>
+            <span class="gx-proteinfold__node n4"></span>
+
+            <span class="gx-proteinfold__bond b1"></span>
+            <span class="gx-proteinfold__bond b2"></span>
+            <span class="gx-proteinfold__bond b3"></span>
+        </div>
+    `;
+
+        const toHtml = `
+        <div class="gx-proteinfold gx-proteinfold--bad">
+            <span class="gx-proteinfold__node n1"></span>
+            <span class="gx-proteinfold__node n2"></span>
+            <span class="gx-proteinfold__node n3"></span>
+            <span class="gx-proteinfold__node n4"></span>
+
+            <span class="gx-proteinfold__bond b1"></span>
+            <span class="gx-proteinfold__bond b2"></span>
+            <span class="gx-proteinfold__bond b3"></span>
+
+            <span class="gx-proteinfold__warn"></span>
+        </div>
+    `;
+
+        return `<div class="gx-bio">${renderStepFrame(step, fromHtml, toHtml)}</div>`;
+    }
+
+    function renderEnzymeReactionVisual(step) {
+        const fromHtml = `
+        <div class="gx-enzymeviz gx-enzymeviz--ok">
+            <div class="gx-enzymeviz__enzyme"></div>
+            <div class="gx-enzymeviz__substrate"></div>
+            <div class="gx-enzymeviz__product p1"></div>
+            <div class="gx-enzymeviz__product p2"></div>
+        </div>
+    `;
+
+        const toHtml = `
+        <div class="gx-enzymeviz gx-enzymeviz--bad">
+            <div class="gx-enzymeviz__enzyme"></div>
+            <div class="gx-enzymeviz__substrate is-stuck"></div>
+            <div class="gx-enzymeviz__waste w1"></div>
+            <div class="gx-enzymeviz__waste w2"></div>
+            <div class="gx-enzymeviz__waste w3"></div>
+            <div class="gx-enzymeviz__waste w4"></div>
+        </div>
+    `;
+
+        return `<div class="gx-bio">${renderStepFrame(step, fromHtml, toHtml)}</div>`;
+    }
+
+    function renderNeuroDamageVisual(step) {
+        const healthy = `
+        <div class="gx-neuroviz gx-neuroviz--ok">
+            <div class="n n1"></div>
+            <div class="n n2"></div>
+            <div class="n n3"></div>
+            <div class="link l1"></div>
+            <div class="link l2"></div>
+        </div>
+    `;
+
+        const damaged = `
+        <div class="gx-neuroviz gx-neuroviz--bad">
+            <div class="n n1"></div>
+            <div class="n n2"></div>
+            <div class="n n3"></div>
+            <div class="link l1"></div>
+            <div class="link l2"></div>
+            <div class="warn">!</div>
+        </div>
+    `;
+
+        return `<div class="gx-bio">${renderStepFrame(step, healthy, damaged)}</div>`;
+    }
+
+    function renderChannelVisual(step) {
+        const open = `
+        <div class="gx-channel gx-channel--open">
+            <span class="gx-ion i1"></span>
+            <span class="gx-ion i2"></span>
+        </div>
+    `;
+
+        const blocked = `
+        <div class="gx-channel gx-channel--blocked">
+            <span class="gx-gate"></span>
+        </div>
+    `;
+
+        return `<div class="gx-bio">${renderStepFrame(step, open, blocked)}</div>`;
+    }
+
+    function renderCellVisual(step) {
+        const normal = `<div class="gx-cell gx-cell--normal"></div>`;
+        const damaged = `<div class="gx-cell gx-cell--damaged"></div>`;
+
+        return `<div class="gx-bio">${renderStepFrame(step, normal, damaged)}</div>`;
+    }
+
+    function renderFlowVisual(step) {
+        const open = `
+        <div class="gx-vessel gx-vessel--open">
+            <span class="gx-vessel__cell c1"></span>
+            <span class="gx-vessel__cell c2"></span>
+        </div>
+    `;
+
+        const blocked = `
+        <div class="gx-vessel gx-vessel--blocked">
+            <span class="gx-vessel__cell is-block"></span>
+        </div>
+    `;
+
+        return `<div class="gx-bio">${renderStepFrame(step, open, blocked)}</div>`;
+    }
+
+    function renderTransportFailureVisual(step) {
+        const normal = `
+        <div class="gx-transport gx-transport--ok">
+            <span class="gx-transport__node gx-transport__node--left"></span>
+            <span class="gx-transport__flow"></span>
+            <span class="gx-transport__node gx-transport__node--right"></span>
+        </div>
+    `;
+
+        const failed = `
+        <div class="gx-transport gx-transport--bad">
+            <span class="gx-transport__node gx-transport__node--left"></span>
+            <span class="gx-transport__barrier"></span>
+            <span class="gx-transport__node gx-transport__node--right"></span>
+        </div>
+    `;
+
+        return `<div class="gx-bio">${renderStepFrame(step, normal, failed)}</div>`;
+    }
+
+    function renderSignalLossVisual(step) {
+        const normal = `
+        <div class="gx-signalviz gx-signalviz--ok">
+            <span class="gx-signalviz__node n1"></span>
+            <span class="gx-signalviz__node n2"></span>
+            <span class="gx-signalviz__node n3"></span>
+            <span class="gx-signalviz__pulse p1"></span>
+            <span class="gx-signalviz__pulse p2"></span>
+        </div>
+    `;
+
+        const failed = `
+        <div class="gx-signalviz gx-signalviz--bad">
+            <span class="gx-signalviz__node n1"></span>
+            <span class="gx-signalviz__node n2"></span>
+            <span class="gx-signalviz__node n3"></span>
+            <span class="gx-signalviz__break"></span>
+        </div>
+    `;
+
+        return `<div class="gx-bio">${renderStepFrame(step, normal, failed)}</div>`;
+    }
+
+    function renderInflammationVisual(step) {
+        const normal = `
+        <div class="gx-inflam gx-inflam--ok">
+            <span class="gx-inflam__cell c1"></span>
+            <span class="gx-inflam__cell c2"></span>
+            <span class="gx-inflam__cell c3"></span>
+        </div>
+    `;
+
+        const inflamed = `
+        <div class="gx-inflam gx-inflam--bad">
+            <span class="gx-inflam__cell c1"></span>
+            <span class="gx-inflam__cell c2"></span>
+            <span class="gx-inflam__cell c3"></span>
+            <span class="gx-inflam__flare f1"></span>
+            <span class="gx-inflam__flare f2"></span>
+            <span class="gx-inflam__flare f3"></span>
+        </div>
+    `;
+
+        return `<div class="gx-bio">${renderStepFrame(step, normal, inflamed)}</div>`;
+    }
+
+    function renderTissueDamageVisual(step) {
+        const healthy = `
+        <div class="gx-tissue gx-tissue--ok">
+            <span class="gx-tissue__cell t1"></span>
+            <span class="gx-tissue__cell t2"></span>
+            <span class="gx-tissue__cell t3"></span>
+            <span class="gx-tissue__cell t4"></span>
+        </div>
+    `;
+
+        const damaged = `
+        <div class="gx-tissue gx-tissue--bad">
+            <span class="gx-tissue__cell t1"></span>
+            <span class="gx-tissue__cell t2 is-damaged"></span>
+            <span class="gx-tissue__cell t3"></span>
+            <span class="gx-tissue__cell t4 is-damaged"></span>
+            <span class="gx-tissue__crack"></span>
+        </div>
+    `;
+
+        return `<div class="gx-bio">${renderStepFrame(step, healthy, damaged)}</div>`;
+    }
+
+    function renderOrganEffectVisual(step) {
+        const normal = `
+        <div class="gx-organ gx-organ--ok">
+            <div class="gx-organ__body"></div>
+            <div class="gx-organ__pulse"></div>
+        </div>
+    `;
+
+        const affected = `
+        <div class="gx-organ gx-organ--bad">
+            <div class="gx-organ__body"></div>
+            <div class="gx-organ__stress"></div>
+            <div class="gx-organ__warn">!</div>
+        </div>
+    `;
+
+        return `<div class="gx-bio">${renderStepFrame(step, normal, affected)}</div>`;
+    }
+
+    function renderPainCrisisVisual(step) {
+        const calm = `
+        <div class="gx-pain gx-pain--ok">
+            <span class="gx-pain__node p1"></span>
+            <span class="gx-pain__node p2"></span>
+            <span class="gx-pain__node p3"></span>
+        </div>
+    `;
+
+        const crisis = `
+        <div class="gx-pain gx-pain--bad">
+            <span class="gx-pain__node p1"></span>
+            <span class="gx-pain__node p2"></span>
+            <span class="gx-pain__node p3"></span>
+            <span class="gx-pain__bolt b1"></span>
+            <span class="gx-pain__bolt b2"></span>
+        </div>
+    `;
+
+        return `<div class="gx-bio">${renderStepFrame(step, calm, crisis)}</div>`;
+    }
+
+    function renderBreathingProblemVisual(step) {
+        const normal = `
+        <div class="gx-lungviz gx-lungviz--ok">
+            <div class="gx-lungviz__lung left"></div>
+            <div class="gx-lungviz__lung right"></div>
+            <div class="gx-lungviz__airflow"></div>
+        </div>
+    `;
+
+        const bad = `
+        <div class="gx-lungviz gx-lungviz--bad">
+            <div class="gx-lungviz__lung left"></div>
+            <div class="gx-lungviz__lung right"></div>
+            <div class="gx-lungviz__airflow is-weak"></div>
+            <div class="gx-lungviz__warn">!</div>
+        </div>
+    `;
+
+        return `<div class="gx-bio">${renderStepFrame(step, normal, bad)}</div>`;
+    }
+
+    function renderInfectionRiskVisual(step) {
+        const normal = `
+        <div class="gx-infect gx-infect--ok">
+            <span class="gx-infect__shield"></span>
+            <span class="gx-infect__dot d1"></span>
+            <span class="gx-infect__dot d2"></span>
+        </div>
+    `;
+
+        const risky = `
+        <div class="gx-infect gx-infect--bad">
+            <span class="gx-infect__shield is-broken"></span>
+            <span class="gx-infect__bug b1"></span>
+            <span class="gx-infect__bug b2"></span>
+            <span class="gx-infect__bug b3"></span>
+        </div>
+    `;
+
+        return `<div class="gx-bio">${renderStepFrame(step, normal, risky)}</div>`;
+    }
+
+    function renderGenericVisual(step) {
+        return `
+        <div class="gx-bio gx-bio--generic">
+            <div class="gx-bio__statebox">${esc(step.fromLabel || "")}</div>
+            <div class="gx-bio__mid-arrow"></div>
+            <div class="gx-bio__statebox">${esc(step.toLabel || "")}</div>
+        </div>
+    `;
+    }
+
+    function renderVisualSteps(container, explanation) {
+        if (!container) return;
+
+        const steps = explanation?.visualSteps || [];
+
+        if (!Array.isArray(steps) || steps.length === 0) {
+            container.innerHTML = `<p class="gx-ai-empty">—</p>`;
+            return;
+        }
+
+        container.innerHTML = `
+        <div class="gx-vsteps">
+            ${steps.map((step, i) => `
+                <section class="gx-vstep gx-vstep--${esc(step.kind || "generic")}">
+                    <div class="gx-vstep__top">
+                        <div class="gx-vstep__index">${i + 1}</div>
+                        <div class="gx-vstep__icon">${visualStepIcon(step.kind)}</div>
+                        <div class="gx-vstep__head">
+                            <h4 class="gx-vstep__title">${esc(step.title || "")}</h4>
+                            <p class="gx-vstep__desc">${esc(step.description || "")}</p>
+                        </div>
+                    </div>
+
+                    <div class="gx-vstep__visual">
+                        ${renderStepVisual(step)}
+                    </div>
+                </section>
+            `).join("")}
+        </div>
+    `;
+
+        animateVisualSteps(container);
+    }
+
+    function animateVisualSteps(container) {
+        const items = container.querySelectorAll(".gx-vstep");
+
+        items.forEach((el, i) => {
+            el.style.opacity = "0";
+            el.style.transform = "translateY(10px)";
+
+            setTimeout(() => {
+                el.style.transition = "opacity .35s ease, transform .35s ease";
+                el.style.opacity = "1";
+                el.style.transform = "translateY(0)";
+            }, i * 120);
+        });
+    }
 
     function setModeUI(isSci) {
         currentModeSci = !!isSci;
@@ -222,6 +677,47 @@ document.addEventListener("DOMContentLoaded", () => {
             lastS2 = m.s2;
             api?.setInspectorData?.(m);
         };
+    }
+
+    function ensureViewer(s1, s2) {
+        if (!viewerApi) {
+            viewerApi = visualizeDNA(s1, s2, { scientific: currentModeSci });
+            attachModelChanged(viewerApi);
+            return viewerApi;
+        }
+
+        viewerApi.setModel?.(s1, s2);
+        viewerApi.setScientific?.(currentModeSci);
+        attachModelChanged(viewerApi);
+        return viewerApi;
+    }
+
+    function runVisualize() {
+        const res = parseTextareaStrict(dnaSequenceInput.value);
+        if (!res.ok) {
+            alert(res.error);
+            return;
+        }
+
+        dnaInputSection.style.display = "none";
+        dnaVisualizerSection.style.display = "block";
+
+        lastS1 = res.s1;
+        lastS2 = res.s2;
+
+        ensureViewer(res.s1, res.s2);
+    }
+
+    function rerenderForMode() {
+        const isSci = !!modeSci?.checked;
+        setModeUI(isSci);
+
+        const s1 = currentModel?.s1 ?? lastS1;
+        const s2 = currentModel?.s2 ?? lastS2;
+
+        if (s1 && s2) {
+            ensureViewer(s1, s2);
+        }
     }
 
     function createNanobot() {
@@ -303,44 +799,27 @@ document.addEventListener("DOMContentLoaded", () => {
         nano.classList.add("is-hidden");
     }
 
-    function ensureViewer(s1, s2) {
-        if (!viewerApi) {
-            viewerApi = visualizeDNA(s1, s2, { scientific: currentModeSci });
-            attachModelChanged(viewerApi);
-            return viewerApi;
-        }
+    function flashDiseaseHit(bestResult) {
+        if (!bestResult?.matches?.length) return;
 
-        viewerApi.setModel?.(s1, s2);
-        viewerApi.setScientific?.(currentModeSci);
-        attachModelChanged(viewerApi);
-        return viewerApi;
-    }
+        const first = bestResult.matches[0];
+        const start = first?.matchedIndex ?? -1;
+        const len = first?.patternSequence?.length ?? 0;
 
-    function runVisualize() {
-        const res = parseTextareaStrict(dnaSequenceInput.value);
-        if (!res.ok) {
-            alert(res.error);
-            return;
-        }
+        if (start < 0 || len <= 0) return;
 
-        dnaInputSection.style.display = "none";
-        dnaVisualizerSection.style.display = "block";
+        const pairs = document.querySelectorAll(".base-pair, .gx-base-pair, [data-pair-index]");
+        if (!pairs.length) return;
 
-        lastS1 = res.s1;
-        lastS2 = res.s2;
+        for (let i = start; i < start + len; i++) {
+            const el =
+                document.querySelector(`[data-pair-index="${i}"]`) ||
+                pairs[i];
 
-        ensureViewer(res.s1, res.s2);
-    }
+            if (!el) continue;
 
-    function rerenderForMode() {
-        const isSci = !!modeSci?.checked;
-        setModeUI(isSci);
-
-        const s1 = currentModel?.s1 ?? lastS1;
-        const s2 = currentModel?.s2 ?? lastS2;
-
-        if (s1 && s2) {
-            ensureViewer(s1, s2);
+            el.classList.add("is-disease-hit");
+            setTimeout(() => el.classList.remove("is-disease-hit"), 1800);
         }
     }
 
@@ -420,219 +899,10 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("gx-disease-close")?.addEventListener("click", close);
     }
 
-    function getIconForType(type) {
-        switch (type) {
-            case "gene-mutation": return "🧬";
-            case "protein-change": return "⚛️";
-            case "cell-change": return "🔬";
-            case "flow-block": return "🩸";
-            case "accumulation": return "⚠️";
-            case "signal-loss": return "🧠";
-            case "organ-effect": return "❤️";
-            default: return "•";
-        }
-    }
-
-    function animateVM(container) {
-        const steps = container.querySelectorAll(".gx-vm-step, .gx-vm-arrow");
-
-        steps.forEach((el, i) => {
-            el.style.opacity = "0";
-            el.style.transform = "translateY(10px)";
-
-            setTimeout(() => {
-                el.style.transition = "all .4s ease";
-                el.style.opacity = "1";
-                el.style.transform = "translateY(0)";
-            }, i * 140);
-        });
-    }
-
-    function renderVisualMechanism(container, explanation) {
-        const steps = explanation?.visualMechanism || [];
-
-        if (!container) return;
-
-        if (!Array.isArray(steps) || steps.length === 0) {
-            container.innerHTML = `<p class="gx-ai-empty">—</p>`;
-            return;
-        }
-
-        container.innerHTML = `
-            <div class="gx-vm">
-                ${steps.map((s, i) => `
-                    <div class="gx-vm-step gx-vm-${esc(s.type || "")}">
-                        <div class="gx-vm-node">
-                            <div class="gx-vm-icon">${getIconForType(s.type)}</div>
-                        </div>
-
-                        <div class="gx-vm-content">
-                            <div class="gx-vm-title">${esc(s.title || "")}</div>
-                            <div class="gx-vm-desc">${esc(s.description || "")}</div>
-                        </div>
-                    </div>
-                    ${i < steps.length - 1 ? `<div class="gx-vm-arrow">↓</div>` : ``}
-                `).join("")}
-            </div>
-        `;
-
-        animateVM(container);
-    }
-
-    async function aiRevealSequence(explanation) {
-        const theme = explanation?.visualTheme || "blood";
-
-        const themeText = currentLang === "bg"
-            ? {
-                blood: "AI анализ на кръвния механизъм...",
-                lung: "AI анализ на дихателния механизъм...",
-                neuro: "AI анализ на невронния механизъм...",
-                metabolic: "AI анализ на метаболитния механизъм..."
-            }
-            : {
-                blood: "AI blood-mechanism analysis...",
-                lung: "AI respiratory-mechanism analysis...",
-                neuro: "AI neural-mechanism analysis...",
-                metabolic: "AI metabolic-mechanism analysis..."
-            };
-
-        const overlay = document.createElement("div");
-        overlay.className = `gx-ai-reveal gx-ai-reveal--${theme}`;
-        overlay.innerHTML = `
-        <div class="gx-ai-reveal__inner">
-            <div class="gx-ai-reveal__ring"></div>
-            <div class="gx-ai-reveal__icon">${getRevealIcon(theme)}</div>
-            <div class="gx-ai-reveal__text">${themeText[theme] || themeText.blood}</div>
-        </div>
-    `;
-
-        document.body.appendChild(overlay);
-
-        requestAnimationFrame(() => overlay.classList.add("is-on"));
-
-        await new Promise(r => setTimeout(r, 1550));
-
-        overlay.classList.remove("is-on");
-        await new Promise(r => setTimeout(r, 260));
-        overlay.remove();
-    }
-
-    function getRevealIcon(theme) {
-        switch (theme) {
-            case "blood": return "🩸";
-            case "lung": return "🫁";
-            case "neuro": return "🧠";
-            case "metabolic": return "⚗️";
-            default: return "🧬";
-        }
-    }
-
-    function renderDiseaseScene(container, explanation) {
-        if (!container) return;
-
-        const theme = explanation?.visualTheme || "blood";
-
-        if (theme === "blood") {
-            container.innerHTML = renderBloodScene();
-            return;
-        }
-
-        if (theme === "lung") {
-            container.innerHTML = renderLungScene();
-            return;
-        }
-
-        if (theme === "neuro") {
-            container.innerHTML = renderNeuroScene();
-            return;
-        }
-
-        if (theme === "metabolic") {
-            container.innerHTML = renderMetabolicScene();
-            return;
-        }
-
-        container.innerHTML = renderBloodScene();
-    }
-
-    function renderBloodScene() {
-        return `
-        <div class="gx-scene gx-scene--blood">
-            <div class="gx-scene__label gx-scene__label--left">DNA</div>
-            <div class="gx-scene__dna"></div>
-
-            <div class="gx-scene__arrow"></div>
-
-            <div class="gx-rbc gx-rbc--normal"></div>
-            <div class="gx-rbc gx-rbc--sickle"></div>
-
-            <div class="gx-scene__arrow"></div>
-
-            <div class="gx-vessel">
-                <span class="gx-vessel__cell c1"></span>
-                <span class="gx-vessel__cell c2"></span>
-                <span class="gx-vessel__cell c3"></span>
-            </div>
-        </div>
-    `;
-    }
-
-    function renderLungScene() {
-        return `
-        <div class="gx-scene gx-scene--lung">
-            <div class="gx-scene__channel">
-                <div class="gx-scene__gate"></div>
-                <span class="gx-ion i1"></span>
-                <span class="gx-ion i2"></span>
-                <span class="gx-ion i3"></span>
-            </div>
-
-            <div class="gx-scene__arrow"></div>
-
-            <div class="gx-mucus">
-                <span class="gx-mucus__blob b1"></span>
-                <span class="gx-mucus__blob b2"></span>
-                <span class="gx-mucus__blob b3"></span>
-            </div>
-        </div>
-    `;
-    }
-
-    function renderNeuroScene() {
-        return `
-        <div class="gx-scene gx-scene--neuro">
-            <div class="gx-neuron gx-neuron--left"></div>
-            <div class="gx-synapse">
-                <span class="gx-signal s1"></span>
-                <span class="gx-signal s2"></span>
-                <span class="gx-signal s3"></span>
-            </div>
-            <div class="gx-neuron gx-neuron--right is-dim"></div>
-        </div>
-    `;
-    }
-
-    function renderMetabolicScene() {
-        return `
-        <div class="gx-scene gx-scene--metabolic">
-            <div class="gx-enzyme"></div>
-            <div class="gx-scene__arrow"></div>
-            <div class="gx-molecule-cloud">
-                <span class="gx-molecule m1"></span>
-                <span class="gx-molecule m2"></span>
-                <span class="gx-molecule m3"></span>
-                <span class="gx-molecule m4"></span>
-                <span class="gx-molecule m5"></span>
-            </div>
-        </div>
-    `;
-    }
-
     function showDiseasePopup(explanation, bestResult) {
         const { backdrop, modal } = ensureDiseaseModal();
 
-        const theme = explanation?.visualTheme || "blood";
-        modal.className = `gx-modal gx-ai-modal gx-ai-theme-${theme}`;
+        modal.className = "gx-modal gx-ai-modal";
 
         modal.innerHTML = `
         <div class="gx-modal__hd gx-ai-modal__hd gx-ai-modal__hd--clean">
@@ -653,71 +923,35 @@ document.addEventListener("DOMContentLoaded", () => {
                 <p id="gx-ai-summary" class="gx-ai-summary"></p>
             </section>
 
-            <section class="gx-ai-card gx-ai-card--scene">
-                <h3>${currentLang === "bg" ? "Визуален механизъм" : "Visual mechanism"}</h3>
-                <div id="gx-disease-scene"></div>
+            <section class="gx-ai-card gx-ai-card--flow">
+                <h3>${esc(T.whatHappensInBody)}</h3>
+                <div id="gx-visual-steps"></div>
             </section>
 
             <div class="gx-ai-grid gx-ai-grid--single">
-                <section class="gx-ai-card">
-                    <p>${esc(explanation?.biologicalMechanism || "")}</p>
-                </section>
-
-                <section class="gx-ai-card gx-ai-card--flow">
-                    <h3>${esc(T.visualScene)}</h3>
-                    <div class="gx-flow-bg">
-                        <span class="gx-flow-pulse"></span>
-                        <span class="gx-flow-particle p1"></span>
-                        <span class="gx-flow-particle p2"></span>
-                        <span class="gx-flow-particle p3"></span>
-                    </div>
-                    <h3>${esc(T.mechanismFlow)}</h3>
-                    <div id="gx-vm-container"></div>
-                </section>
-
                 <section class="gx-ai-card">
                     <h3>${esc(T.affectedSystems)}</h3>
                     ${systemsHtml(explanation?.affectedSystems)}
                 </section>
 
                 <section class="gx-ai-card">
-                    <h3>${esc(T.whyMatters)}</h3>
-                    <p>${esc(explanation?.whyThisMatters || "")}</p>
-                </section>
-
-                <section class="gx-ai-card">
-                    <h3>${esc(T.symptoms)}</h3>
+                    <h3>${esc(T.whatYouMayFeel)}</h3>
                     ${listHtml(explanation?.possibleSymptoms)}
                 </section>
 
                 <section class="gx-ai-card">
-                    <h3>${esc(T.food)}</h3>
-                    ${listHtml(explanation?.foodAndLifestyleConsiderations)}
-                </section>
-
-                <section class="gx-ai-card">
-                    <h3>${esc(T.meds)}</h3>
-                    ${listHtml(explanation?.medicationConsiderations)}
-                </section>
-
-                <section class="gx-ai-card">
-                    <h3>${currentLang === "bg" ? "Хранителни приоритети" : "Food priorities"}</h3>
-                    ${listHtml(explanation?.foodPriorities)}
-                </section>
-
-                <section class="gx-ai-card">
-                    <h3>${currentLang === "bg" ? "Неща за избягване или обсъждане" : "Things to avoid or discuss"}</h3>
-                    ${listHtml(explanation?.thingsToAvoidOrDiscuss)}
-                </section>
-
-                <section class="gx-ai-card">
-                    <h3>${currentLang === "bg" ? "Лекарства и вещества за обсъждане с лекар" : "Medicines and substances to discuss with a doctor"}</h3>
+                    <h3>${esc(T.medicinesToDiscuss)}</h3>
                     ${listHtml(explanation?.medicinesToDiscussWithDoctor)}
                 </section>
 
                 <section class="gx-ai-card">
                     <h3>${esc(T.monitoring)}</h3>
                     ${listHtml(explanation?.helpfulMonitoringIdeas)}
+                </section>
+
+                <section class="gx-ai-card">
+                    <h3>${esc(T.foodPriorities)}</h3>
+                    ${listHtml(explanation?.foodPriorities)}
                 </section>
 
                 <section class="gx-ai-card gx-ai-card--notice">
@@ -740,13 +974,8 @@ document.addEventListener("DOMContentLoaded", () => {
             10
         );
 
-        renderDiseaseScene(
-            document.getElementById("gx-disease-scene"),
-            explanation
-        );
-
-        renderVisualMechanism(
-            document.getElementById("gx-vm-container"),
+        renderVisualSteps(
+            document.getElementById("gx-visual-steps"),
             explanation
         );
     }
@@ -884,8 +1113,8 @@ document.addEventListener("DOMContentLoaded", () => {
             setScanLoadingText(
                 loadingEl,
                 currentLang === "bg"
-                    ? "Интерпретиране на биологичния механизъм..."
-                    : "Interpreting biological mechanism..."
+                    ? "Подготовка на кратък AI анализ..."
+                    : "Preparing compact AI insight..."
             );
 
             const explainRes = await fetch("/dna/explain-disease-scan", {
@@ -920,7 +1149,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
             hideScanLoading(loadingEl);
 
-            await aiRevealSequence(explainData.explanation);
             await runNanobotReveal(bestResult);
 
             showDiseasePopup(explainData.explanation, bestResult);

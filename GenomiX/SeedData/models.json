@@ -1,6 +1,7 @@
 ﻿[
   {
     "Id": "44444444-0000-0000-0000-000000000001",
+    "Name": "Сърповидно-клетъчна анемия",
     "UserId": "ea821ce2-2a3d-43ef-8978-5f34ee07d080",
     "CurrentIndex": 0,
     "DisplayMode": 1,
@@ -9,6 +10,7 @@
   },
   {
     "Id": "44444444-0000-0000-0000-000000000002",
+    "Name": "Кистична фиброза",
     "UserId": "9d5e0ac1-4f1b-422b-b7f0-0f7d5d2dbbb1",
     "CurrentIndex": 0,
     "DisplayMode": 0,
@@ -17,6 +19,7 @@
   },
   {
     "Id": "44444444-0000-0000-0000-000000000003",
+    "Name": "Болест на Хънтингтън",
     "UserId": "58a7c2b5-1347-4f0a-b3ad-912d4f098aaa",
     "CurrentIndex": 0,
     "DisplayMode": 1,
@@ -25,10 +28,56 @@
   },
   {
     "Id": "44444444-0000-0000-0000-000000000005",
+    "Name": "Фенилкетонурия",
     "UserId": "c2b3d8ae-2b6d-4c41-9b8e-b1c2a3d4e005",
     "CurrentIndex": 0,
     "DisplayMode": 1,
     "CreatedAt": "2024-09-10T11:20:00Z",
     "UpdatedAt": "2024-09-10T11:20:00Z"
+  },
+  {
+    "Id": "44444444-0000-0000-0000-000000000006",
+    "Name": "Мускулна дистрофия на Дюшен",
+    "UserId": "9d5e0ac1-4f1b-422b-b7f0-0f7d5d2dbbb1",
+    "CurrentIndex": 0,
+    "DisplayMode": 1,
+    "CreatedAt": "2024-10-01T10:00:00Z",
+    "UpdatedAt": "2024-10-01T10:00:00Z"
+  },
+  {
+    "Id": "44444444-0000-0000-0000-000000000007",
+    "Name": "Синдром на Марфан",
+    "UserId": "9d5e0ac1-4f1b-422b-b7f0-0f7d5d2dbbb1",
+    "CurrentIndex": 0,
+    "DisplayMode": 0,
+    "CreatedAt": "2024-10-02T10:00:00Z",
+    "UpdatedAt": "2024-10-02T10:00:00Z"
+  },
+  {
+    "Id": "44444444-0000-0000-0000-000000000008",
+    "Name": "Болест на Tay-Sachs",
+    "UserId": "9d5e0ac1-4f1b-422b-b7f0-0f7d5d2dbbb1",
+    "CurrentIndex": 0,
+    "DisplayMode": 1,
+    "CreatedAt": "2024-10-03T10:00:00Z",
+    "UpdatedAt": "2024-10-03T10:00:00Z"
+  },
+  {
+    "Id": "44444444-0000-0000-0000-000000000009",
+    "Name": "Алфа-1 антитрипсинов дефицит",
+    "UserId": "9d5e0ac1-4f1b-422b-b7f0-0f7d5d2dbbb1",
+    "CurrentIndex": 0,
+    "DisplayMode": 1,
+    "CreatedAt": "2024-10-04T10:00:00Z",
+    "UpdatedAt": "2024-10-04T10:00:00Z"
+  },
+  {
+    "Id": "44444444-0000-0000-0000-000000000010",
+    "Name": "Наследствена хемохроматоза",
+    "UserId": "9d5e0ac1-4f1b-422b-b7f0-0f7d5d2dbbb1",
+    "CurrentIndex": 0,
+    "DisplayMode": 0,
+    "CreatedAt": "2024-10-05T10:00:00Z",
+    "UpdatedAt": "2024-10-05T10:00:00Z"
   }
 ]

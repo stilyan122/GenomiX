@@ -48,5 +48,55 @@
     "StartIndex": null,
     "AllowedMismatchCount": 0,
     "Notes": "Реален класически β-таласемичен вариант: HBB c.118C>T, codon 39, CAG>TAG, p.Gln40Ter. Този v1 marker е codon-level motif за реалния nonsense вариант."
+  },
+  {
+    "Id": "66666666-aaaa-aaaa-aaaa-666666666666",
+    "DiseaseId": "ffffffff-6666-6666-6666-666666666666",
+    "GeneName": "DMD",
+    "PatternSequence": "ATGGAAGATGACATTGAG",
+    "MatchType": "Exact",
+    "StartIndex": null,
+    "AllowedMismatchCount": 0,
+    "Notes": "Образователен marker за DMD-свързан вариант, използван за демонстрация на мускулна дистрофия на Дюшен."
+  },
+  {
+    "Id": "77777777-bbbb-bbbb-bbbb-777777777777",
+    "DiseaseId": "12121212-7777-7777-7777-777777777777",
+    "GeneName": "FBN1",
+    "PatternSequence": "GCTTCCAGTGGATGCTAAC",
+    "MatchType": "Exact",
+    "StartIndex": null,
+    "AllowedMismatchCount": 0,
+    "Notes": "Образователен marker за FBN1-свързан вариант."
+  },
+  {
+    "Id": "88888888-cccc-cccc-cccc-888888888888",
+    "DiseaseId": "23232323-8888-8888-8888-888888888888",
+    "GeneName": "HEXA",
+    "PatternSequence": "TACCGGATCCTGAACTTGGA",
+    "MatchType": "Exact",
+    "StartIndex": null,
+    "AllowedMismatchCount": 0,
+    "Notes": "Образователен marker за HEXA-свързан вариант."
+  },
+  {
+    "Id": "99999999-dddd-dddd-dddd-999999999999",
+    "DiseaseId": "34343434-9999-9999-9999-999999999999",
+    "GeneName": "SERPINA1",
+    "PatternSequence": "GAGAAGGCGTTCCTGGTCAA",
+    "MatchType": "Exact",
+    "StartIndex": null,
+    "AllowedMismatchCount": 0,
+    "Notes": "Образователен marker за SERPINA1-свързан вариант."
+  },
+  {
+    "Id": "abababab-eeee-eeee-eeee-abababababab",
+    "DiseaseId": "45454545-aaaa-bbbb-cccc-101010101010",
+    "GeneName": "HFE",
+    "PatternSequence": "CAGGTGGACCTACTGGTG",
+    "MatchType": "Exact",
+    "StartIndex": null,
+    "AllowedMismatchCount": 0,
+    "Notes": "Образователен marker за HFE-свързан вариант."
   }
 ]

@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GenomiX.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260324075336_InitialMigration")]
+    [Migration("20260327125128_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -64,7 +64,7 @@ namespace GenomiX.Infrastructure.Migrations
                         {
                             Id = new Guid("44444444-0000-0000-0000-000000000001"),
                             CreatedAt = new DateTimeOffset(new DateTime(2024, 6, 15, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
-                            Name = "Untitled model",
+                            Name = "Сърповидно-клетъчна анемия",
                             UpdatedAt = new DateTimeOffset(new DateTime(2024, 6, 15, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             UserId = new Guid("ea821ce2-2a3d-43ef-8978-5f34ee07d080")
                         },
@@ -72,7 +72,7 @@ namespace GenomiX.Infrastructure.Migrations
                         {
                             Id = new Guid("44444444-0000-0000-0000-000000000002"),
                             CreatedAt = new DateTimeOffset(new DateTime(2024, 7, 20, 9, 30, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
-                            Name = "Untitled model",
+                            Name = "Кистична фиброза",
                             UpdatedAt = new DateTimeOffset(new DateTime(2024, 7, 20, 9, 30, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             UserId = new Guid("9d5e0ac1-4f1b-422b-b7f0-0f7d5d2dbbb1")
                         },
@@ -80,7 +80,7 @@ namespace GenomiX.Infrastructure.Migrations
                         {
                             Id = new Guid("44444444-0000-0000-0000-000000000003"),
                             CreatedAt = new DateTimeOffset(new DateTime(2024, 8, 25, 10, 45, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
-                            Name = "Untitled model",
+                            Name = "Болест на Хънтингтън",
                             UpdatedAt = new DateTimeOffset(new DateTime(2024, 8, 25, 10, 45, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             UserId = new Guid("58a7c2b5-1347-4f0a-b3ad-912d4f098aaa")
                         },
@@ -88,9 +88,49 @@ namespace GenomiX.Infrastructure.Migrations
                         {
                             Id = new Guid("44444444-0000-0000-0000-000000000005"),
                             CreatedAt = new DateTimeOffset(new DateTime(2024, 9, 10, 11, 20, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
-                            Name = "Untitled model",
+                            Name = "Фенилкетонурия",
                             UpdatedAt = new DateTimeOffset(new DateTime(2024, 9, 10, 11, 20, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             UserId = new Guid("c2b3d8ae-2b6d-4c41-9b8e-b1c2a3d4e005")
+                        },
+                        new
+                        {
+                            Id = new Guid("44444444-0000-0000-0000-000000000006"),
+                            CreatedAt = new DateTimeOffset(new DateTime(2024, 10, 1, 10, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Name = "Мускулна дистрофия на Дюшен",
+                            UpdatedAt = new DateTimeOffset(new DateTime(2024, 10, 1, 10, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            UserId = new Guid("9d5e0ac1-4f1b-422b-b7f0-0f7d5d2dbbb1")
+                        },
+                        new
+                        {
+                            Id = new Guid("44444444-0000-0000-0000-000000000007"),
+                            CreatedAt = new DateTimeOffset(new DateTime(2024, 10, 2, 10, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Name = "Синдром на Марфан",
+                            UpdatedAt = new DateTimeOffset(new DateTime(2024, 10, 2, 10, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            UserId = new Guid("9d5e0ac1-4f1b-422b-b7f0-0f7d5d2dbbb1")
+                        },
+                        new
+                        {
+                            Id = new Guid("44444444-0000-0000-0000-000000000008"),
+                            CreatedAt = new DateTimeOffset(new DateTime(2024, 10, 3, 10, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Name = "Болест на Tay-Sachs",
+                            UpdatedAt = new DateTimeOffset(new DateTime(2024, 10, 3, 10, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            UserId = new Guid("9d5e0ac1-4f1b-422b-b7f0-0f7d5d2dbbb1")
+                        },
+                        new
+                        {
+                            Id = new Guid("44444444-0000-0000-0000-000000000009"),
+                            CreatedAt = new DateTimeOffset(new DateTime(2024, 10, 4, 10, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Name = "Алфа-1 антитрипсинов дефицит",
+                            UpdatedAt = new DateTimeOffset(new DateTime(2024, 10, 4, 10, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            UserId = new Guid("9d5e0ac1-4f1b-422b-b7f0-0f7d5d2dbbb1")
+                        },
+                        new
+                        {
+                            Id = new Guid("44444444-0000-0000-0000-000000000010"),
+                            CreatedAt = new DateTimeOffset(new DateTime(2024, 10, 5, 10, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Name = "Наследствена хемохроматоза",
+                            UpdatedAt = new DateTimeOffset(new DateTime(2024, 10, 5, 10, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            UserId = new Guid("9d5e0ac1-4f1b-422b-b7f0-0f7d5d2dbbb1")
                         });
                 });
 
@@ -128,6 +168,41 @@ namespace GenomiX.Infrastructure.Migrations
                         {
                             DNAModelId = new Guid("44444444-0000-0000-0000-000000000002"),
                             DiseaseId = new Guid("cccccccc-3333-3333-3333-333333333333")
+                        },
+                        new
+                        {
+                            DNAModelId = new Guid("44444444-0000-0000-0000-000000000006"),
+                            DiseaseId = new Guid("ffffffff-6666-6666-6666-666666666666")
+                        },
+                        new
+                        {
+                            DNAModelId = new Guid("44444444-0000-0000-0000-000000000007"),
+                            DiseaseId = new Guid("12121212-7777-7777-7777-777777777777")
+                        },
+                        new
+                        {
+                            DNAModelId = new Guid("44444444-0000-0000-0000-000000000008"),
+                            DiseaseId = new Guid("23232323-8888-8888-8888-888888888888")
+                        },
+                        new
+                        {
+                            DNAModelId = new Guid("44444444-0000-0000-0000-000000000009"),
+                            DiseaseId = new Guid("34343434-9999-9999-9999-999999999999")
+                        },
+                        new
+                        {
+                            DNAModelId = new Guid("44444444-0000-0000-0000-000000000010"),
+                            DiseaseId = new Guid("45454545-aaaa-bbbb-cccc-101010101010")
+                        },
+                        new
+                        {
+                            DNAModelId = new Guid("44444444-0000-0000-0000-000000000006"),
+                            DiseaseId = new Guid("bbbbbbbb-2222-2222-2222-222222222222")
+                        },
+                        new
+                        {
+                            DNAModelId = new Guid("44444444-0000-0000-0000-000000000007"),
+                            DiseaseId = new Guid("aaaaaaaa-1111-1111-1111-111111111111")
                         });
                 });
 
@@ -299,6 +374,86 @@ namespace GenomiX.Infrastructure.Migrations
                             ModelId = new Guid("44444444-0000-0000-0000-000000000003"),
                             Sequence = "TACGGTCC TCGACGACCTCCTCCACGACCTCCGACCTCCGCAAGGACCCGACTCACCGACCTCCTCCTCGTCCTCCGACCGACGACCTC",
                             Strand = (byte)2
+                        },
+                        new
+                        {
+                            Id = new Guid("d1111111-1111-1111-1111-111111111111"),
+                            CreatedAt = new DateTimeOffset(new DateTime(2024, 10, 1, 10, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            ModelId = new Guid("44444444-0000-0000-0000-000000000006"),
+                            Sequence = "ATGGAAGATGACATTGAGGCTGCTGCTGCTGCTGCTGCTGCTGCTGCTGCTGCTGCTGCTGCTGCTGCTGCTGCT",
+                            Strand = (byte)1
+                        },
+                        new
+                        {
+                            Id = new Guid("d2222222-2222-2222-2222-222222222222"),
+                            CreatedAt = new DateTimeOffset(new DateTime(2024, 10, 1, 10, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            ModelId = new Guid("44444444-0000-0000-0000-000000000006"),
+                            Sequence = "TACCTTCTACTGTAACTCCGACGACGACGACGACGACGACGACGACGACGACGACGACGACGACGACGACGACGA",
+                            Strand = (byte)2
+                        },
+                        new
+                        {
+                            Id = new Guid("e1111111-1111-1111-1111-111111111111"),
+                            CreatedAt = new DateTimeOffset(new DateTime(2024, 10, 2, 10, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            ModelId = new Guid("44444444-0000-0000-0000-000000000007"),
+                            Sequence = "GCTTCCAGTGGATGCTAACGCGCGCGCGCGCGCGCGCGCGCGCGCGCGCGCGCGCGCGCGCGCGCGCGCGCGC",
+                            Strand = (byte)1
+                        },
+                        new
+                        {
+                            Id = new Guid("e2222222-2222-2222-2222-222222222222"),
+                            CreatedAt = new DateTimeOffset(new DateTime(2024, 10, 2, 10, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            ModelId = new Guid("44444444-0000-0000-0000-000000000007"),
+                            Sequence = "CGAAGGTCACCTACGATTGCGCGCGCGCGCGCGCGCGCGCGCGCGCGCGCGCGCGCGCGCGCGCGCGCGCGCG",
+                            Strand = (byte)2
+                        },
+                        new
+                        {
+                            Id = new Guid("f1111111-1111-1111-1111-111111111111"),
+                            CreatedAt = new DateTimeOffset(new DateTime(2024, 10, 3, 10, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            ModelId = new Guid("44444444-0000-0000-0000-000000000008"),
+                            Sequence = "TACCGGATCCTGAACTTGGAGAGAGAGAGAGAGAGAGAGAGAGAGAGAGAGAGAGAGAGAGAGAGAGAGAGAGA",
+                            Strand = (byte)1
+                        },
+                        new
+                        {
+                            Id = new Guid("f2222222-2222-2222-2222-222222222222"),
+                            CreatedAt = new DateTimeOffset(new DateTime(2024, 10, 3, 10, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            ModelId = new Guid("44444444-0000-0000-0000-000000000008"),
+                            Sequence = "ATGGCCTAGGACTTGAACCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCT",
+                            Strand = (byte)2
+                        },
+                        new
+                        {
+                            Id = new Guid("a9111111-1111-1111-1111-111111111111"),
+                            CreatedAt = new DateTimeOffset(new DateTime(2024, 10, 4, 10, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            ModelId = new Guid("44444444-0000-0000-0000-000000000009"),
+                            Sequence = "GAGAAGGCGTTCCTGGTCAATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATC",
+                            Strand = (byte)1
+                        },
+                        new
+                        {
+                            Id = new Guid("a9222222-2222-2222-2222-222222222222"),
+                            CreatedAt = new DateTimeOffset(new DateTime(2024, 10, 4, 10, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            ModelId = new Guid("44444444-0000-0000-0000-000000000009"),
+                            Sequence = "CTCTTCCGCAAGGACCAGTTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAG",
+                            Strand = (byte)2
+                        },
+                        new
+                        {
+                            Id = new Guid("aa111111-1111-1111-1111-111111111110"),
+                            CreatedAt = new DateTimeOffset(new DateTime(2024, 10, 5, 10, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            ModelId = new Guid("44444444-0000-0000-0000-000000000010"),
+                            Sequence = "CAGGTGGACCTACTGGTGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+                            Strand = (byte)1
+                        },
+                        new
+                        {
+                            Id = new Guid("aa222222-2222-2222-2222-222222222220"),
+                            CreatedAt = new DateTimeOffset(new DateTime(2024, 10, 5, 10, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            ModelId = new Guid("44444444-0000-0000-0000-000000000010"),
+                            Sequence = "GTCCACCTGGATGACCACCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC",
+                            Strand = (byte)2
                         });
                 });
 
@@ -358,6 +513,36 @@ namespace GenomiX.Infrastructure.Migrations
                             Id = new Guid("eeeeeeee-5555-5555-5555-555555555555"),
                             Description = "Наследствено заболяване, свързано с патогенни варианти в HBB, които намаляват или прекъсват синтеза на бета-глобин.",
                             Name = "Бета-таласемия"
+                        },
+                        new
+                        {
+                            Id = new Guid("ffffffff-6666-6666-6666-666666666666"),
+                            Description = "Наследствено заболяване, причинено от патогенни варианти в DMD гена, водещи до липса или силно намалено количество дистрофин.",
+                            Name = "Мускулна дистрофия на Дюшен"
+                        },
+                        new
+                        {
+                            Id = new Guid("12121212-7777-7777-7777-777777777777"),
+                            Description = "Наследствено заболяване на съединителната тъкан, свързано с патогенни варианти в FBN1.",
+                            Name = "Синдром на Марфан"
+                        },
+                        new
+                        {
+                            Id = new Guid("23232323-8888-8888-8888-888888888888"),
+                            Description = "Наследствено невродегенеративно заболяване, причинено от патогенни варианти в HEXA, водещи до натрупване на GM2 ганглиозиди.",
+                            Name = "Болест на Tay-Sachs"
+                        },
+                        new
+                        {
+                            Id = new Guid("34343434-9999-9999-9999-999999999999"),
+                            Description = "Наследствено заболяване, причинено от патогенни варианти в SERPINA1, свързано с неправилно нагъване и натрупване на белтъка.",
+                            Name = "Алфа-1 антитрипсинов дефицит"
+                        },
+                        new
+                        {
+                            Id = new Guid("45454545-aaaa-bbbb-cccc-101010101010"),
+                            Description = "Наследствено заболяване, причинено най-често от патогенни варианти в HFE, водещо до повишено натрупване на желязо.",
+                            Name = "Наследствена хемохроматоза"
                         });
                 });
 
@@ -463,6 +648,56 @@ namespace GenomiX.Infrastructure.Migrations
                             MatchType = "Exact",
                             Notes = "Реален класически β-таласемичен вариант: HBB c.118C>T, codon 39, CAG>TAG, p.Gln40Ter. Този v1 marker е codon-level motif за реалния nonsense вариант.",
                             PatternSequence = "CAGTAG"
+                        },
+                        new
+                        {
+                            Id = new Guid("66666666-aaaa-aaaa-aaaa-666666666666"),
+                            AllowedMismatchCount = 0,
+                            DiseaseId = new Guid("ffffffff-6666-6666-6666-666666666666"),
+                            GeneName = "DMD",
+                            MatchType = "Exact",
+                            Notes = "Образователен marker за DMD-свързан вариант, използван за демонстрация на мускулна дистрофия на Дюшен.",
+                            PatternSequence = "ATGGAAGATGACATTGAG"
+                        },
+                        new
+                        {
+                            Id = new Guid("77777777-bbbb-bbbb-bbbb-777777777777"),
+                            AllowedMismatchCount = 0,
+                            DiseaseId = new Guid("12121212-7777-7777-7777-777777777777"),
+                            GeneName = "FBN1",
+                            MatchType = "Exact",
+                            Notes = "Образователен marker за FBN1-свързан вариант.",
+                            PatternSequence = "GCTTCCAGTGGATGCTAAC"
+                        },
+                        new
+                        {
+                            Id = new Guid("88888888-cccc-cccc-cccc-888888888888"),
+                            AllowedMismatchCount = 0,
+                            DiseaseId = new Guid("23232323-8888-8888-8888-888888888888"),
+                            GeneName = "HEXA",
+                            MatchType = "Exact",
+                            Notes = "Образователен marker за HEXA-свързан вариант.",
+                            PatternSequence = "TACCGGATCCTGAACTTGGA"
+                        },
+                        new
+                        {
+                            Id = new Guid("99999999-dddd-dddd-dddd-999999999999"),
+                            AllowedMismatchCount = 0,
+                            DiseaseId = new Guid("34343434-9999-9999-9999-999999999999"),
+                            GeneName = "SERPINA1",
+                            MatchType = "Exact",
+                            Notes = "Образователен marker за SERPINA1-свързан вариант.",
+                            PatternSequence = "GAGAAGGCGTTCCTGGTCAA"
+                        },
+                        new
+                        {
+                            Id = new Guid("abababab-eeee-eeee-eeee-abababababab"),
+                            AllowedMismatchCount = 0,
+                            DiseaseId = new Guid("45454545-aaaa-bbbb-cccc-101010101010"),
+                            GeneName = "HFE",
+                            MatchType = "Exact",
+                            Notes = "Образователен marker за HFE-свързан вариант.",
+                            PatternSequence = "CAGGTGGACCTACTGGTG"
                         });
                 });
 

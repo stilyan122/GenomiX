@@ -4,7 +4,6 @@ using GenomiX.ViewModels.Disease;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.Options;
-using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
@@ -12,7 +11,7 @@ using System.Text.Json;
 namespace GenomiX.Core.Services
 {
     /// <summary>
-    /// Provides AI-generated explanations for potential genetic disease markers based on input data.
+    /// Provides short AI-generated educational guidance for possible genetic disease marker matches.
     /// </summary>
     public class AiDiseaseExplanationService : IAiDiseaseExplanationService
     {
@@ -20,7 +19,8 @@ namespace GenomiX.Core.Services
         private readonly OpenAiOptions _options;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public AiDiseaseExplanationService(HttpClient httpClient, 
+        public AiDiseaseExplanationService(
+            HttpClient httpClient,
             IOptions<OpenAiOptions> options,
             IHttpContextAccessor httpContextAccessor)
         {
@@ -38,105 +38,125 @@ namespace GenomiX.Core.Services
                 .UICulture
                 .Name;
 
-            var lang = culture?.StartsWith("bg") == true ? "Bulgarian" : "English";
+            var lang = culture?.StartsWith("bg", StringComparison.OrdinalIgnoreCase) == true
+                ? "Bulgarian"
+                : "English";
 
             var prompt = $"""
-                You are generating an educational explanation for a premium DNA analysis platform called GenomiX.
+            You are generating an educational explanation for a premium DNA analysis platform called GenomiX.
 
-                Language requirement:
-                - The response MUST be written entirely in {lang}.
-                - Do NOT mix languages.
-                - If the language is Bulgarian, use Cyrillic alphabet only.
-                - All section content must strictly follow the selected language.
+            Language requirement:
+            - The response MUST be written entirely in {lang}.
+            - Do NOT mix languages.
+            - If the language is Bulgarian, use Cyrillic alphabet only.
+            - All content must strictly follow the selected language.
 
-                Context:
-                A possible genetic disease marker match was detected.
+            Context:
+            A possible genetic disease marker match was detected.
 
-                Disease: {input.DiseaseName}
-                Gene: {input.GeneName}
-                Description: {input.Description}
-                Matched patterns: {input.MatchedPatterns}
-                Total patterns: {input.TotalPatterns}
-                Confidence: {Math.Round(input.Confidence * 100)}%
+            Disease: {input.DiseaseName}
+            Gene: {input.GeneName}
+            Description: {input.Description}
+            Matched patterns: {input.MatchedPatterns}
+            Total patterns: {input.TotalPatterns}
+            Confidence: {Math.Round(input.Confidence * 100)}%
 
-                Goal:
-                Create a rich, visually meaningful educational explanation suitable for a modern popup interface.
+            Core safety rules:
+            - This is educational, not diagnostic.
+            - Do not claim the user has the disease.
+            - Do not prescribe treatment.
+            - Do not say "take this medicine" or "stop this medicine".
+            - Instead, mention concrete medicines, medicine classes, foods, nutrients, and tests that are commonly relevant to discuss with a qualified doctor.
+            - Mention that real interpretation requires clinical testing and consultation with a qualified medical professional.
 
-                Rules:
-                - This is educational, not diagnostic.
-                - Do not claim the user has the disease.
-                - Use wording such as "may be associated with" and "could indicate".
-                - Do not prescribe treatment.
-                - Mention that real interpretation requires clinical testing and consultation with a qualified medical professional.
-                - Be specific to the disease and gene.
-                - Avoid generic filler text.
-                - Do not leave fields empty.
-                - possibleSymptoms must contain 3 to 6 items.
-                - foodAndLifestyleConsiderations must contain 3 to 6 items.
-                - medicationConsiderations must contain 3 to 6 items.
-                - helpfulMonitoringIdeas must contain 3 to 6 items.
-                - mechanismSteps must contain 4 to 6 short steps.
-                - affectedSystems must contain 3 to 6 short items.
+            UI intent:
+            - The output will be shown in a premium medical-style DNA dashboard.
+            - It must feel concrete, visual, disease-specific, and easy to understand.
+            - Do not return generic disease themes like blood, lung, neuro, or metabolic.
+            - Instead, describe the exact biological chain of this specific disease.
 
-                mechanismSteps must explain the biological chain in the body, for example:
-                mutation -> protein change -> cell change -> tissue/system effect -> visible consequence
+            Style requirement:
+            - Keep everything concise and information-dense.
+            - No storytelling.
+            - No filler.
+            - Prefer short, specific, high-value phrasing.
+            - Each list item should be short and clear.
+            - Each visual step should describe one concrete biological event.
 
-                Return JSON with exactly these fields:
-                - title
-                - shortSummary
-                - biologicalMechanism
-                - mechanismSteps
-                - affectedSystems
-                - whyThisMatters
-                - possibleSymptoms
-                - foodAndLifestyleConsiderations
-                - medicationConsiderations
-                - helpfulMonitoringIdeas
-                - educationalNotice
+            Required fields and limits:
+            - shortSummary: max 2 short sentences
+            - affectedSystems: exactly 3 items
+            - possibleSymptoms: exactly 3 items
+            - foodPriorities: exactly 3 items
+            - medicinesToDiscussWithDoctor: exactly 3 items
+            - helpfulMonitoringIdeas: exactly 3 items
+            - visualSteps: exactly 4 steps
+            - educationalNotice: max 2 short sentences
 
-                mechanismSteps must be an array of objects with:
-                - title
-                - description
+            Advice quality rules:
+            - Be specific to the disease and gene.
+            - Avoid generic phrases like "eat healthy" or "consult a doctor" as standalone advice.
+            - For medicinesToDiscussWithDoctor, include concrete medicine names or medicine classes when relevant, but always frame them as discussion points with a doctor.
+            - For helpfulMonitoringIdeas, include concrete tests, lab work, follow-up, or measurable indicators.
+            - For foodPriorities, include concrete food categories, nutrients, or dietary focus areas.
+            - possibleSymptoms should describe what the person may actually feel or notice.
+            - affectedSystems should describe the main organs, tissues, or systems involved.
 
-                - visualMechanism: array of 4–6 steps describing the biological process visually
-                Each step must have:
-                - type (one of: gene-mutation, protein-change, cell-change, flow-block, accumulation, signal-loss, organ-effect)
-                - title
-                - description
+            Visual steps rules:
+            - visualSteps must describe the exact disease mechanism step by step.
+            - Each step must represent a concrete biological event for this specific disease.
+            - The 4 steps should follow a clear chain such as:
+              mutation -> abnormal protein / transport / signal -> cell or tissue problem -> symptom or organ effect
+            - Do NOT use generic theme words as the main structure.
+            - Do NOT return broad categories like "blood theme" or "lung theme".
+            - Each step must use one of these kinds only:
+              mutation
+              abnormal-protein
+              misfolded-protein
+              blocked-channel
+              transport-failure
+              cell-deformation
+              blocked-flow
+              accumulation
+              signal-loss
+              inflammation
+              tissue-damage
+              organ-effect
+              pain-crisis
+              breathing-problem
+              infection-risk
+              low-oxygen
 
-                - visualTheme: one of:
-                blood, lung, neuro, metabolic
+            For each visual step:
+            - title: very short
+            - description: 1 short sentence
+            - fromLabel: short starting state
+            - toLabel: short ending state
+            - tags: 1 to 3 short tags
 
-                Rules:
-                - steps must represent real biological progression
-                - do not invent unrealistic biology
+            Examples of good specificity:
+            - "пълна кръвна картина"
+            - "ретикулоцити"
+            - "електрофореза на хемоглобин"
+            - "фенилаланин в кръвта"
+            - "чернодробни ензими"
+            - "храни с фолиева киселина"
+            - "добра хидратация"
+            - "обсъждане на хидроксиурея"
+            - "обсъждане на дорназа алфа"
+            - "обсъждане на CFTR модулатори"
 
-                The educational advice must be specific, practical, and disease-related.
-
-                Return concrete but safe guidance.
-
-                For food:
-                - include specific food priorities or nutritional directions when appropriate
-                - examples may include hydration, protein intake, avoiding excess phenylalanine, iron-related considerations, etc.
-                - do not prescribe a medical diet as treatment
-
-                For medicines and substances:
-                - do NOT prescribe or forbid medication absolutely
-                - instead return medicines, substances, or drug categories that should be discussed with a doctor
-                - examples: steroids, dehydration-inducing drugs, sedatives, painkillers, high-risk supplements, or disease-specific medication categories
-                - use wording like "may need medical review" or "should be discussed with a qualified clinician"
-
-                Return these additional JSON fields:
-                - foodPriorities
-                - thingsToAvoidOrDiscuss
-                - medicinesToDiscussWithDoctor
-
-                Rules:
-                - each of these arrays must contain 3 to 6 concrete items
-                - do not leave them empty
-                - do not give direct treatment orders
-                - keep everything educational and safety-aware
-                """;
+            Return JSON with exactly these fields:
+            - title
+            - shortSummary
+            - affectedSystems
+            - possibleSymptoms
+            - foodPriorities
+            - medicinesToDiscussWithDoctor
+            - helpfulMonitoringIdeas
+            - educationalNotice
+            - visualSteps
+            """;
 
             var payload = new
             {
@@ -147,7 +167,7 @@ namespace GenomiX.Core.Services
                     format = new
                     {
                         type = "json_schema",
-                        name = "disease_popup",
+                        name = "disease_popup_minimal",
                         schema = new
                         {
                             type = "object",
@@ -155,102 +175,86 @@ namespace GenomiX.Core.Services
                             properties = new
                             {
                                 title = new { type = "string" },
+
                                 shortSummary = new { type = "string" },
-                                biologicalMechanism = new { type = "string" },
-                                mechanismSteps = new
-                                {
-                                    type = "array",
-                                    items = new
-                                    {
-                                        type = "object",
-                                        additionalProperties = false,
-                                        properties = new
-                                        {
-                                            title = new { type = "string" },
-                                            description = new { type = "string" }
-                                        },
-                                        required = new[] { "title", "description" }
-                                    }
-                                },
+
                                 affectedSystems = new
                                 {
                                     type = "array",
                                     items = new { type = "string" }
                                 },
-                                whyThisMatters = new { type = "string" },
+
                                 possibleSymptoms = new
                                 {
                                     type = "array",
                                     items = new { type = "string" }
                                 },
-                                foodAndLifestyleConsiderations = new
-                                {
-                                    type = "array",
-                                    items = new { type = "string" }
-                                },
-                                medicationConsiderations = new
-                                {
-                                    type = "array",
-                                    items = new { type = "string" }
-                                },
-                                helpfulMonitoringIdeas = new
-                                {
-                                    type = "array",
-                                    items = new { type = "string" }
-                                },
-                                educationalNotice = new { type = "string" },
-                                visualMechanism = new
-                                {
-                                    type = "array",
-                                    items = new
-                                    {
-                                        type = "object",
-                                        additionalProperties = false,
-                                        properties = new
-                                        {
-                                            type = new { type = "string" },
-                                            title = new { type = "string" },
-                                            description = new { type = "string" }
-                                        },
-                                        required = new[] { "type", "title", "description" }
-                                    }
-                                },
+
                                 foodPriorities = new
                                 {
                                     type = "array",
                                     items = new { type = "string" }
                                 },
-                                thingsToAvoidOrDiscuss = new
-                                {
-                                    type = "array",
-                                    items = new { type = "string" }
-                                },
+
                                 medicinesToDiscussWithDoctor = new
                                 {
                                     type = "array",
                                     items = new { type = "string" }
                                 },
 
-                                visualTheme = new { type = "string" }
+                                helpfulMonitoringIdeas = new
+                                {
+                                    type = "array",
+                                    items = new { type = "string" }
+                                },
+
+                                educationalNotice = new { type = "string" },
+
+                                visualSteps = new
+                                {
+                                    type = "array",
+                                    items = new
+                                    {
+                                        type = "object",
+                                        additionalProperties = false,
+                                        properties = new
+                                        {
+                                            kind = new { type = "string" },
+                                            title = new { type = "string" },
+                                            description = new { type = "string" },
+                                            fromLabel = new { type = "string" },
+                                            toLabel = new { type = "string" },
+
+                                            tags = new
+                                            {
+                                                type = "array",
+                                                items = new { type = "string" }
+                                            }
+                                        },
+                                        required = new[]
+        {
+             "kind",
+    "title",
+    "description",
+    "fromLabel",
+    "toLabel",
+    "tags"
+        }
+                                    
+                            }
+                                }
                             },
                             required = new[]
     {
         "title",
         "shortSummary",
-        "biologicalMechanism",
-        "mechanismSteps",
         "affectedSystems",
-        "whyThisMatters",
         "possibleSymptoms",
-        "foodAndLifestyleConsiderations",
-        "medicationConsiderations",
+        "foodPriorities",
+        "medicinesToDiscussWithDoctor",
         "helpfulMonitoringIdeas",
         "educationalNotice",
-        "visualMechanism",
-        "visualTheme",
-        "foodPriorities",
-        "thingsToAvoidOrDiscuss",
-        "medicinesToDiscussWithDoctor",
+        "visualSteps"
     }
                         }
                     }
@@ -287,7 +291,10 @@ namespace GenomiX.Core.Services
 
             var result = JsonSerializer.Deserialize<DiseaseAiExplanationDto>(
                 outputText,
-                new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
 
             return result ?? throw new InvalidOperationException("Failed to parse AI explanation JSON.");
         }
