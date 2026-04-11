@@ -6,8 +6,8 @@ import { createNanobotCinematicRepair } from "./dna-nanobot.js";
 
 let gxHistoryIdSeed = 0;
 
-export function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
-    const visualizer = document.getElementById("dna-visual");
+export function visualizeDNA(strand1, strand2, { scientific = false, containerId = "dna-visual", compareMutatedIndices = [] } = {}) {
+    const visualizer = document.getElementById(containerId);
 
     if (!visualizer)
         throw new Error("Missing #dna-visual");
@@ -17,7 +17,7 @@ export function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
 
     const legend3D = visualizer.querySelector("#gx-legend-3d");
 
-    visualizer.replaceChildren(); 
+    visualizer.replaceChildren();
     if (legend3D) legend3D.classList.add("gx-hidden");
 
     visualizer.classList.toggle("mode--sci", scientific);
@@ -50,6 +50,9 @@ export function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
 
     let s1 = strand1.split("");
     let s2 = strand2.split("");
+
+    const originalS1 = [...s1];
+    const originalS2 = [...s2];
 
     let currentModel = null;
     const api = { onModelChanged: null };
@@ -86,8 +89,7 @@ export function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
         setCurrentIndex: (i) => { current = i; }
     });
 
-    function clamp(v, min, max)
-    {
+    function clamp(v, min, max) {
         return Math.max(min, Math.min(max, v));
     }
 
@@ -113,6 +115,24 @@ export function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
         const dnaSequenceInput = document.getElementById("sequence");
         if (!dnaSequenceInput) return;
         dnaSequenceInput.value = `${s1.join("")}\n${s2.join("")}`;
+    }
+
+    function getMutationIndices(a1, a2, b1, b2) {
+        const out = [];
+        const len = Math.max(a1.length, b1.length, a2.length, b2.length);
+
+        for (let i = 0; i < len; i++) {
+            const x1 = a1[i] || "";
+            const x2 = a2[i] || "";
+            const y1 = b1[i] || "";
+            const y2 = b2[i] || "";
+
+            if (x1 !== y1 || x2 !== y2) {
+                out.push(i);
+            }
+        }
+
+        return out;
     }
 
     function syncCurrentModel() {
@@ -229,7 +249,7 @@ export function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
             current = Number(pairEl.dataset.i || 0);
 
             edit.openAt(current, strandClicked);
-            updateView();                          
+            updateView();
         });
     }
 
@@ -627,7 +647,7 @@ export function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
 
     let scanAbort = false;
 
-    let stickyTip = null;      
+    let stickyTip = null;
     let stickyTipActive = false;
 
     function setStickyTip(text) {
@@ -649,7 +669,7 @@ export function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
     function clearStickyTip() {
         stickyTip = null;
         stickyTipActive = false;
-        renderNormalTipNow(); 
+        renderNormalTipNow();
     }
 
     function onUserNavigate() {
@@ -666,11 +686,11 @@ export function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
             if (scanAbort) break;
 
             current = i;
-            updateView();                 
-            positionScannerAtIndex(i);   
+            updateView();
+            positionScannerAtIndex(i);
 
             pairs[current]?.classList.add("gx-scan-active");
-            pairs[current-1]?.classList.remove("gx-scan-active");
+            pairs[current - 1]?.classList.remove("gx-scan-active");
 
             const isMis = (COMP[s1[i]] || "") !== s2[i];
 
@@ -731,7 +751,6 @@ export function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
             if ((COMP[b1] || "") !== b2) count++;
         }
         repairAllBtn.disabled = count === 0;
-        repairAllBtn.textContent = count ? `Repair DNA (${count})` : "Repair DNA";
     }
 
     repairAllBtn.addEventListener("click", async () => {
@@ -828,7 +847,9 @@ export function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
 
         function ensure3D(idx) {
             if (!threeApi) {
-                threeApi = mountHelix3D(s1.join(""), s2.join(""), threeWrap, idx ?? current, { detailPanel: true });
+                threeApi = mountHelix3D(s1.join(""), s2.join(""), threeWrap, idx ?? current, {
+                    detailPanel: true, mutatedIndices: compareMutatedIndices
+                });
             }
 
             threeApi.onPick((seqIndex) => {
@@ -872,11 +893,11 @@ export function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
             if (isFs) {
                 threeWrap.classList.add("gx-fs");
                 ensureFsBar();
-                hideFullscreenBtn();      
+                hideFullscreenBtn();
             } else {
                 threeWrap.classList.remove("gx-fs");
                 removeFsBar();
-                showFullscreenBtn();    
+                showFullscreenBtn();
             }
 
             setTimeout(() => threeApi?.refresh?.(), 60);
@@ -911,8 +932,7 @@ export function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
             updateView();
         };
 
-        const onTab3D = () =>
-        { 
+        const onTab3D = () => {
             tab3d.classList.add("is-active");
             tab2d.classList.remove("is-active");
 
@@ -1029,8 +1049,8 @@ export function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
         const popW = popRect.width || 320;
         const popH = popRect.height || 200;
 
-        const gap = 12;    
-        const pad = 10;    
+        const gap = 12;
+        const pad = 10;
 
         const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
         const clampPos = (left, top) => ({
@@ -1065,7 +1085,7 @@ export function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
 
                 if (!overlapsPair(rightPos)) pos = rightPos;
                 else if (!overlapsPair(leftPos)) pos = leftPos;
-                else pos = below; 
+                else pos = below;
             }
         }
 
@@ -1150,7 +1170,9 @@ export function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
         getPairs: () => pairs,
         setCurrentIndex: (i) => { current = i; },
         closeEditPop,
-        updateView
+        updateView,
+        onUndo: undo,
+        onRedo: redo,
     });
     history.mount();
 
@@ -1311,6 +1333,14 @@ export function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
     };
     document.addEventListener("pointerdown", onPointerDownEditGlobal, { capture: true });
 
+    window.mountCompareDNAView = (containerId, s1, s2, mutatedIndices = []) => {
+        visualizeDNA(s1, s2, {
+            scientific: true,
+            containerId,
+            compareMutatedIndices: mutatedIndices
+        });
+    };
+
     visualizer._disposeAll = () => {
         undoBtn?.removeEventListener("click", onUndoClick);
         redoBtn?.removeEventListener("click", onRedoClick);
@@ -1413,6 +1443,24 @@ export function visualizeDNA(strand1, strand2, { scientific = false } = {}) {
     };
 
     api.dispose = () => visualizer._disposeAll?.();
+
+    api.getOriginalModel = () => ({
+        s1: originalS1.join(""),
+        s2: originalS2.join("")
+    });
+
+    api.getCurrentModel = () => ({
+        s1: s1.join(""),
+        s2: s2.join("")
+    });
+
+    api.getMutationIndices = () =>
+        getMutationIndices(
+            originalS1,
+            originalS2,
+            s1,
+            s2
+        );
 
     return api;
 }

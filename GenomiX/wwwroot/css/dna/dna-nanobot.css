@@ -1162,7 +1162,6 @@
     left: 8px;
 }
 
-/* BLOOD */
 .gx-scene__dna {
     width: 58px;
     height: 100px;
@@ -1227,7 +1226,6 @@
         animation-delay: 2s;
     }
 
-/* LUNG */
 .gx-scene__channel {
     width: 130px;
     height: 76px;
@@ -1315,7 +1313,6 @@
         animation-delay: 1.4s;
     }
 
-/* NEURO */
 .gx-neuron {
     width: 64px;
     height: 64px;
@@ -1380,7 +1377,6 @@
         animation-delay: 1.4s;
     }
 
-/* METABOLIC */
 .gx-enzyme {
     width: 72px;
     height: 72px;
@@ -2330,7 +2326,6 @@
     backdrop-filter: blur(12px);
 }
 
-    /* LEFT / RIGHT BLOCKS */
     .gx-stepviz > *:first-child,
     .gx-stepviz > *:last-child {
         display: flex;
@@ -2342,7 +2337,6 @@
         background: rgba(0,0,0,0.25);
     }
 
-/* ARROW (CENTER — NEVER BREAKS) */
 .gx-stepviz__arrow {
     display: flex;
     justify-content: center;
@@ -2354,7 +2348,6 @@
     flex-shrink: 0;
 }
 
-/* LABELS */
 .gx-stepviz__labels {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -2667,23 +2660,18 @@
     max-width: 120px;
     height: 70px;
 }
-
-    /* неврони */
     .gx-neuroviz .n {
         position: absolute;
         width: 10px;
         height: 10px;
         border-radius: 50%;
     }
-
-    /* връзки */
     .gx-neuroviz .link {
         position: absolute;
         height: 2px;
         background: rgba(0,255,255,0.6);
     }
 
-/* позиции */
 .n1 {
     top: 20%;
     left: 20%;
@@ -4854,3 +4842,16 @@
             transform: translateX(-50%) rotate(135deg);
         }
 }
+
+.gx-compare__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    height: 70vh;
+}
+
+    .gx-compare__grid > div {
+        background: rgba(255,255,255,0.03);
+        border-radius: 16px;
+        padding: 10px;
+    }

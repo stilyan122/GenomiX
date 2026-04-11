@@ -1,5 +1,7 @@
 ﻿import { parseTextareaStrict, parseFileStrict } from "./dna-utils.js";
 import { visualizeDNA } from "./dna-viewer.js";
+import { renderChromosomeAbnormalitiesCompare } from "./dna-chromosome-abnormalities.js";
+import { createCodonOverlay } from "./dna-codon-overlay.js";
 
 let lastS1 = null;
 let lastS2 = null;
@@ -7,6 +9,7 @@ let currentModel = null;
 
 let viewerApi = null;
 let currentModeSci = false;
+let codonOverlay = null;
 
 document.addEventListener("DOMContentLoaded", () => {
     const dnaSequenceInput = document.getElementById("sequence");
@@ -676,19 +679,31 @@ document.addEventListener("DOMContentLoaded", () => {
             lastS1 = m.s1;
             lastS2 = m.s2;
             api?.setInspectorData?.(m);
+            codonOverlay?.setSequence(m.s1);
         };
+    }
+
+    function ensureCodonOverlay() {
+        if (codonOverlay) return;
+        // Defer slightly so the ladder-wrap is in the DOM
+        requestAnimationFrame(() => {
+            codonOverlay = createCodonOverlay(viewerApi);
+            if (lastS1) codonOverlay.setSequence(lastS1);
+        });
     }
 
     function ensureViewer(s1, s2) {
         if (!viewerApi) {
             viewerApi = visualizeDNA(s1, s2, { scientific: currentModeSci });
             attachModelChanged(viewerApi);
+            ensureCodonOverlay();
             return viewerApi;
         }
 
         viewerApi.setModel?.(s1, s2);
         viewerApi.setScientific?.(currentModeSci);
         attachModelChanged(viewerApi);
+        codonOverlay?.setSequence(s1);
         return viewerApi;
     }
 
@@ -1060,6 +1075,111 @@ document.addEventListener("DOMContentLoaded", () => {
         };
 
         input.click();
+    });
+
+    function ensureCompareModal() {
+        let backdrop = document.getElementById("gx-compare-backdrop");
+        let modal = document.getElementById("gx-compare-modal");
+
+        if (!backdrop) {
+            backdrop = document.createElement("div");
+            backdrop.id = "gx-compare-backdrop";
+            backdrop.className = "gx-modal-backdrop";
+            backdrop.style.display = "none";
+            document.body.appendChild(backdrop);
+        }
+
+        if (!modal) {
+            modal = document.createElement("div");
+            modal.id = "gx-compare-modal";
+            modal.className = "gx-modal gx-compare-modal";
+            modal.style.display = "none";
+            document.body.appendChild(modal);
+        }
+
+        return { backdrop, modal };
+    }
+
+    function openCompareModal(original, current) {
+        const { backdrop, modal } = ensureCompareModal();
+
+        // Dispose any previous 3D chromosome scenes
+        ["gx-chrom-normal", "gx-chrom-mutated"].forEach(id => {
+            document.getElementById(id)?._gxDispose?.();
+        });
+
+        const compareTitle = currentLang === "bg" ? "Сравнение на хромозоми" : "Chromosome comparison";
+        const sameLabel = original.s1 === current.s1
+            ? (currentLang === "bg" ? " — последователностите са идентични" : " — sequences are identical")
+            : "";
+
+        modal.innerHTML = `
+        <div class="gx-compare-modal__hd">
+            <div>
+                <div class="gx-compare-modal__title">${compareTitle}</div>
+                <div style="font-size:13px;color:rgba(160,190,255,.65);margin-top:3px">
+                    ${currentLang === "bg" ? "3D интерактивен изглед • Завъртете с мишката" : "3D interactive view • Drag to rotate"}<span style="color:rgba(100,220,130,.75)">${sameLabel}</span>
+                </div>
+            </div>
+            <button type="button" class="gx-modal__close" id="gx-compare-close" aria-label="${esc(T.close)}">✕</button>
+        </div>
+
+        <div class="gx-compare-modal__body">
+            <div class="gx-chrom-compare-grid">
+                <section class="gx-chromosome-box">
+                    <div id="gx-chrom-normal"></div>
+                </section>
+                <section class="gx-chromosome-box">
+                    <div id="gx-chrom-mutated"></div>
+                </section>
+            </div>
+            <div id="gx-chrom-info"></div>
+        </div>
+    `;
+
+        backdrop.style.display = "block";
+        modal.style.display = "block";
+        document.body.classList.add("gx-ai-modal-open");
+
+        const close = () => {
+            // Dispose 3D scenes on close to free GPU memory
+            ["gx-chrom-normal", "gx-chrom-mutated"].forEach(id => {
+                document.getElementById(id)?._gxDispose?.();
+            });
+            backdrop.style.display = "none";
+            modal.style.display = "none";
+            document.body.classList.remove("gx-ai-modal-open");
+        };
+
+        backdrop.onclick = close;
+        document.getElementById("gx-compare-close")?.addEventListener("click", close);
+
+        // Slight defer so the modal is in the DOM and has dimensions
+        requestAnimationFrame(() => {
+            renderChromosomeAbnormalitiesCompare({
+                normalMount: document.getElementById("gx-chrom-normal"),
+                mutatedMount: document.getElementById("gx-chrom-mutated"),
+                infoMount: document.getElementById("gx-chrom-info"),
+                originalSequence: original.s1,
+                mutatedSequence: current.s1
+            });
+        });
+    }
+
+    const compareBtn = document.getElementById("compare-btn");
+
+    compareBtn?.addEventListener("click", () => {
+        if (!viewerApi) return;
+
+        const original = viewerApi.getOriginalModel?.();
+        const current = viewerApi.getCurrentModel?.();
+
+        if (!original || !current) {
+            alert(T.analysisFailed);
+            return;
+        }
+
+        openCompareModal(original, current);
     });
 
     visualizeBtn?.addEventListener("click", runVisualize);

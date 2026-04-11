@@ -172,10 +172,13 @@
     <value>Save model</value>
   </data>
   <data name="ScanDiseases" xml:space="preserve">
-    <value>Scan for diseases</value>
+    <value>AI analysis for genetic diseases</value>
+  </data>
+  <data name="CompareDNA" xml:space="preserve">
+    <value>Compare chromosomes</value>
   </data>
   <data name="ScanDNA" xml:space="preserve">
-    <value>Scan DNA</value>
+    <value>Scan DNA for mutations</value>
   </data>
   <data name="ScientificMode" xml:space="preserve">
     <value>Scientific Mode</value>

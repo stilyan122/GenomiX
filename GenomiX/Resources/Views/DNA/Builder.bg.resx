@@ -169,10 +169,13 @@
     <value>Запази модела</value>
   </data>
   <data name="ScanDiseases" xml:space="preserve">
-    <value>Сканирай за генни заболявания</value>
+    <value>AI анализ за генни заболявания</value>
+  </data>
+  <data name="CompareDNA" xml:space="preserve">
+    <value>Сравни хромозоми</value>
   </data>
   <data name="ScanDNA" xml:space="preserve">
-    <value>Сканирай ДНК</value>
+    <value>Сканирай ДНК за мутации</value>
   </data>
   <data name="ScientificMode" xml:space="preserve">
     <value>Научен режим</value>

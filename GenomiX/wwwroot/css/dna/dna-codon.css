@@ -1,0 +1,344 @@
+﻿/* ═══════════════════════════════════════════════════════════════════════════
+   GenomiX — Codon Reading Frame Overlay
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Push tooltip below codon bar when overlay is active ─────────────────── */
+
+.gx-codon-active .dna-tooltip {
+    top: 72px !important; /* 10px offset + 52px bar + 10px gap */
+}
+
+/* ── Codon bar clears the tooltip area ───────────────────────────────────── */
+
+.gx-codon-bar {
+    position: absolute;
+    top: 10px;
+    left: 0;
+    height: 52px;
+    z-index: 20;
+    pointer-events: none;
+    will-change: transform;
+    transition: opacity .2s;
+}
+
+    .gx-codon-bar.is-hidden {
+        display: none;
+    }
+
+/* ── Individual codon block ──────────────────────────────────────────────── */
+
+.gx-codon-block {
+    position: absolute;
+    top: 0;
+    height: 48px;
+    border-radius: 8px;
+    border: 1.5px solid color-mix(in srgb, var(--ac, #6688ff) 45%, transparent);
+    background: color-mix(in srgb, var(--ac, #6688ff) 12%, rgba(8,12,28,.88));
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    padding: 0 4px;
+    cursor: pointer;
+    pointer-events: auto;
+    overflow: hidden;
+    transition: background .14s, border-color .14s, transform .14s, box-shadow .14s;
+    user-select: none;
+}
+
+    .gx-codon-block:hover {
+        background: color-mix(in srgb, var(--ac, #6688ff) 24%, rgba(8,12,28,.95));
+        border-color: color-mix(in srgb, var(--ac, #6688ff) 75%, transparent);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px color-mix(in srgb, var(--ac, #6688ff) 30%, transparent);
+        z-index: 5;
+    }
+
+/* Stop codon: bold red styling */
+.gx-codon-block--is-stop {
+    background: rgba(200, 30, 60, .16);
+    border-color: rgba(220, 50, 80, .55);
+    border-style: dashed;
+}
+
+    .gx-codon-block--is-stop:hover {
+        background: rgba(220, 40, 70, .28);
+    }
+
+/* Start codon: bright teal */
+.gx-codon-block--is-start {
+    background: rgba(0, 200, 140, .15);
+    border-color: rgba(0, 220, 150, .55);
+    box-shadow: 0 0 10px rgba(0, 220, 150, .18);
+}
+
+    .gx-codon-block--is-start:hover {
+        background: rgba(0, 220, 150, .26);
+        box-shadow: 0 6px 22px rgba(0, 220, 150, .30);
+    }
+
+/* Partial codon (< 3 bp): faded */
+.gx-codon-block--partial {
+    opacity: .38;
+    border-style: dotted;
+    cursor: default;
+}
+
+/* Leader: unpaired bases before frame starts */
+.gx-codon-block--leader {
+    border-style: dotted;
+    border-color: rgba(255,255,255,.12);
+    background: rgba(255,255,255,.03);
+    cursor: default;
+    pointer-events: none;
+}
+
+/* ── Content inside codon blocks ─────────────────────────────────────────── */
+
+.gx-codon-block__aa {
+    font-family: ui-monospace, Menlo, Consolas, monospace;
+    font-size: 17px;
+    font-weight: 900;
+    line-height: 1;
+    color: color-mix(in srgb, var(--ac, #aaaaff) 90%, #fff);
+    letter-spacing: -.5px;
+}
+
+.gx-codon-block__mrna {
+    font-family: ui-monospace, Menlo, Consolas, monospace;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    color: color-mix(in srgb, var(--ac, #aaaaff) 65%, rgba(255,255,255,.6));
+    opacity: .85;
+    line-height: 1;
+}
+
+.gx-codon-block__partial {
+    font-size: 16px;
+    opacity: .5;
+    color: rgba(255,255,255,.5);
+}
+
+.gx-codon-block__frame-gap {
+    font-size: 10px;
+    font-weight: 700;
+    color: rgba(255,255,255,.35);
+    letter-spacing: .06em;
+}
+
+/* ── Frame picker controls ───────────────────────────────────────────────── */
+
+.gx-codon-controls {
+    position: absolute;
+    top: 68px; /* below the 52px-tall codon bar (10px offset + 52px + 6px gap) */
+    right: 14px;
+    z-index: 30;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    background: rgba(6, 10, 24, .72);
+    border: 1px solid rgba(255,255,255,.10);
+    backdrop-filter: blur(10px);
+    border-radius: 10px;
+    padding: 5px 10px;
+    pointer-events: auto;
+}
+
+    .gx-codon-controls.is-hidden {
+        display: none;
+    }
+
+.gx-codon-controls__label {
+    font-size: 11px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: rgba(160,180,230,.60);
+    white-space: nowrap;
+    user-select: none;
+}
+
+.gx-codon-controls__frames {
+    display: flex;
+    gap: 4px;
+}
+
+.gx-codon-frame-btn {
+    padding: 3px 10px;
+    border-radius: 6px;
+    border: 1px solid rgba(255,255,255,.10);
+    background: rgba(255,255,255,.05);
+    color: rgba(200,215,255,.70);
+    font-size: 11px;
+    font-weight: 800;
+    cursor: pointer;
+    letter-spacing: .04em;
+    transition: all .13s;
+    line-height: 1;
+}
+
+    .gx-codon-frame-btn:hover {
+        background: rgba(255,255,255,.10);
+        color: #fff;
+    }
+
+    .gx-codon-frame-btn.is-active {
+        background: rgba(100,140,255,.22);
+        border-color: rgba(100,140,255,.50);
+        color: rgba(180,205,255,.98);
+        box-shadow: 0 0 8px rgba(100,140,255,.20);
+    }
+
+/* ── Codon hover tooltip ─────────────────────────────────────────────────── */
+
+.gx-codon-tip {
+    position: fixed;
+    z-index: 9000;
+    width: 220px;
+    background: linear-gradient(160deg, rgba(8,12,28,.97), rgba(5,8,20,.98));
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 14px;
+    box-shadow: 0 14px 40px rgba(0,0,0,.55);
+    backdrop-filter: blur(14px);
+    padding: 0;
+    overflow: hidden;
+    pointer-events: none;
+    font-size: 13px;
+    color: rgba(220,230,255,.90);
+    animation: gxCodonTipIn .12s ease;
+}
+
+@keyframes gxCodonTipIn {
+    from {
+        opacity: 0;
+        transform: translateY(4px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.gx-codon-tip__header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    background: color-mix(in srgb, var(--ac, #6688ff) 14%, rgba(8,12,30,.90));
+    border-bottom: 1px solid rgba(255,255,255,.08);
+}
+
+.gx-codon-tip__aa {
+    font-family: ui-monospace, Menlo, Consolas, monospace;
+    font-size: 28px;
+    font-weight: 900;
+    line-height: 1;
+    color: color-mix(in srgb, var(--ac, #aabbff) 90%, #fff);
+    flex-shrink: 0;
+}
+
+.gx-codon-tip__names {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.gx-codon-tip__fullname {
+    font-weight: 700;
+    font-size: 13px;
+    color: rgba(255,255,255,.95);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.gx-codon-tip__abbr {
+    font-family: ui-monospace, Menlo, Consolas, monospace;
+    font-size: 11px;
+    color: rgba(160,180,230,.65);
+}
+
+.gx-codon-tip__row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 8px;
+    padding: 5px 14px;
+    border-bottom: 1px solid rgba(255,255,255,.04);
+}
+
+    .gx-codon-tip__row:last-of-type {
+        border-bottom: none;
+    }
+
+.gx-codon-tip__k {
+    font-size: 11px;
+    color: rgba(160,180,230,.55);
+    letter-spacing: .04em;
+    white-space: nowrap;
+}
+
+.gx-codon-tip__v {
+    font-size: 12px;
+    font-weight: 700;
+    color: rgba(220,230,255,.90);
+    text-align: right;
+}
+
+.gx-codon-tip__mrna {
+    font-family: ui-monospace, Menlo, Consolas, monospace;
+    font-size: 14px;
+    letter-spacing: .10em;
+    color: rgba(150,200,255,.95);
+}
+
+.gx-codon-tip__badge {
+    margin: 6px 14px 10px;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .10em;
+    text-align: center;
+}
+
+.gx-codon-tip__badge--start {
+    background: rgba(0,200,140,.18);
+    border: 1px solid rgba(0,220,150,.40);
+    color: rgba(100,255,200,.95);
+}
+
+.gx-codon-tip__badge--stop {
+    background: rgba(200,30,60,.18);
+    border: 1px solid rgba(220,50,80,.40);
+    color: rgba(255,130,150,.95);
+}
+
+/* ── Codons toggle button: active state ──────────────────────────────────── */
+
+#gx-codon-toggle-btn.is-active {
+    background: rgba(100,140,255,.18);
+    border-color: rgba(100,140,255,.45);
+    color: rgba(180,205,255,.98);
+}
+
+/* ── Responsive ──────────────────────────────────────────────────────────── */
+
+@media (max-width: 720px) {
+    .gx-codon-controls {
+        right: 8px;
+        padding: 4px 8px;
+    }
+
+    .gx-codon-frame-btn {
+        padding: 3px 7px;
+        font-size: 10px;
+    }
+
+    .gx-codon-tip {
+        width: 190px;
+    }
+}

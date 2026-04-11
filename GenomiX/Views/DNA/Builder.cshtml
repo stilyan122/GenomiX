@@ -63,41 +63,45 @@
 
                 <button id="history-btn" class="gx-btn gx-btn--ghost" type="button">@L["History"]</button>
 
+                <button id="scan-dna-btn" type="button" class="gx-btn gx-btn--accent">@L["ScanDNA"]</button>
+
+                <button id="scan-disease-btn"
+                        type="button"
+                        class="gx-btn gx-btn--accent"
+                        aria-label="@L["ScanDiseases"]"
+                        title="@L["ScanDiseases"]">
+                    @L["ScanDiseases"]
+                </button>
+
+                <button id="compare-btn" class="gx-btn gx-btn--ghost">
+                    @L["CompareDNA"]
+                </button>
+
+                <button id="repair-dna-btn" type="button" 
+                class="gx-btn gx-btn--danger is-hidden">@L["RepairDNA"]</button>
+
+                <button id="undo-btn"
+                        class="gx-btn gx-btn--soft"
+                        type="button"
+                        aria-label="@L["Undo"]"
+                        title="@L["Undo"]">
+                    <span class="gx-action__icon">↶</span>
+                    <span class="gx-action__text">@L["Undo"]</span>
+                </button>
+
+                <button id="redo-btn"
+                        class="gx-btn gx-btn--soft"
+                        type="button"
+                        aria-label="@L["Redo"]"
+                        title="@L["Redo"]">
+                    <span class="gx-action__icon">↷</span>
+                    <span class="gx-action__text">@L["Redo"]</span>
+                </button>
+
+                <div id="gx-helix-actions"></div>
+
                 <div class="gx-dna__viewerhint">@L["ViewerHint"]</div>
 
-                <div class="gx-dna__vieweractions">
-                    <button id="scan-dna-btn" type="button" class="gx-btn gx-btn--accent">@L["ScanDNA"]</button>
-
-                    <button id="scan-disease-btn"
-                            type="button"
-                            class="gx-btn gx-btn--accent"
-                            aria-label="@L["ScanDiseases"]"
-                            title="@L["ScanDiseases"]">
-                        @L["ScanDiseases"]
-                    </button>
-
-                    <button id="repair-dna-btn" type="button" class="gx-btn gx-btn--danger is-hidden">@L["RepairDNA"]</button>
-
-                    <button id="undo-btn"
-                            class="gx-btn gx-btn--soft"
-                            type="button"
-                            aria-label="@L["Undo"]"
-                            title="@L["Undo"]">
-                        <span class="gx-action__icon">↶</span>
-                        <span class="gx-action__text">@L["Undo"]</span>
-                    </button>
-
-                    <button id="redo-btn"
-                            class="gx-btn gx-btn--soft"
-                            type="button"
-                            aria-label="@L["Redo"]"
-                            title="@L["Redo"]">
-                        <span class="gx-action__icon">↷</span>
-                        <span class="gx-action__text">@L["Redo"]</span>
-                    </button>
-
-                    <div id="gx-helix-actions"></div>
-                </div>
             </div>
 
           <div id="dnaMount"

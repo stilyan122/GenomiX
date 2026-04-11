@@ -1,172 +1,489 @@
-﻿export function createHistoryController({
+﻿// ─── Mutation Timeline Panel ───────────────────────────────────────────────
+//
+// Full-featured side-drawer timeline showing every edit recorded in the
+// undo/redo stacks with rich descriptions, mini position strips, session
+// stats, type-filters, jump-to-position, and undo/redo-to-here support.
+
+export function createHistoryController({
     undoStack,
     redoStack,
     getPairs,
     setCurrentIndex,
     closeEditPop,
-    updateView
+    updateView,
+    onUndo,      // optional: () => void  — call the viewer's undo()
+    onRedo,      // optional: () => void  — call the viewer's redo()
 }) {
-    let historyPop = null;
-    let historyOpen = false;
-    let histList = null, histMeta = null, histEmpty = null, histUndoCount = null, histRedoCount = null;
+    // ── State ──────────────────────────────────────────────────────────────
+    let panel = null;
+    let panelOpen = false;
+    let activeFilter = "all";
+    let sessionStart = null;   // timestamp of first edit
+    let tickTimer = null;
 
     const historyBtn = document.getElementById("history-btn");
 
-    function labelForOp(op) {
-        switch (op.type) {
-            case "mutate": return `Mutate strand ${op.strand}: ${op.from} → ${op.to}`;
-            case "insert": return `Insert ${op.b1}-${op.b2}`;
-            case "delete": return `Delete ${op.b1}-${op.b2}`;
-            case "move": return `Move base`;
-            default: return op.type;
-        }
-    }
+    // ── Op metadata helpers ────────────────────────────────────────────────
 
-    function subForOp(op) {
-        const idx = (op.index ?? op.idx);
-        const baseTxt = (idx != null) ? `Base #${idx + 1}` : `—`;
-        const t = op.timestamp ? new Date(op.timestamp).toLocaleTimeString() : "";
-        return `${baseTxt}${t ? " • " + t : ""}`;
-    }
-
-    function positionHistoryPop() {
-        if (!historyPop) return;
-        const r = historyBtn?.getBoundingClientRect?.();
-        historyPop.style.position = "fixed";
-
-        const pad = 10;
-        const w = historyPop.getBoundingClientRect().width || 420;
-        const h = historyPop.getBoundingClientRect().height || 420;
-
-        let left = r ? (r.right - w) : (window.innerWidth - w - 18);
-        let top = r ? (r.bottom + 10) : 92;
-
-        left = Math.max(pad, Math.min(window.innerWidth - w - pad, left));
-        top = Math.max(pad, Math.min(window.innerHeight - h - pad, top));
-
-        historyPop.style.left = `${left}px`;
-        historyPop.style.top = `${top}px`;
-    }
-
-    function buildHistoryPop() {
-        const pop = document.createElement("div");
-        pop.className = "gx-hpop is-hidden";
-        pop.innerHTML = `
-          <div class="gx-hpop__head">
-            <div class="gx-hpop__title">History</div>
-            <div class="gx-hpop__meta" id="gx-history-meta">0 actions</div>
-            <button class="gx-hpop__x" type="button" aria-label="Close">×</button>
-          </div>
-          <div class="gx-hpop__sub">
-            <span class="gx-hcount">Undo: <strong id="gx-hist-undo-count">0</strong></span>
-            <span class="gx-hcount">Redo: <strong id="gx-hist-redo-count">0</strong></span>
-          </div>
-          <div class="gx-hpop__body">
-            <div class="gx-hpop__empty" id="gx-hist-empty" hidden>No actions yet.</div>
-            <div class="gx-history__list" id="gx-history-list"></div>
-          </div>
-        `;
-
-        pop.querySelector(".gx-hpop__x")?.addEventListener("click", closeHistory);
-
-        histList = pop.querySelector("#gx-history-list");
-        histMeta = pop.querySelector("#gx-history-meta");
-        histEmpty = pop.querySelector("#gx-hist-empty");
-        histUndoCount = pop.querySelector("#gx-hist-undo-count");
-        histRedoCount = pop.querySelector("#gx-hist-redo-count");
-
-        return pop;
-    }
-
-    function openHistory() {
-        if (!historyPop) {
-            historyPop = buildHistoryPop();
-            document.body.appendChild(historyPop);
-        }
-        historyOpen = true;
-        historyPop.classList.remove("is-hidden");
-        positionHistoryPop();
-        renderHistory();
-    }
-
-    function closeHistory() {
-        historyOpen = false;
-        historyPop?.classList.add("is-hidden");
-    }
-
-    function toggleHistory() {
-        if (historyOpen) closeHistory();
-        else openHistory();
-    }
-
-    function renderHistory() {
-        if (!histList) return;
-        histList.innerHTML = "";
-
-        const undoView = [...undoStack].reverse().map(op => ({ op, lane: "undo" }));
-        const redoView = [...redoStack].reverse().map(op => ({ op, lane: "redo" }));
-        const all = [...undoView, ...redoView];
-
-        const total = all.length;
-        if (histMeta) histMeta.textContent = `${total} action${total === 1 ? "" : "s"}`;
-
-        const pairs = getPairs();
-        for (const { op, lane } of all) {
-            const el = document.createElement("div");
-            el.className =
-                `gx-hitem gx-hitem--${op.type} ` +
-                (lane === "redo" ? "gx-hitem--redoable" : "gx-hitem--undoable");
-
-            el.innerHTML = `
-                <div class="gx-hitem__left">
-                  <div class="gx-hitem__top">${labelForOp(op)}</div>
-                  <div class="gx-hitem__sub">${subForOp(op)}</div>
-                </div>
-                <div class="gx-hitem__tag">${op.type}</div>
-              `;
-
-            el.addEventListener("click", () => {
-                const idx = (op.index ?? op.idx);
-                if (typeof idx === "number" && idx >= 0 && idx < pairs.length) {
-                    setCurrentIndex(idx);
-                    closeEditPop();
-                    updateView();
-                }
-            });
-
-            histList.appendChild(el);
-        }
-
-        if (histUndoCount) histUndoCount.textContent = String(undoStack.length);
-        if (histRedoCount) histRedoCount.textContent = String(redoStack.length);
-        if (histEmpty) histEmpty.hidden = total !== 0;
-    }
-
-    const onPointerDownHistory = (e) => {
-        if (!historyOpen || !historyPop) return;
-        const t = e.target;
-        if (historyPop.contains(t)) return;
-        if (historyBtn && historyBtn.contains(t)) return;
-        closeHistory();
+    const OP_META = {
+        mutate: { label: "Substitution", short: "SUB", color: "#7090ff", icon: "⇄" },
+        insert: { label: "Insertion", short: "INS", color: "#44e887", icon: "+" },
+        delete: { label: "Deletion", short: "DEL", color: "#ff5566", icon: "−" },
+        move: { label: "Move", short: "MOV", color: "#ffd54f", icon: "↕" },
     };
 
-    function onHistoryBtnClick() { toggleHistory(); }
+    function meta(type) { return OP_META[type] ?? { label: type, short: type, color: "#aaa", icon: "•" }; }
+
+    const BASE_COLOR = { A: "#5fe8a0", T: "#ff7b7b", C: "#7ca8ff", G: "#ffd97a" };
+    function baseHtml(b) {
+        const col = BASE_COLOR[b] ?? "#ccc";
+        return `<span class="gx-tl-base" style="--bc:${col}">${b}</span>`;
+    }
+
+    function describeOp(op) {
+        switch (op.type) {
+            case "mutate":
+                return `Strand ${op.strand} · pos <strong>${(op.index ?? 0) + 1}</strong> · ${baseHtml(op.from)} → ${baseHtml(op.to)}${op.reason === "repair" ? ' <span class="gx-tl-tag-repair">repair</span>' : ""}`;
+            case "insert":
+                return `pos <strong>${(op.index ?? 0) + 1}</strong> · inserted ${baseHtml(op.b1)}–${baseHtml(op.b2)}`;
+            case "delete":
+                return `pos <strong>${(op.index ?? 0) + 1}</strong> · removed ${baseHtml(op.b1)}–${baseHtml(op.b2)}`;
+            case "move":
+                return `pos <strong>${(op.from ?? 0) + 1}</strong> → pos <strong>${(op.to ?? 0) + 1}</strong>`;
+            default:
+                return op.type;
+        }
+    }
+
+    // ── Session time ───────────────────────────────────────────────────────
+
+    function fmtDuration(ms) {
+        const s = Math.floor(ms / 1000);
+        if (s < 60) return `${s}s`;
+        const m = Math.floor(s / 60), ss = s % 60;
+        if (m < 60) return `${m}m ${ss}s`;
+        const h = Math.floor(m / 60), mm = m % 60;
+        return `${h}h ${mm}m`;
+    }
+
+    function fmtRelTime(ts) {
+        const diff = Date.now() - ts;
+        const s = Math.floor(diff / 1000);
+        if (s < 5) return "just now";
+        if (s < 60) return `${s}s ago`;
+        const m = Math.floor(s / 60);
+        if (m < 60) return `${m}m ago`;
+        return `${Math.floor(m / 60)}h ago`;
+    }
+
+    function fmtTimestamp(ts) {
+        return new Date(ts).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+    }
+
+    // ── Stats ─────────────────────────────────────────────────────────────
+
+    function computeStats() {
+        const all = [...undoStack, ...redoStack];
+        const byType = {};
+        let netLen = 0;
+        const positions = new Set();
+
+        all.forEach(op => {
+            byType[op.type] = (byType[op.type] || 0) + 1;
+            if (op.type === "insert") netLen++;
+            if (op.type === "delete") netLen--;
+            const idx = op.index ?? op.idx ?? op.from ?? null;
+            if (idx != null) positions.add(idx);
+        });
+
+        return { total: all.length, byType, netLen, positions: positions.size };
+    }
+
+    // ── Mini position strip ────────────────────────────────────────────────
+
+    function makeStrip(opIndex, seqLen, opType) {
+        const W = 200, H = 12;
+        const safLen = Math.max(1, seqLen);
+        const pct = Math.min(1, Math.max(0, opIndex / safLen));
+        const px = Math.round(pct * (W - 6)) + 3;
+        const col = meta(opType).color;
+
+        return `<svg class="gx-tl-strip" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" aria-hidden="true">
+            <rect x="0" y="4" width="${W}" height="4" rx="2" fill="rgba(255,255,255,0.07)"/>
+            <rect x="${px - 3}" y="1" width="6" height="10" rx="3" fill="${col}" opacity="0.85"/>
+            <rect x="${px - 1}" y="3" width="2" height="6" rx="1" fill="white" opacity="0.6"/>
+        </svg>`;
+    }
+
+    // ── Copy report ────────────────────────────────────────────────────────
+
+    function buildTextReport() {
+        const stats = computeStats();
+        const all = [...undoStack].reverse();
+        const lines = ["=== GenomiX Mutation Timeline ===",
+            `Date: ${new Date().toLocaleString()}`,
+            `Total edits: ${stats.total}  |  Net bp change: ${stats.netLen >= 0 ? "+" : ""}${stats.netLen}  |  Positions touched: ${stats.positions}`,
+            ""];
+
+        all.forEach((op, i) => {
+            const m = meta(op.type);
+            const pos = (op.index ?? op.idx ?? op.from ?? "?") + 1;
+            let detail = "";
+            if (op.type === "mutate") detail = `strand ${op.strand}: ${op.from} → ${op.to}`;
+            if (op.type === "insert") detail = `+${op.b1}-${op.b2}`;
+            if (op.type === "delete") detail = `-${op.b1}-${op.b2}`;
+            if (op.type === "move") detail = `${(op.from ?? 0) + 1} → ${(op.to ?? 0) + 1}`;
+            lines.push(`${String(i + 1).padStart(3, " ")}.  [${m.short}]  pos ${String(pos).padStart(5)}  ${detail.padEnd(20)}  ${fmtTimestamp(op.timestamp)}`);
+        });
+
+        return lines.join("\n");
+    }
+
+    // ── Jump / undo-to-here ────────────────────────────────────────────────
+
+    function jumpToPos(op) {
+        const idx = op.index ?? op.idx ?? op.from ?? null;
+        if (idx == null) return;
+        setCurrentIndex(idx);
+        closeEditPop();
+        updateView();
+    }
+
+    function undoToEntry(undoStackIndex) {
+        // undoStackIndex: position in undoStack (0=oldest, length-1=most recent)
+        // we want state after applying op[undoStackIndex]
+        // so undo (undoStack.length - 1 - undoStackIndex) times
+        if (!onUndo) return;
+        const steps = undoStack.length - 1 - undoStackIndex;
+        for (let i = 0; i < steps; i++) onUndo();
+    }
+
+    function redoToEntry(redoStackIndex) {
+        // redoStackIndex: position in redoStack (0=oldest-undone, length-1=most-recently-undone)
+        // to restore up to and including redoStack[redoStackIndex]
+        // redo (redoStack.length - redoStackIndex) times
+        if (!onRedo) return;
+        const steps = redoStack.length - redoStackIndex;
+        for (let i = 0; i < steps; i++) onRedo();
+    }
+
+    // ── Build panel DOM ────────────────────────────────────────────────────
+
+    function buildPanel() {
+        const el = document.createElement("div");
+        el.id = "gx-timeline-panel";
+        el.className = "gx-tl-panel";
+        el.innerHTML = `
+            <div class="gx-tl-header">
+                <div class="gx-tl-header__left">
+                    <span class="gx-tl-header__icon">🧬</span>
+                    <span class="gx-tl-header__title">Mutation Timeline</span>
+                </div>
+                <button class="gx-tl-header__close" id="gx-tl-close" aria-label="Close">✕</button>
+            </div>
+
+            <div class="gx-tl-stats" id="gx-tl-stats">
+                <div class="gx-tl-stat">
+                    <div class="gx-tl-stat__v" id="gx-tls-total">0</div>
+                    <div class="gx-tl-stat__k">edits</div>
+                </div>
+                <div class="gx-tl-stat">
+                    <div class="gx-tl-stat__v" id="gx-tls-net">+0 bp</div>
+                    <div class="gx-tl-stat__k">net change</div>
+                </div>
+                <div class="gx-tl-stat">
+                    <div class="gx-tl-stat__v" id="gx-tls-pos">0</div>
+                    <div class="gx-tl-stat__k">positions</div>
+                </div>
+                <div class="gx-tl-stat">
+                    <div class="gx-tl-stat__v" id="gx-tls-time">—</div>
+                    <div class="gx-tl-stat__k">session</div>
+                </div>
+            </div>
+
+            <div class="gx-tl-filters" id="gx-tl-filters">
+                <button class="gx-tl-filter is-active" data-filter="all">All</button>
+                <button class="gx-tl-filter gx-tl-filter--mutate" data-filter="mutate">Sub</button>
+                <button class="gx-tl-filter gx-tl-filter--insert" data-filter="insert">Ins</button>
+                <button class="gx-tl-filter gx-tl-filter--delete" data-filter="delete">Del</button>
+                <button class="gx-tl-filter gx-tl-filter--move"   data-filter="move">Mov</button>
+            </div>
+
+            <div class="gx-tl-body" id="gx-tl-body">
+                <div class="gx-tl-empty" id="gx-tl-empty">
+                    <div class="gx-tl-empty__icon">✏️</div>
+                    <div class="gx-tl-empty__text">No edits yet.<br>Start modifying your DNA to see the timeline.</div>
+                </div>
+            </div>
+
+            <div class="gx-tl-footer">
+                <button class="gx-tl-footer-btn gx-tl-footer-btn--copy" id="gx-tl-copy">📋 Copy report</button>
+                <div class="gx-tl-footer-count" id="gx-tl-footer-count"></div>
+            </div>
+        `;
+
+        document.body.appendChild(el);
+
+        el.querySelector("#gx-tl-close")?.addEventListener("click", closePanel);
+
+        el.querySelector("#gx-tl-filters")?.addEventListener("click", e => {
+            const btn = e.target.closest("[data-filter]");
+            if (!btn) return;
+            activeFilter = btn.dataset.filter;
+            el.querySelectorAll(".gx-tl-filter").forEach(b => b.classList.toggle("is-active", b.dataset.filter === activeFilter));
+            renderTimeline();
+        });
+
+        el.querySelector("#gx-tl-copy")?.addEventListener("click", async () => {
+            try {
+                await navigator.clipboard.writeText(buildTextReport());
+                const btn = el.querySelector("#gx-tl-copy");
+                const orig = btn.textContent;
+                btn.textContent = "✓ Copied!";
+                setTimeout(() => { btn.textContent = orig; }, 1800);
+            } catch { /* ignore */ }
+        });
+
+        return el;
+    }
+
+    // ── Render entry ───────────────────────────────────────────────────────
+
+    function renderEntry({ op, lane, stepNum, undoIdx, redoIdx, seqLen }) {
+        const m = meta(op.type);
+        const isUndo = lane === "undo";
+        const el = document.createElement("div");
+        const opIndex = op.index ?? op.idx ?? op.from ?? 0;
+
+        el.className = `gx-tl-entry gx-tl-entry--${op.type} ${isUndo ? "" : "gx-tl-entry--undone"}`;
+        el.dataset.opId = op.id;
+
+        const stepsAway = isUndo
+            ? (undoIdx != null ? undoStack.length - 1 - undoIdx : null)
+            : (redoIdx != null ? redoStack.length - redoIdx : null);
+
+        const jumpBtn = (typeof opIndex === "number")
+            ? `<button class="gx-tl-act gx-tl-act--goto" data-action="goto">Go to pos</button>`
+            : "";
+
+        let restoreBtn = "";
+        if (onUndo && isUndo && stepsAway > 0)
+            restoreBtn = `<button class="gx-tl-act gx-tl-act--undo" data-action="undo-to">Undo to here</button>`;
+        if (onRedo && !isUndo)
+            restoreBtn = `<button class="gx-tl-act gx-tl-act--redo" data-action="redo-to">Redo to here</button>`;
+
+        el.innerHTML = `
+            <div class="gx-tl-entry__track">
+                <div class="gx-tl-entry__dot" style="--dc:${m.color}">
+                    <span class="gx-tl-entry__dot-icon">${m.icon}</span>
+                </div>
+                <div class="gx-tl-entry__line"></div>
+            </div>
+
+            <div class="gx-tl-entry__card">
+                <div class="gx-tl-entry__top">
+                    <span class="gx-tl-badge" style="--bc:${m.color}">${m.short}</span>
+                    <span class="gx-tl-entry__step">#${stepNum}</span>
+                    <span class="gx-tl-entry__time" title="${fmtTimestamp(op.timestamp)}">${fmtRelTime(op.timestamp)}</span>
+                    ${!isUndo ? `<span class="gx-tl-entry__undone-tag">undone</span>` : ""}
+                </div>
+
+                <div class="gx-tl-entry__desc">${describeOp(op)}</div>
+
+                <div class="gx-tl-entry__strip" title="Position in sequence">
+                    ${makeStrip(opIndex, seqLen, op.type)}
+                    <span class="gx-tl-entry__strip-label">pos ${opIndex + 1} / ${seqLen}</span>
+                </div>
+
+                ${(jumpBtn || restoreBtn) ? `<div class="gx-tl-entry__actions">${jumpBtn}${restoreBtn}</div>` : ""}
+            </div>
+        `;
+
+        // Action button clicks
+        el.addEventListener("click", e => {
+            const action = e.target.closest("[data-action]")?.dataset.action;
+            if (!action) return;
+            e.stopPropagation();
+
+            if (action === "goto") {
+                jumpToPos(op);
+            } else if (action === "undo-to" && undoIdx != null) {
+                undoToEntry(undoIdx);
+            } else if (action === "redo-to" && redoIdx != null) {
+                redoToEntry(redoIdx);
+            }
+        });
+
+        return el;
+    }
+
+    // ── Render full timeline ───────────────────────────────────────────────
+
+    function renderTimeline() {
+        if (!panel) return;
+
+        const body = panel.querySelector("#gx-tl-body");
+        const empty = panel.querySelector("#gx-tl-empty");
+        const footCount = panel.querySelector("#gx-tl-footer-count");
+
+        if (!body) return;
+
+        const stats = computeStats();
+        const seqLen = getPairs().length;
+
+        // Update stats bar
+        panel.querySelector("#gx-tls-total").textContent = stats.total;
+        panel.querySelector("#gx-tls-net").textContent = (stats.netLen >= 0 ? "+" : "") + stats.netLen + " bp";
+        panel.querySelector("#gx-tls-pos").textContent = stats.positions;
+        if (sessionStart) {
+            panel.querySelector("#gx-tls-time").textContent = fmtDuration(Date.now() - sessionStart);
+        }
+
+        // Build ordered list: undoStack newest-first, then redoStack newest-first
+        const entries = [];
+        let globalStep = undoStack.length + redoStack.length;
+
+        // undoStack: index 0=oldest ... length-1=most recent
+        for (let i = undoStack.length - 1; i >= 0; i--) {
+            entries.push({ op: undoStack[i], lane: "undo", stepNum: globalStep--, undoIdx: i, redoIdx: null });
+        }
+
+        // Current-state divider marker
+        entries.push({ divider: true });
+
+        // redoStack: index length-1=most-recently-undone ... 0=oldest-undone
+        for (let j = redoStack.length - 1; j >= 0; j--) {
+            entries.push({ op: redoStack[j], lane: "redo", stepNum: globalStep--, undoIdx: null, redoIdx: j });
+        }
+
+        // Filter
+        const filtered = entries.filter(e => e.divider || activeFilter === "all" || e.op.type === activeFilter);
+
+        // Render
+        body.innerHTML = "";
+
+        if (stats.total === 0) {
+            body.appendChild(empty || document.createElement("div"));
+            if (empty) { empty.hidden = false; body.appendChild(empty); }
+            if (footCount) footCount.textContent = "";
+            return;
+        }
+
+        if (empty) empty.hidden = true;
+
+        let renderedCount = 0;
+
+        filtered.forEach(e => {
+            if (e.divider) {
+                const div = document.createElement("div");
+                div.className = "gx-tl-divider";
+                div.innerHTML = `<span class="gx-tl-divider__label">▶ Current state</span>`;
+                body.appendChild(div);
+                return;
+            }
+            renderedCount++;
+            body.appendChild(renderEntry({ ...e, seqLen }));
+        });
+
+        if (footCount) footCount.textContent = renderedCount > 0 ? `${renderedCount} entries` : "";
+    }
+
+    // ── Session timer tick ─────────────────────────────────────────────────
+
+    function startTick() {
+        if (tickTimer) return;
+        tickTimer = setInterval(() => {
+            if (!panelOpen || !panel) return;
+            if (!sessionStart) return;
+            const el = panel.querySelector("#gx-tls-time");
+            if (el) el.textContent = fmtDuration(Date.now() - sessionStart);
+        }, 1000);
+    }
+
+    // ── Open / close ───────────────────────────────────────────────────────
+
+    function openPanel() {
+        if (!panel) panel = buildPanel();
+        panelOpen = true;
+        panel.classList.add("is-open");
+        historyBtn?.classList.add("is-active");
+        // Shift main content so page stays centered in the visible area
+        const panelW = window.innerWidth <= 860 ? 0 : 400;
+        document.body.style.transition = "padding-right .32s cubic-bezier(.4,0,.2,1)";
+        document.body.style.paddingRight = panelW ? `${panelW}px` : "";
+        renderTimeline();
+        startTick();
+    }
+
+    function closePanel() {
+        panelOpen = false;
+        panel?.classList.remove("is-open");
+        historyBtn?.classList.remove("is-active");
+        document.body.style.paddingRight = "";
+    }
+
+    function togglePanel() {
+        if (panelOpen) closePanel();
+        else openPanel();
+    }
+
+    // ── Public: renderHistory (called by viewer on every record/undo/redo) ──
+
+    function renderHistory() {
+        // Track first edit timestamp
+        if (undoStack.length > 0 && !sessionStart) {
+            sessionStart = undoStack[0].timestamp;
+        }
+
+        if (panelOpen) renderTimeline();
+
+        // Update button badge
+        updateHistoryBtn();
+    }
+
+    function updateHistoryBtn() {
+        if (!historyBtn) return;
+        const total = undoStack.length + redoStack.length;
+        let badge = historyBtn.querySelector(".gx-hbtn-badge");
+        if (total > 0) {
+            if (!badge) {
+                badge = document.createElement("span");
+                badge.className = "gx-hbtn-badge";
+                historyBtn.appendChild(badge);
+            }
+            badge.textContent = total;
+        } else if (badge) {
+            badge.remove();
+        }
+    }
+
+    // ── Mount / dispose ────────────────────────────────────────────────────
+
+    const onOutsideClick = e => {
+        if (!panelOpen || !panel) return;
+        if (panel.contains(e.target)) return;
+        if (historyBtn?.contains(e.target)) return;
+        closePanel();
+    };
 
     function mount() {
-        historyBtn?.addEventListener("click", onHistoryBtnClick);
-        document.addEventListener("pointerdown", onPointerDownHistory, { capture: true });
+        historyBtn?.addEventListener("click", togglePanel);
+        document.addEventListener("pointerdown", onOutsideClick, { capture: true });
     }
 
     function dispose() {
-        historyBtn?.removeEventListener("click", onHistoryBtnClick);
-        document.removeEventListener("pointerdown", onPointerDownHistory, { capture: true });
-
-        historyPop?.remove();
-        historyPop = null;
-        historyOpen = false;
-
-        histList = histMeta = histEmpty = histUndoCount = histRedoCount = null;
+        clearInterval(tickTimer);
+        tickTimer = null;
+        historyBtn?.removeEventListener("click", togglePanel);
+        document.removeEventListener("pointerdown", onOutsideClick, { capture: true });
+        panel?.remove();
+        panel = null;
+        panelOpen = false;
+        sessionStart = null;
     }
+
+    // Legacy compat: expose closeHistory for any existing callers
+    function closeHistory() { closePanel(); }
 
     return { mount, dispose, renderHistory, closeHistory };
 }

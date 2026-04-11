@@ -639,6 +639,7 @@ function buildBaseRing(letter, center, basisX, basisY, size = 0.24) {
 
 export function mountHelix3D(strand1, strand2, mount, initialIndex = null, opts = {}) {
     const SHOW_DETAIL_PANEL = opts?.detailPanel !== false;
+    const mutatedSet = new Set(opts?.mutatedIndices || []);
 
     if (!mount) throw new Error("mountHelix3D: missing mount element");
     if (!mount.style.minHeight) mount.style.minHeight = "460px";
@@ -1018,6 +1019,39 @@ export function mountHelix3D(strand1, strand2, mount, initialIndex = null, opts 
         setTab("mol");
     }
 
+    function isMutatedVisualIndex(vi) {
+        const seqIndex = REV ? (N - 1 - vi) : vi;
+        return mutatedSet.has(seqIndex);
+    }
+
+    function applyBaseVisual(mesh, isMutated, isActive = false, isHovered = false) {
+        if (!mesh?.material) return;
+
+        const m = mesh.material;
+
+        if (isMutated) {
+            m.emissive.setHex(0xff2a55);
+            m.emissiveIntensity = isActive ? 1.35 : isHovered ? 1.05 : 0.72;
+            mesh.scale.setScalar(isActive ? 1.55 : isHovered ? 1.24 : 1.08);
+        } else {
+            m.emissive.setHex(isActive || isHovered ? 0xffffff : 0x000000);
+            m.emissiveIntensity = isActive ? 0.38 : isHovered ? 0.28 : 0.0;
+            mesh.scale.setScalar(isActive ? 1.45 : isHovered ? 1.18 : 1.0);
+        }
+    }
+
+    function applyRungVisual(rung, baseOpacity, isMutated, isActive = false) {
+        if (!rung?.material) return;
+
+        if (isMutated) {
+            rung.material.color.setHex(0xff4b6e);
+            rung.material.opacity = isActive ? 1.0 : Math.max(0.92, baseOpacity);
+        } else {
+            rung.material.color.setHex(0xffffff);
+            rung.material.opacity = isActive ? Math.min(1, baseOpacity * 1.6) : baseOpacity;
+        }
+    }
+
     function hideDetailPanel() {
         bpPreview?.dispose?.();
         bpPreview = null;
@@ -1174,13 +1208,24 @@ export function mountHelix3D(strand1, strand2, mount, initialIndex = null, opts 
         const x2 = -x1, y2 = -y1;
 
         const b1 = strand1[si], b2 = strand2[si];
+        const isMutated = mutatedSet.has(si);
 
         const m1 = new THREE.Mesh(baseGeom, new THREE.MeshStandardMaterial({
-            color: baseHex[b1] ?? 0xffffff, metalness: 0.05, roughness: 0.35, emissive: 0x000000, emissiveIntensity: 0
+            color: baseHex[b1] ?? 0xffffff,
+            metalness: 0.05,
+            roughness: 0.35,
+            emissive: isMutated ? 0xff2a55 : 0x000000,
+            emissiveIntensity: isMutated ? 0.72 : 0
         }));
+
         const m2 = new THREE.Mesh(baseGeom, new THREE.MeshStandardMaterial({
-            color: baseHex[b2] ?? 0xffffff, metalness: 0.05, roughness: 0.35, emissive: 0x000000, emissiveIntensity: 0
+            color: baseHex[b2] ?? 0xffffff,
+            metalness: 0.05,
+            roughness: 0.35,
+            emissive: isMutated ? 0xff2a55 : 0x000000,
+            emissiveIntensity: isMutated ? 0.72 : 0
         }));
+
 
         m1.position.set(x1, y1, z);
         m2.position.set(x2, y2, z);
@@ -1193,6 +1238,11 @@ export function mountHelix3D(strand1, strand2, mount, initialIndex = null, opts 
         back1.push(m1.position.clone());
         back2.push(m2.position.clone());
 
+        if (isMutated) {
+            m1.scale.setScalar(1.08);
+            m2.scale.setScalar(1.08);
+        }
+
         const baseOp =
             ((b1 === "A" && b2 === "T") || (b1 === "T" && b2 === "A")) ? 0.50 :
                 ((b1 === "C" && b2 === "G") || (b1 === "G" && b2 === "C")) ? 0.85 : 0.20;
@@ -1204,6 +1254,11 @@ export function mountHelix3D(strand1, strand2, mount, initialIndex = null, opts 
         rung.position.copy(mid);
         rung.lookAt(m2.position);
         rung.rotateX(Math.PI / 2);
+
+        if (isMutated) {
+            rung.material.color.setHex(0xff4b6e);
+            rung.material.opacity = Math.max(0.92, baseOp);
+        }
 
         globalGroup.add(rung);
         rungMeshes.push(rung);
@@ -1394,21 +1449,41 @@ export function mountHelix3D(strand1, strand2, mount, initialIndex = null, opts 
     let hoverIndex = -1;
     function clearHover(i) {
         if (i < 0) return;
-        const a = baseMeshes1[i], b = baseMeshes2[i];
-        if (a) { a.scale.setScalar(1); a.material.emissive.setHex(0); a.material.emissiveIntensity = 0; }
-        if (b) { b.scale.setScalar(1); b.material.emissive.setHex(0); b.material.emissiveIntensity = 0; }
+
+        const a = baseMeshes1[i];
+        const b = baseMeshes2[i];
+        const isMut = isMutatedVisualIndex(i);
+
+        applyBaseVisual(a, isMut, false, false);
+        applyBaseVisual(b, isMut, false, false);
     }
     function setHover(i) {
         if (i === hoverIndex) return;
+
         clearHover(hoverIndex);
         hoverIndex = i;
-        if (hoverIndex < 0) { hoverRing1.visible = hoverRing2.visible = false; return; }
-        const a = baseMeshes1[hoverIndex], b = baseMeshes2[hoverIndex];
-        a.scale.setScalar(1.18); b.scale.setScalar(1.18);
-        a.material.emissive.setHex(0xffffff); b.material.emissive.setHex(0xffffff);
-        a.material.emissiveIntensity = 0.28; b.material.emissiveIntensity = 0.28;
+
+        if (hoverIndex < 0) {
+            hoverRing1.visible = hoverRing2.visible = false;
+            return;
+        }
+
+        const a = baseMeshes1[hoverIndex];
+        const b = baseMeshes2[hoverIndex];
+        const isMut = isMutatedVisualIndex(hoverIndex);
+
+        applyBaseVisual(a, isMut, false, true);
+        applyBaseVisual(b, isMut, false, true);
+
         hoverRing1.position.copy(a.position);
         hoverRing2.position.copy(b.position);
+
+        if (isMut) {
+            hoverRingMat.color.setHex(0xff5a7a);
+        } else {
+            hoverRingMat.color.setHex(0x7ee6ff);
+        }
+
         hoverRing1.visible = hoverRing2.visible = true;
     }
 
@@ -1451,25 +1526,26 @@ export function mountHelix3D(strand1, strand2, mount, initialIndex = null, opts 
         if (vi < 0 || vi >= N) return;
 
         if (active >= 0) {
-            baseMeshes1[active].scale.set(1, 1, 1);
-            baseMeshes2[active].scale.set(1, 1, 1);
-            baseMeshes1[active].material.emissive.setHex(0x000000);
-            baseMeshes2[active].material.emissive.setHex(0x000000);
-            baseMeshes1[active].material.emissiveIntensity = 0;
-            baseMeshes2[active].material.emissiveIntensity = 0;
-            rungMeshes[active].material.opacity = rungBaseOpacity[active];
+            const wasMut = isMutatedVisualIndex(active);
+
+            applyBaseVisual(baseMeshes1[active], wasMut, false, false);
+            applyBaseVisual(baseMeshes2[active], wasMut, false, false);
+            applyRungVisual(rungMeshes[active], rungBaseOpacity[active], wasMut, false);
         }
 
         active = vi;
 
-        baseMeshes1[vi].scale.set(1.45, 1.45, 1.45);
-        baseMeshes2[vi].scale.set(1.45, 1.45, 1.45);
-        baseMeshes1[vi].material.emissive.setHex(0xffffff);
-        baseMeshes2[vi].material.emissive.setHex(0xffffff);
-        baseMeshes1[vi].material.emissiveIntensity = 0.38;
-        baseMeshes2[vi].material.emissiveIntensity = 0.38;
+        const isMut = isMutatedVisualIndex(vi);
 
-        rungMeshes[vi].material.opacity = Math.min(1, rungBaseOpacity[vi] * 1.6);
+        applyBaseVisual(baseMeshes1[vi], isMut, true, false);
+        applyBaseVisual(baseMeshes2[vi], isMut, true, false);
+        applyRungVisual(rungMeshes[vi], rungBaseOpacity[vi], isMut, true);
+
+        if (isMut) {
+            ringMat.color.setHex(0xff4b6e);
+        } else {
+            ringMat.color.setHex(0xffffff);
+        }
 
         ring1.position.copy(baseMeshes1[vi].position);
         ring2.position.copy(baseMeshes2[vi].position);
