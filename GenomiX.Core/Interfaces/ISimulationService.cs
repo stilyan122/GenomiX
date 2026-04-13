@@ -67,5 +67,10 @@ namespace GenomiX.Core.Interfaces
         /// <param name="userId">The unique identifier of the user for whom the population will be deleted.</param>
         /// <param name="populationId">The unique identifier of the population to delete.</param>
         Task DeleteForUserAsync(Guid userId, Guid populationId);
+
+        /// <summary>
+        /// Saves the current organism states (status, fitness) from the canvas back to the database.
+        /// </summary>
+        Task SaveStateAsync(Guid userId, Guid populationId, List<(Guid id, string status, double fitness)> organisms);
     }
 }

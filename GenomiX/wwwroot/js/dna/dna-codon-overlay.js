@@ -59,8 +59,6 @@ const CAT_LABELS = {
 
 function aaData(letter) { return AA[letter] ?? AA["?"]; }
 
-// ── DNA → mRNA (coding strand convention: T → U) ──────────────────────────
-
 function toMRNA(dna) { return dna.toUpperCase().replace(/T/g, "U"); }
 
 function codonInfo(dnaTriplet) {

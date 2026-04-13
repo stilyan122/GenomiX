@@ -2,7 +2,7 @@
 @inject Microsoft.AspNetCore.Mvc.Localization.IViewLocalizer L
 
 @{
-    ViewData["Title"] = L["SimCreate_PageTitle"];
+    ViewData["Title"] = L["SimCreate_PageTitle"].Value;
     ViewData["ActiveNav"] = "simulations";
 }
 
@@ -34,6 +34,13 @@
                     </div>
 
                     <div class="gx-field">
+                        <label class="gx-label" asp-for="Size">@L["SimCreate_PopulationSize_Label"]</label>
+                        <input class="gx-input" asp-for="Size" type="number" min="2" max="5000" step="1" />
+                        <div class="gx-help">@L["SimCreate_PopulationSize_Help"]</div>
+                        <span class="gx-val" asp-validation-for="Size"></span>
+                    </div>
+
+                    <div class="gx-field">
                         <label class="gx-label" for="Species">@L["SimCreate_OrganismType_Label"]</label>
                         <select class="gx-select" id="Species" name="Species">
                             <option value="mouse">@L["SimCreate_Species_Mouse"]</option>
@@ -58,13 +65,6 @@
                             }
                         </select>
                         <span class="gx-val" asp-validation-for="BaseModelId"></span>
-                    </div>
-
-                    <div class="gx-field">
-                        <label class="gx-label" asp-for="Size">@L["SimCreate_PopulationSize_Label"]</label>
-                        <input class="gx-input" asp-for="Size" type="number" min="2" max="5000" step="1" />
-                        <div class="gx-help">@L["SimCreate_PopulationSize_Help"]</div>
-                        <span class="gx-val" asp-validation-for="Size"></span>
                     </div>
                 </div>
 

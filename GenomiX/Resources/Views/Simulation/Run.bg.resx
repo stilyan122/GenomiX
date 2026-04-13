@@ -1,128 +1,168 @@
 <?xml version="1.0" encoding="utf-8"?>
 <root>
-  <resheader name="resmimetype">
-    <value>text/microsoft-resx</value>
-  </resheader>
-  <resheader name="version">
-    <value>2.0</value>
-  </resheader>
-  <resheader name="reader">
-    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </resheader>
-  <resheader name="writer">
-    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </resheader>
+	<resheader name="resmimetype">
+		<value>text/microsoft-resx</value>
+	</resheader>
+	<resheader name="version">
+		<value>2.0</value>
+	</resheader>
+	<resheader name="reader">
+		<value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+	</resheader>
+	<resheader name="writer">
+		<value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+	</resheader>
 
-  <data name="SimRun_PageTitle" xml:space="preserve">
+	<data name="SimRun_PageTitle" xml:space="preserve">
     <value>Стартирай симулация</value>
   </data>
 
-  <data name="SimRun_Kicker_Simulation" xml:space="preserve">
+	<data name="SimRun_Kicker_Simulation" xml:space="preserve">
     <value>Симулация</value>
   </data>
 
-  <data name="SimRun_Sub_LiveEnvironment" xml:space="preserve">
+	<data name="SimRun_Sub_LiveEnvironment" xml:space="preserve">
     <value>Контрол на средата на живо</value>
   </data>
 
-  <data name="SimRun_Sub_DNA" xml:space="preserve">
+	<data name="SimRun_Sub_DNA" xml:space="preserve">
     <value>ДНК</value>
   </data>
 
-  <data name="SimRun_Sub_Run" xml:space="preserve">
+	<data name="SimRun_Sub_Run" xml:space="preserve">
     <value>Рън</value>
   </data>
 
-  <data name="Common_Back" xml:space="preserve">
+	<data name="Common_Back" xml:space="preserve">
     <value>Назад</value>
   </data>
 
-  <data name="SimRun_Btn_Start" xml:space="preserve">
+	<data name="SimRun_Btn_Start" xml:space="preserve">
     <value>Старт</value>
   </data>
 
-  <data name="SimRun_Btn_Tick10" xml:space="preserve">
+	<data name="SimRun_Btn_Tick10" xml:space="preserve">
     <value>Тик ×10</value>
   </data>
 
-  <data name="SimRun_Btn_Pause" xml:space="preserve">
+	<data name="SimRun_Btn_Pause" xml:space="preserve">
     <value>Пауза</value>
   </data>
 
-  <data name="SimRun_Scenario_Placeholder" xml:space="preserve">
+	<data name="SimRun_Scenario_Placeholder" xml:space="preserve">
     <value>Сценарий…</value>
   </data>
 
-  <data name="SimRun_Btn_Apply" xml:space="preserve">
+	<data name="SimRun_Btn_Apply" xml:space="preserve">
     <value>Приложи</value>
   </data>
 
-  <data name="SimRun_Hud_Alive" xml:space="preserve">
+	<data name="SimRun_Hud_Alive" xml:space="preserve">
     <value>Живи</value>
   </data>
 
-  <data name="SimRun_Hud_Dead" xml:space="preserve">
+	<data name="SimRun_Hud_Dead" xml:space="preserve">
     <value>Мъртви</value>
   </data>
 
-  <data name="SimRun_Hud_Reproduced" xml:space="preserve">
+	<data name="SimRun_Hud_Reproduced" xml:space="preserve">
     <value>Размножени</value>
   </data>
 
-  <data name="SimRun_Hud_AvgFitness" xml:space="preserve">
+	<data name="SimRun_Hud_AvgFitness" xml:space="preserve">
     <value>Средна пригодност</value>
   </data>
 
-  <data name="SimRun_Hud_Tick" xml:space="preserve">
+	<data name="SimRun_Hud_Tick" xml:space="preserve">
     <value>Тик</value>
   </data>
 
-  <data name="SimRun_Status_Ready" xml:space="preserve">
+	<data name="SimRun_Status_Ready" xml:space="preserve">
     <value>Готово.</value>
   </data>
 
-  <data name="SimRun_Btn_Fullscreen" xml:space="preserve">
+	<data name="SimRun_Btn_Fullscreen" xml:space="preserve">
     <value>Цял екран</value>
   </data>
 
-  <data name="SimRun_Log_Title" xml:space="preserve">
+	<data name="SimRun_Log_Title" xml:space="preserve">
     <value>Лог на живо</value>
   </data>
 
-  <data name="SimRun_Kicker_Environment" xml:space="preserve">
+	<data name="SimRun_Kicker_Environment" xml:space="preserve">
     <value>Среда</value>
   </data>
 
-  <data name="SimRun_ControlPanel_Title" xml:space="preserve">
+	<data name="SimRun_ControlPanel_Title" xml:space="preserve">
     <value>Контролен панел</value>
   </data>
 
-  <data name="SimRun_ControlPanel_Subtitle" xml:space="preserve">
+	<data name="SimRun_ControlPanel_Subtitle" xml:space="preserve">
     <value>Промените важат веднага (без презареждане).</value>
   </data>
 
-  <data name="SimRun_Aria_ToggleEnvironment" xml:space="preserve">
+	<data name="SimRun_Aria_ToggleEnvironment" xml:space="preserve">
     <value>Превключи панела за средата</value>
   </data>
 
-  <data name="SimRun_Temperature_Label" xml:space="preserve">
+	<data name="SimRun_Temperature_Label" xml:space="preserve">
     <value>Температура</value>
   </data>
 
-  <data name="SimRun_Radiation_Label" xml:space="preserve">
+	<data name="SimRun_Radiation_Label" xml:space="preserve">
     <value>Радиация</value>
   </data>
 
-  <data name="SimRun_DiseasePressure_Label" xml:space="preserve">
+	<data name="SimRun_DiseasePressure_Label" xml:space="preserve">
     <value>Натиск от болести</value>
   </data>
 
-  <data name="SimRun_Resources_Label" xml:space="preserve">
+	<data name="SimRun_Resources_Label" xml:space="preserve">
     <value>Ресурси</value>
   </data>
 
-  <data name="SimRun_Speed_Label" xml:space="preserve">
+	<data name="SimRun_Speed_Label" xml:space="preserve">
     <value>Скорост</value>
+  </data>
+
+	<data name="SimRun_Btn_Save" xml:space="preserve">
+    <value>Запази</value>
+  </data>
+
+	<data name="SimRun_Extinction_Badge" xml:space="preserve">
+    <value>СЪБИТИЕ НА ИЗЧЕЗВАНЕ</value>
+  </data>
+
+	<data name="SimRun_Extinction_Title" xml:space="preserve">
+    <value>Целият живот е угаснал</value>
+  </data>
+
+	<data name="SimRun_Extinction_CauseLabel" xml:space="preserve">
+    <value>Основна причина</value>
+  </data>
+
+	<data name="SimRun_Extinction_Stat_Ticks" xml:space="preserve">
+    <value>Тикове оцелели</value>
+  </data>
+
+	<data name="SimRun_Extinction_Stat_Peak" xml:space="preserve">
+    <value>Пик популация</value>
+  </data>
+
+	<data name="SimRun_Extinction_Stat_Born" xml:space="preserve">
+    <value>Общо родени</value>
+  </data>
+
+	<data name="SimRun_Extinction_Stat_AvgFitness" xml:space="preserve">
+    <value>Последна пригодност</value>
+  </data>
+
+	<data name="SimRun_Extinction_Btn_New" xml:space="preserve">
+    <value>Нова симулация</value>
+  </data>
+
+	<data name="SimRun_Extinction_Btn_Dismiss" xml:space="preserve">
+    <value>Продължи наблюдението</value>
   </data>
 
 </root>

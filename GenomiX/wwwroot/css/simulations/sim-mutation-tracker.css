@@ -1,0 +1,460 @@
+﻿/* ═══════════════════════════════════════════════════════════════════════════
+   GenomiX — Simulation Mutation Tracker Panel
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Drawer panel ────────────────────────────────────────────────────────── */
+
+.gx-mut-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 400px;
+    height: 100dvh;
+    z-index: 880;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: linear-gradient(180deg, rgba(5,8,20,.97), rgba(3,5,16,.98));
+    border-left: 1px solid rgba(255,255,255,.08);
+    backdrop-filter: blur(22px);
+    -webkit-backdrop-filter: blur(22px);
+    box-shadow: -16px 0 50px rgba(0,0,0,.50);
+    transform: translateX(100%);
+    transition: transform .30s cubic-bezier(.4,0,.2,1);
+    will-change: transform;
+}
+
+    .gx-mut-panel.is-open {
+        transform: translateX(0);
+    }
+
+/* ── Header ──────────────────────────────────────────────────────────────── */
+
+.gx-mut-hd {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 18px 18px 14px;
+    border-bottom: 1px solid rgba(255,255,255,.07);
+    flex-shrink: 0;
+}
+
+.gx-mut-hd__left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.gx-mut-hd__icon {
+    font-size: 22px;
+    line-height: 1;
+}
+
+.gx-mut-hd__title {
+    font-size: 16px;
+    font-weight: 800;
+    letter-spacing: -.2px;
+    color: rgba(255,255,255,.97);
+}
+
+.gx-mut-hd__hint {
+    font-size: 11px;
+    color: rgba(160,180,230,.55);
+    margin-top: 2px;
+}
+
+.gx-mut-close {
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: rgba(255,255,255,.06);
+    border-radius: 8px;
+    color: rgba(255,255,255,.75);
+    font-size: 16px;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    transition: background .14s;
+    flex-shrink: 0;
+}
+
+    .gx-mut-close:hover {
+        background: rgba(255,255,255,.12);
+        color: #fff;
+    }
+
+/* ── Stats bar ───────────────────────────────────────────────────────────── */
+
+.gx-mut-stats {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    background: rgba(255,255,255,.06);
+    border-bottom: 1px solid rgba(255,255,255,.07);
+    flex-shrink: 0;
+    gap: 1px;
+}
+
+.gx-mut-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 10px 4px;
+    background: rgba(6,9,22,.97);
+}
+
+.gx-mut-stat__v {
+    font-size: 17px;
+    font-weight: 900;
+    color: rgba(255,255,255,.97);
+    font-variant-numeric: tabular-nums;
+}
+
+.gx-mut-stat__v--mut {
+    color: #ff7722;
+}
+
+.gx-mut-stat__v--death {
+    color: #ff2244;
+}
+
+.gx-mut-stat__v--repro {
+    color: #44dd88;
+}
+
+.gx-mut-stat__k {
+    font-size: 9px;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: rgba(160,180,230,.55);
+    text-align: center;
+    white-space: nowrap;
+}
+
+/* ── Filter tabs ─────────────────────────────────────────────────────────── */
+
+.gx-mut-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 10px 14px;
+    border-bottom: 1px solid rgba(255,255,255,.06);
+    flex-shrink: 0;
+}
+
+.gx-mut-filter {
+    flex-shrink: 0;
+    padding: 5px 12px;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,.10);
+    background: rgba(255,255,255,.04);
+    color: rgba(200,215,255,.70);
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all .13s;
+}
+
+    .gx-mut-filter:hover {
+        background: rgba(255,255,255,.09);
+        color: #fff;
+    }
+
+    .gx-mut-filter.is-active {
+        background: rgba(100,140,255,.20);
+        border-color: rgba(100,140,255,.45);
+        color: rgba(180,200,255,.98);
+    }
+
+.gx-mut-filter--mut.is-active {
+    background: rgba(255,119,34,.14);
+    border-color: rgba(255,119,34,.42);
+    color: rgba(255,180,120,.98);
+}
+
+.gx-mut-filter--death.is-active {
+    background: rgba(255,34,68,.14);
+    border-color: rgba(255,34,68,.42);
+    color: rgba(255,160,175,.98);
+}
+
+.gx-mut-filter--repro.is-active {
+    background: rgba(68,221,136,.14);
+    border-color: rgba(68,221,136,.42);
+    color: rgba(140,255,190,.98);
+}
+
+/* ── Feed body ───────────────────────────────────────────────────────────── */
+
+.gx-mut-body {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 10px 14px 6px;
+    display: flex;
+    flex-direction: column;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,.10) transparent;
+}
+
+    .gx-mut-body::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    .gx-mut-body::-webkit-scrollbar-thumb {
+        background: rgba(255,255,255,.10);
+        border-radius: 4px;
+    }
+
+/* ── Empty state ─────────────────────────────────────────────────────────── */
+
+.gx-mut-empty {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-size: 13px;
+    color: rgba(160,180,230,.45);
+    line-height: 1.6;
+    white-space: pre-line;
+    padding: 40px 20px;
+}
+
+/* ── Event entry ─────────────────────────────────────────────────────────── */
+
+.gx-mut-entry {
+    display: flex;
+    gap: 0;
+    animation: gxMutEntryIn .25s ease;
+}
+
+@keyframes gxMutEntryIn {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.gx-mut-entry__track {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 32px;
+    flex-shrink: 0;
+    padding-top: 2px;
+}
+
+.gx-mut-entry__dot {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 2px solid var(--dc, #ff7722);
+    background: color-mix(in srgb, var(--dc, #ff7722) 18%, rgba(6,9,22,.9));
+    display: grid;
+    place-items: center;
+    font-size: 12px;
+    flex-shrink: 0;
+    transition: transform .15s;
+}
+
+.gx-mut-entry:hover .gx-mut-entry__dot {
+    transform: scale(1.1);
+}
+
+.gx-mut-entry__line {
+    flex: 1;
+    width: 2px;
+    background: rgba(255,255,255,.07);
+    margin: 3px 0;
+    border-radius: 1px;
+    min-height: 8px;
+}
+
+.gx-mut-entry__card {
+    flex: 1;
+    min-width: 0;
+    padding: 4px 0 14px 10px;
+}
+
+.gx-mut-entry__top {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    flex-wrap: wrap;
+    margin-bottom: 6px;
+}
+
+.gx-mut-badge {
+    padding: 3px 8px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--bc, #ff7722);
+    background: color-mix(in srgb, var(--bc, #ff7722) 14%, transparent);
+    border: 1px solid color-mix(in srgb, var(--bc, #ff7722) 35%, transparent);
+    flex-shrink: 0;
+}
+
+.gx-mut-entry__org {
+    font-size: 12px;
+    font-weight: 700;
+    color: rgba(220,230,255,.90);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 140px;
+}
+
+.gx-mut-entry__tick {
+    font-size: 11px;
+    color: rgba(160,180,230,.45);
+    margin-left: auto;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+.gx-mut-entry__delta {
+    font-size: 12px;
+    color: rgba(200,215,255,.75);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+    .gx-mut-entry__delta strong {
+        font-variant-numeric: tabular-nums;
+    }
+
+    .gx-mut-entry__delta.is-neg strong {
+        color: #ff5566;
+    }
+
+    .gx-mut-entry__delta.is-pos strong {
+        color: #44dd88;
+    }
+
+.gx-mut-entry__fitbar {
+    flex: 1;
+    height: 4px;
+    background: rgba(255,255,255,.07);
+    border-radius: 2px;
+    overflow: hidden;
+    max-width: 80px;
+}
+
+.gx-mut-entry__fitfill {
+    display: block;
+    height: 100%;
+    border-radius: 2px;
+    transition: width .3s ease;
+}
+
+/* ── Footer ──────────────────────────────────────────────────────────────── */
+
+.gx-mut-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 14px;
+    border-top: 1px solid rgba(255,255,255,.07);
+    flex-shrink: 0;
+}
+
+.gx-mut-copy {
+    padding: 7px 14px;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,.10);
+    background: rgba(255,255,255,.05);
+    color: rgba(200,215,255,.85);
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all .13s;
+}
+
+    .gx-mut-copy:hover {
+        background: rgba(255,255,255,.10);
+        border-color: rgba(255,255,255,.18);
+        color: #fff;
+    }
+
+.gx-mut-foot__count {
+    font-size: 11px;
+    color: rgba(160,180,230,.40);
+    font-variant-numeric: tabular-nums;
+}
+
+/* ── Toggle button badge ─────────────────────────────────────────────────── */
+
+.gx-mut-toggle-btn {
+    position: relative;
+}
+
+.gx-mut-badge-btn {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 4px;
+    border-radius: 999px;
+    background: #ff7722;
+    color: #fff;
+    font-size: 9px;
+    font-weight: 800;
+    display: grid;
+    place-items: center;
+    pointer-events: none;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+}
+
+.gx-mut-toggle-btn.is-active {
+    background: rgba(255,119,34,.20);
+    border-color: rgba(255,119,34,.50);
+    color: rgba(255,190,140,.98);
+}
+
+/* ── Canvas flash rings ──────────────────────────────────────────────────── */
+/* (drawn via JS on canvas — no CSS needed) */
+
+/* ── Responsive ──────────────────────────────────────────────────────────── */
+
+@media (max-width: 860px) {
+    .gx-mut-panel {
+        width: 100vw;
+    }
+
+    .gx-mut-stats {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* Reproduction entry row */
+.gx-mut-entry__repro {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px;
+    color: rgba(200,215,255,.75);
+    gap: 8px;
+}
+
+.gx-mut-entry__repro-label {
+    opacity: .80;
+}
+
+.gx-mut-entry__repro-fit {
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+}

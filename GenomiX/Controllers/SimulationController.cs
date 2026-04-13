@@ -79,14 +79,14 @@ namespace GenomiX.Controllers
             if (user == null) return Challenge();
 
             var name = (input.Name ?? "").Trim();
-            if (name.Length == 0) 
+            if (name.Length == 0)
                 ModelState.AddModelError(nameof(input.Name), "Name is required.");
 
-            if (input.Size < 2 || input.Size > 5000) 
+            if (input.Size < 2 || input.Size > 5000)
                 ModelState.AddModelError(nameof(input.Size), "Size must be 2-5000.");
 
-            if (input.BaseModelId == Guid.Empty) 
-                ModelState.AddModelError(nameof(input.BaseModelId), 
+            if (input.BaseModelId == Guid.Empty)
+                ModelState.AddModelError(nameof(input.BaseModelId),
                     "Choose a base DNA model.");
 
             if (!ModelState.IsValid)
@@ -133,17 +133,18 @@ namespace GenomiX.Controllers
         public async Task<IActionResult> Edit(Guid id)
         {
             var user = await _users.GetUserAsync(User);
-            if (user == null) 
+            if (user == null)
                 return Challenge();
 
             var pop = await _sim.GetForUserAsync(user.Id, id);
-            if (pop == null) 
+            if (pop == null)
                 return NotFound();
 
-            return View(new EditPopulationInputModel 
-            { 
-                Id = pop.Id, 
-                Name = pop.Name }
+            return View(new EditPopulationInputModel
+            {
+                Id = pop.Id,
+                Name = pop.Name
+            }
             );
         }
 
@@ -153,18 +154,18 @@ namespace GenomiX.Controllers
         public async Task<IActionResult> Edit(EditPopulationInputModel input)
         {
             var user = await _users.GetUserAsync(User);
-            if (user == null) 
+            if (user == null)
                 return Challenge();
 
             var name = (input.Name ?? "").Trim();
 
-            if (name.Length == 0) 
+            if (name.Length == 0)
                 ModelState.AddModelError(nameof(input.Name), "Name is required.");
 
-            if (name.Length > 60) 
+            if (name.Length > 60)
                 ModelState.AddModelError(nameof(input.Name), "Max 60 characters.");
 
-            if (!ModelState.IsValid) 
+            if (!ModelState.IsValid)
                 return View(input);
 
             await _sim.RenameAsync(user.Id, input.Id, name);
@@ -179,7 +180,7 @@ namespace GenomiX.Controllers
         {
             var user = await _users.GetUserAsync(User);
 
-            if (user == null) 
+            if (user == null)
                 return Challenge();
 
             await _sim.DeleteForUserAsync(user.Id, id);
@@ -209,10 +210,10 @@ namespace GenomiX.Controllers
                 DiseasePressure = f.DiseasePressure,
                 Resources = f.Resources,
                 Speed = f.Speed,
-                Organisms = pop?.Organisms?.Select(o => new OrganismViewModel 
-                { 
+                Organisms = pop?.Organisms?.Select(o => new OrganismViewModel
+                {
                     Id = o.Id,
-                    Species = o.Type, 
+                    Species = o.Type,
                     ScientificName = o.ScientificName,
                     SimpleName = o.SimpleName,
                     Status = o.Status,
@@ -274,6 +275,23 @@ namespace GenomiX.Controllers
 
             return Ok(res);
         }
- 
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("/simulations/{id:guid}/save")]
+        public async Task<IActionResult> SaveState(Guid id, [FromBody] SaveStateRequest req)
+        {
+            var user = await _users.GetUserAsync(User);
+            if (user == null) return Challenge();
+
+            var orgs = req.Organisms
+                .Select(o => (o.Id, o.Status, o.Fitness))
+                .ToList();
+
+            await _sim.SaveStateAsync(user.Id, id, orgs);
+
+            return Ok(new { ok = true, savedAt = DateTimeOffset.UtcNow });
+        }
+
     }
 }

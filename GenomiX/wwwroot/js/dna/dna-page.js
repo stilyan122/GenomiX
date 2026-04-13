@@ -700,8 +700,19 @@ document.addEventListener("DOMContentLoaded", () => {
             return viewerApi;
         }
 
+        // setScientific tears down the old DOM and returns a brand-new API instance
+        // when the mode actually changes — we MUST capture that return value.
+        const maybeNew = viewerApi.setScientific?.(currentModeSci);
+        if (maybeNew && maybeNew !== viewerApi) {
+            viewerApi = maybeNew;
+            attachModelChanged(viewerApi);
+            // Codon overlay DOM was destroyed with the old viewer — rebuild it
+            codonOverlay?.destroy?.();
+            codonOverlay = null;
+            ensureCodonOverlay();
+        }
+
         viewerApi.setModel?.(s1, s2);
-        viewerApi.setScientific?.(currentModeSci);
         attachModelChanged(viewerApi);
         codonOverlay?.setSequence(s1);
         return viewerApi;
