@@ -365,7 +365,9 @@ namespace GenomiX.Infrastructure.Migrations
                     Factors = table.Column<string>(type: "nvarchar(4000)", maxLength: 4000, nullable: false, comment: "JSON with simulation factors (temperature, sunExposure, diseasePressure, ...)."),
                     BaseModelId = table.Column<Guid>(type: "uniqueidentifier", nullable: true, comment: "Link to the base DNAModel used to derive this population."),
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true, comment: "User who created the population."),
-                    CreatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false, comment: "UTC created timestamp.")
+                    CreatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false, comment: "UTC created timestamp."),
+                    IsPublic = table.Column<bool>(type: "bit", nullable: false, comment: "Whether this simulation is publicly visible to all users."),
+                    PublishedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true, comment: "UTC timestamp when this simulation was published.")
                 },
                 constraints: table =>
                 {
@@ -563,12 +565,12 @@ namespace GenomiX.Infrastructure.Migrations
 
             migrationBuilder.InsertData(
                 table: "Populations",
-                columns: new[] { "Id", "BaseModelId", "CreatedAt", "Factors", "Name", "UserId" },
+                columns: new[] { "Id", "BaseModelId", "CreatedAt", "Factors", "IsPublic", "Name", "PublishedAt", "UserId" },
                 values: new object[,]
                 {
-                    { new Guid("11111111-1111-1111-1111-111111111111"), new Guid("44444444-0000-0000-0000-000000000001"), new DateTimeOffset(new DateTime(2024, 6, 1, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "{ \"temperature\": 22, \"sunExposure\": \"medium\", \"diseasePressure\": 0.3 }", "Human Urban Population", new Guid("ea821ce2-2a3d-43ef-8978-5f34ee07d080") },
-                    { new Guid("22222222-2222-2222-2222-222222222222"), new Guid("44444444-0000-0000-0000-000000000002"), new DateTimeOffset(new DateTime(2024, 7, 15, 10, 30, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "{ \"temperature\": 25, \"sunExposure\": \"low\", \"diseasePressure\": 0.1 }", "Mouse Lab Population", new Guid("9d5e0ac1-4f1b-422b-b7f0-0f7d5d2dbbb1") },
-                    { new Guid("33333333-3333-3333-3333-333333333333"), new Guid("44444444-0000-0000-0000-000000000003"), new DateTimeOffset(new DateTime(2024, 8, 20, 8, 45, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "{ \"temperature\": 28, \"sunExposure\": \"high\", \"diseasePressure\": 0.5 }", "Dog Wild Pack", new Guid("58a7c2b5-1347-4f0a-b3ad-912d4f098aaa") }
+                    { new Guid("11111111-1111-1111-1111-111111111111"), new Guid("44444444-0000-0000-0000-000000000001"), new DateTimeOffset(new DateTime(2024, 6, 1, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "{ \"temperature\": 22, \"sunExposure\": \"medium\", \"diseasePressure\": 0.3 }", false, "Human Urban Population", null, new Guid("ea821ce2-2a3d-43ef-8978-5f34ee07d080") },
+                    { new Guid("22222222-2222-2222-2222-222222222222"), new Guid("44444444-0000-0000-0000-000000000002"), new DateTimeOffset(new DateTime(2024, 7, 15, 10, 30, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "{ \"temperature\": 25, \"sunExposure\": \"low\", \"diseasePressure\": 0.1 }", false, "Mouse Lab Population", null, new Guid("9d5e0ac1-4f1b-422b-b7f0-0f7d5d2dbbb1") },
+                    { new Guid("33333333-3333-3333-3333-333333333333"), new Guid("44444444-0000-0000-0000-000000000003"), new DateTimeOffset(new DateTime(2024, 8, 20, 8, 45, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "{ \"temperature\": 28, \"sunExposure\": \"high\", \"diseasePressure\": 0.5 }", false, "Dog Wild Pack", null, new Guid("58a7c2b5-1347-4f0a-b3ad-912d4f098aaa") }
                 });
 
             migrationBuilder.InsertData(

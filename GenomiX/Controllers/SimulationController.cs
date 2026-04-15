@@ -40,6 +40,8 @@ namespace GenomiX.Controllers
                 CreatedAt = p.CreatedAt.ToString("yyyy-MM-dd HH:mm"),
                 BaseModelId = p.BaseModelId,
                 BaseModelName = p.BaseModel?.Name,
+                IsPublic = p.IsPublic,
+                PublishedAt = p.PublishedAt?.ToString("yyyy-MM-dd HH:mm"),
                 Organisms = p.Organisms.Select(o => new OrganismViewModel
                 {
                     Id = o.Id,
@@ -133,19 +135,16 @@ namespace GenomiX.Controllers
         public async Task<IActionResult> Edit(Guid id)
         {
             var user = await _users.GetUserAsync(User);
-            if (user == null)
-                return Challenge();
+            if (user == null) return Challenge();
 
             var pop = await _sim.GetForUserAsync(user.Id, id);
-            if (pop == null)
-                return NotFound();
+            if (pop == null) return NotFound();
 
             return View(new EditPopulationInputModel
             {
                 Id = pop.Id,
                 Name = pop.Name
-            }
-            );
+            });
         }
 
         [HttpPost]
@@ -154,8 +153,7 @@ namespace GenomiX.Controllers
         public async Task<IActionResult> Edit(EditPopulationInputModel input)
         {
             var user = await _users.GetUserAsync(User);
-            if (user == null)
-                return Challenge();
+            if (user == null) return Challenge();
 
             var name = (input.Name ?? "").Trim();
 
@@ -179,9 +177,7 @@ namespace GenomiX.Controllers
         public async Task<IActionResult> Delete(Guid id)
         {
             var user = await _users.GetUserAsync(User);
-
-            if (user == null)
-                return Challenge();
+            if (user == null) return Challenge();
 
             await _sim.DeleteForUserAsync(user.Id, id);
             return RedirectToAction(nameof(Simulations));
@@ -193,8 +189,14 @@ namespace GenomiX.Controllers
             var user = await _users.GetUserAsync(User);
             if (user == null) return Challenge();
 
-            var pop = await _sim.GetForUserAsync(user.Id, id);
+            // Use GetByIdAsync to check global existence, not just user-owned
+            var pop = await _sim.GetByIdAsync(id);
             if (pop == null) return NotFound();
+
+            bool isReadOnly = pop.UserId != user.Id;
+
+            // Security: If not owner, must be public. If private and not owner, block.
+            if (isReadOnly && !pop.IsPublic) return Forbid();
 
             var f = SimFactorsJsonHelper.Read(pop.Factors);
 
@@ -204,13 +206,14 @@ namespace GenomiX.Controllers
                 Name = pop.Name,
                 CreatedAt = pop.CreatedAt.ToString("yyyy-MM-dd HH:mm"),
                 BaseModelId = pop.BaseModelId,
-                BaseModelName = pop?.BaseModel?.Name,
+                BaseModelName = pop.BaseModel?.Name,
                 Temperature = f.Temperature,
                 Radiation = f.Radiation,
                 DiseasePressure = f.DiseasePressure,
                 Resources = f.Resources,
                 Speed = f.Speed,
-                Organisms = pop?.Organisms?.Select(o => new OrganismViewModel
+                IsReadOnly = isReadOnly,
+                Organisms = pop.Organisms?.Select(o => new OrganismViewModel
                 {
                     Id = o.Id,
                     Species = o.Type,
@@ -218,7 +221,7 @@ namespace GenomiX.Controllers
                     SimpleName = o.SimpleName,
                     Status = o.Status,
                     SurvivalScore = o.SurvivalScore ?? 0
-                })?.ToList() ?? new()
+                }).ToList() ?? new()
             };
 
             return View(vm);
@@ -232,17 +235,16 @@ namespace GenomiX.Controllers
             var user = await _users.GetUserAsync(User);
             if (user == null) return Challenge();
 
-            req.Temperature = Math.Clamp(req.Temperature, -20, 60);
-            req.Radiation = Math.Clamp(req.Radiation, 0, 1);
-            req.DiseasePressure = Math.Clamp(req.DiseasePressure, 0, 1);
-            req.Resources = Math.Clamp(req.Resources, 0, 1);
+            // Security: Verify ownership before allowing factor updates
+            var pop = await _sim.GetForUserAsync(user.Id, id);
+            if (pop == null) return Forbid();
 
             var factors = new SimFactors
             {
-                Temperature = req.Temperature,
-                Radiation = req.Radiation,
-                DiseasePressure = req.DiseasePressure,
-                Resources = req.Resources,
+                Temperature = Math.Clamp(req.Temperature, -20, 60),
+                Radiation = Math.Clamp(req.Radiation, 0, 1),
+                DiseasePressure = Math.Clamp(req.DiseasePressure, 0, 1),
+                Resources = Math.Clamp(req.Resources, 0, 1),
                 Speed = Math.Clamp(req.Speed, 1, 50),
             };
 
@@ -258,6 +260,10 @@ namespace GenomiX.Controllers
             var user = await _users.GetUserAsync(User);
             if (user == null) return Challenge();
 
+            // Security: Verify ownership
+            var pop = await _sim.GetForUserAsync(user.Id, id);
+            if (pop == null) return Forbid();
+
             await _sim.SetRunningAsync(user.Id, id, req.IsRunning);
             return Ok(new { ok = true });
         }
@@ -270,9 +276,12 @@ namespace GenomiX.Controllers
             var user = await _users.GetUserAsync(User);
             if (user == null) return Challenge();
 
+            // Security: Verify ownership
+            var pop = await _sim.GetForUserAsync(user.Id, id);
+            if (pop == null) return Forbid();
+
             var steps = Math.Clamp(req.Steps, 1, 200);
             var res = await _sim.TickAsync(user.Id, id, steps);
-
             return Ok(res);
         }
 
@@ -284,14 +293,90 @@ namespace GenomiX.Controllers
             var user = await _users.GetUserAsync(User);
             if (user == null) return Challenge();
 
-            var orgs = req.Organisms
-                .Select(o => (o.Id, o.Status, o.Fitness))
-                .ToList();
+            // Security: Verify ownership
+            var pop = await _sim.GetForUserAsync(user.Id, id);
+            if (pop == null) return Forbid();
 
+            var orgs = req.Organisms.Select(o => (o.Id, o.Status, o.Fitness)).ToList();
             await _sim.SaveStateAsync(user.Id, id, orgs);
-
             return Ok(new { ok = true, savedAt = DateTimeOffset.UtcNow });
         }
 
+        [HttpGet]
+        [Authorize(Roles = "Scientist,Admin")]
+        [Route("/simulations/{id:guid}/publish")]
+        public async Task<IActionResult> PublishView(Guid id)
+        {
+            var user = await _users.GetUserAsync(User);
+            if (user == null) return Challenge();
+
+            var pop = await _sim.GetForUserAsync(user.Id, id);
+            if (pop == null) return NotFound();
+
+            var f = SimFactorsJsonHelper.Read(pop.Factors);
+            var vm = new PopulationViewModel
+            {
+                Id = pop.Id,
+                Name = pop.Name,
+                CreatedAt = pop.CreatedAt.ToString("yyyy-MM-dd HH:mm"),
+                BaseModelId = pop.BaseModelId,
+                BaseModelName = pop.BaseModel?.Name,
+                IsPublic = pop.IsPublic,
+                PublishedAt = pop.PublishedAt?.ToString("yyyy-MM-dd HH:mm"),
+                Temperature = f.Temperature,
+                Radiation = f.Radiation,
+                Organisms = pop.Organisms?.Select(o => new OrganismViewModel
+                {
+                    Id = o.Id,
+                    Status = o.Status
+                }).ToList() ?? new()
+            };
+
+            return View("Publish", vm);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Scientist,Admin")]
+        [Route("/simulations/{id:guid}/publish")]
+        public async Task<IActionResult> Publish(Guid id)
+        {
+            var user = await _users.GetUserAsync(User);
+            if (user == null) return Challenge();
+            var ok = await _sim.PublishAsync(user.Id, id);
+            if (!ok) return Forbid();
+            return RedirectToAction(nameof(Simulations));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Scientist,Admin")]
+        [Route("/simulations/{id:guid}/unpublish")]
+        public async Task<IActionResult> Unpublish(Guid id)
+        {
+            var user = await _users.GetUserAsync(User);
+            if (user == null) return Challenge();
+            await _sim.UnpublishAsync(user.Id, id);
+            return RedirectToAction(nameof(Simulations));
+        }
+
+        [Route("/simulations/public")]
+        public async Task<IActionResult> Public()
+        {
+            var pubs = await _sim.GetPublicAsync();
+            var viewModels = pubs.Select(p => new PopulationViewModel
+            {
+                Id = p.Id,
+                Name = p.Name,
+                CreatedAt = p.CreatedAt.ToString("yyyy-MM-dd HH:mm"),
+                BaseModelId = p.BaseModelId,
+                BaseModelName = p.BaseModel?.Name,
+                IsPublic = p.IsPublic,
+                PublishedAt = p.PublishedAt?.ToString("yyyy-MM-dd HH:mm"),
+                OwnerName = p.User?.UserName ?? p.User?.Email ?? "Unknown",
+                Organisms = p.Organisms.Select(o => new OrganismViewModel { Id = o.Id }).ToList()
+            }).ToList();
+            return View(viewModels);
+        }
     }
 }

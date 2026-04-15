@@ -1,0 +1,116 @@
+﻿@model PopulationViewModel
+@inject Microsoft.AspNetCore.Mvc.Localization.IViewLocalizer L
+
+@{
+    ViewData["Title"] = "Publish Simulation";
+    ViewData["ActiveNav"] = "simulations";
+}
+
+<section class="gx-sim-page">
+    <div class="container gx-sim">
+
+        <header class="gx-sim__header gx-sim__header--index">
+            <div class="gx-sim__head-left">
+                <div class="gx-sim__kicker">🌐 Scientist Lab</div>
+                <h1 class="gx-sim__title">Publish Simulation</h1>
+                <p class="gx-sim__subtitle">
+                    Make this simulation visible to all users in the public gallery.
+                    They can watch it live in read-only mode.
+                </p>
+            </div>
+            <div class="gx-sim__head-right gx-sim__head-right--index">
+                <a class="gx-btn gx-btn--ghost" href="/simulations">@L["Common_Back"]</a>
+            </div>
+        </header>
+
+        <div class="gx-publish-layout">
+
+            @* ── Simulation preview card ── *@
+            <div class="gx-card gx-publish-preview">
+                <div class="gx-publish-preview__glow"></div>
+
+                <div class="gx-publish-preview__top">
+                    <div>
+                        <div class="gx-sim__kicker">Simulation</div>
+                        <div class="gx-publish-preview__name">@Model.Name</div>
+                        <div class="gx-publish-preview__meta mono">
+                            @Model.BaseModelName &nbsp;·&nbsp; @(Model.Organisms?.Count ?? 0) organisms &nbsp;·&nbsp; created @Model.CreatedAt
+                        </div>
+                    </div>
+                    <div class="gx-publish-badge @(Model.IsPublic ? "gx-publish-badge--live" : "gx-publish-badge--draft")">
+                        @(Model.IsPublic ? "🌐 Live" : "🔒 Private")
+                    </div>
+                </div>
+
+                <div class="gx-publish-stats">
+                    <div class="gx-ext-stat">
+                        <div class="gx-ext-stat__v">@(Model.Organisms?.Count(o => o.Status != "dead") ?? 0)</div>
+                        <div class="gx-ext-stat__k">Alive</div>
+                    </div>
+                    <div class="gx-ext-stat">
+                        <div class="gx-ext-stat__v">@(Model.Organisms?.Count(o => o.Status == "dead") ?? 0)</div>
+                        <div class="gx-ext-stat__k">Dead</div>
+                    </div>
+                    <div class="gx-ext-stat">
+                        <div class="gx-ext-stat__v mono" style="font-size:13px">@(Model.Temperature)°C</div>
+                        <div class="gx-ext-stat__k">Temperature</div>
+                    </div>
+                    <div class="gx-ext-stat">
+                        <div class="gx-ext-stat__v mono" style="font-size:13px">@(Model.Radiation.ToString("0.00"))</div>
+                        <div class="gx-ext-stat__k">Radiation</div>
+                    </div>
+                </div>
+            </div>
+
+            @* ── What happens section ── *@
+            <div class="gx-card gx-publish-info">
+                <div class="gx-publish-info__title">What happens when you publish</div>
+
+                <ul class="gx-publish-info__list">
+                    <li>
+                        <span class="gx-publish-info__icon">👁</span>
+                        <span>All logged-in users can find this simulation in the <strong>Community</strong> gallery and watch it live.</span>
+                    </li>
+                    <li>
+                        <span class="gx-publish-info__icon">🔒</span>
+                        <span>Viewers have <strong>read-only</strong> access — they cannot change environment factors or pause the simulation.</span>
+                    </li>
+                    <li>
+                        <span class="gx-publish-info__icon">🌐</span>
+                        <span>Your username will be shown as the author of the simulation.</span>
+                    </li>
+                    <li>
+                        <span class="gx-publish-info__icon">↩️</span>
+                        <span>You can <strong>unpublish</strong> at any time from your simulations list.</span>
+                    </li>
+                </ul>
+            </div>
+
+            @* ── Action ── *@
+            <div class="gx-publish-actions">
+                @if (Model.IsPublic)
+                {
+                    <div class="gx-publish-already">
+                        <span>✅</span>
+                        <span>This simulation is already public. You can unpublish it from your simulations list.</span>
+                    </div>
+
+                    <form method="post" action="/simulations/@Model.Id/unpublish">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="gx-btn gx-btn--danger">Remove from gallery</button>
+                    </form>
+                }
+                else
+                {
+                    <form method="post" action="/simulations/@Model.Id/publish">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="gx-btn gx-btn--publish">🌐 Publish to community</button>
+                    </form>
+                }
+
+                <a class="gx-btn gx-btn--ghost" href="/simulations">Cancel</a>
+            </div>
+
+        </div>
+    </div>
+</section>

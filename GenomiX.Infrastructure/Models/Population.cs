@@ -40,12 +40,20 @@ namespace GenomiX.Infrastructure.Models
 
         /// <summary> UTC created timestamp. </summary>
         [Comment("UTC created timestamp.")]
-        public DateTimeOffset CreatedAt { get; set; } 
+        public DateTimeOffset CreatedAt { get; set; }
 
         /// <summary> Navigation property for organism table. </summary>
         public ICollection<Organism> Organisms { get; set; } = new List<Organism>();
 
         /// <summary> Navigation property for user table. </summary>
         public GenUser? User { get; set; }
+
+        /// <summary> Whether this simulation is publicly visible to all users. </summary>
+        [Comment("Whether this simulation is publicly visible to all users.")]
+        public bool IsPublic { get; set; } = false;
+
+        /// <summary> UTC timestamp when the simulation was published. </summary>
+        [Comment("UTC timestamp when this simulation was published.")]
+        public DateTimeOffset? PublishedAt { get; set; }
     }
 }

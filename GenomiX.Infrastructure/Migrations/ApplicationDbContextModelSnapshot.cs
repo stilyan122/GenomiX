@@ -1000,11 +1000,19 @@ namespace GenomiX.Infrastructure.Migrations
                         .HasColumnType("nvarchar(4000)")
                         .HasComment("JSON with simulation factors (temperature, sunExposure, diseasePressure, ...).");
 
+                    b.Property<bool>("IsPublic")
+                        .HasColumnType("bit")
+                        .HasComment("Whether this simulation is publicly visible to all users.");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)")
                         .HasComment("Human-friendly name for the run.");
+
+                    b.Property<DateTimeOffset?>("PublishedAt")
+                        .HasColumnType("datetimeoffset")
+                        .HasComment("UTC timestamp when this simulation was published.");
 
                     b.Property<Guid?>("UserId")
                         .HasColumnType("uniqueidentifier")
@@ -1028,6 +1036,7 @@ namespace GenomiX.Infrastructure.Migrations
                             BaseModelId = new Guid("44444444-0000-0000-0000-000000000001"),
                             CreatedAt = new DateTimeOffset(new DateTime(2024, 6, 1, 12, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             Factors = "{ \"temperature\": 22, \"sunExposure\": \"medium\", \"diseasePressure\": 0.3 }",
+                            IsPublic = false,
                             Name = "Human Urban Population",
                             UserId = new Guid("ea821ce2-2a3d-43ef-8978-5f34ee07d080")
                         },
@@ -1037,6 +1046,7 @@ namespace GenomiX.Infrastructure.Migrations
                             BaseModelId = new Guid("44444444-0000-0000-0000-000000000002"),
                             CreatedAt = new DateTimeOffset(new DateTime(2024, 7, 15, 10, 30, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             Factors = "{ \"temperature\": 25, \"sunExposure\": \"low\", \"diseasePressure\": 0.1 }",
+                            IsPublic = false,
                             Name = "Mouse Lab Population",
                             UserId = new Guid("9d5e0ac1-4f1b-422b-b7f0-0f7d5d2dbbb1")
                         },
@@ -1046,6 +1056,7 @@ namespace GenomiX.Infrastructure.Migrations
                             BaseModelId = new Guid("44444444-0000-0000-0000-000000000003"),
                             CreatedAt = new DateTimeOffset(new DateTime(2024, 8, 20, 8, 45, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             Factors = "{ \"temperature\": 28, \"sunExposure\": \"high\", \"diseasePressure\": 0.5 }",
+                            IsPublic = false,
                             Name = "Dog Wild Pack",
                             UserId = new Guid("58a7c2b5-1347-4f0a-b3ad-912d4f098aaa")
                         });

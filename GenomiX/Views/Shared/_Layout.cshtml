@@ -9,86 +9,87 @@
     <title>@ViewData["Title"] - @L["Brand_Name"]</title>
 
     <link rel="icon" href="~/images/icons/favicon.ico" sizes="any">
-    <link rel="icon" type="image/png" sizes="32x32" href="~/images/icons/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="~/images/icons/favicon-16x16.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="~/images/icons/apple-touch-icon.png">
+        <link rel="icon" type="image/png" sizes="32x32" href="~/images/icons/favicon-32x32.png">
+            <link rel="icon" type="image/png" sizes="16x16" href="~/images/icons/favicon-16x16.png">
+                <link rel="apple-touch-icon" sizes="180x180" href="~/images/icons/apple-touch-icon.png">
 
-    <link rel="stylesheet" href="~/css/dna/dna.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/core/core.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/simulations/sim.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/lab/lab.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/admin/admin.css" asp-append-version="true" />
+                    <link rel="stylesheet" href="~/css/dna/dna.css" asp-append-version="true" />
+                    <link rel="stylesheet" href="~/css/core/core.css" asp-append-version="true" />
+                    <link rel="stylesheet" href="~/css/simulations/sim.css" asp-append-version="true" />
+                    <link rel="stylesheet" href="~/css/lab/lab.css" asp-append-version="true" />
+                    <link rel="stylesheet" href="~/css/admin/admin.css" asp-append-version="true" />
 
-    @await RenderSectionAsync("Styles", required: false)
-</head>
-<body>
-    <header class="wrap">
-        <div class="wrap__inner">
-            <nav class="nav" aria-label="Main">
-                <a class="brand" href="/">
-                    <img src="~/images/brand/gx-logo.png" alt="@L["Brand_Name"]" class="brand__logo" />
-                    <strong>@L["Brand_Name"]</strong>
-                </a>
+                    @await RenderSectionAsync("Styles", required: false)
+                </head>
+                <body>
+                    <header class="wrap">
+                        <div class="wrap__inner">
+                            <nav class="nav" aria-label="Main">
+                                <a class="brand" href="/">
+                                    <img src="~/images/brand/gx-logo.png" alt="@L["Brand_Name"]" class="brand__logo" />
+                                    <strong>@L["Brand_Name"]</strong>
+                                </a>
 
-                <div class="navlinks navlinks--primary">
-                    <a class="navlink @(ViewData["ActiveNav"] as string == "dna" ? "is-active" : "")" href="/dna">@L["Nav_DnaBuilder"]</a>
-                    <a class="navlink @(ViewData["ActiveNav"] as string == "sim" ? "is-active" : "")" href="/simulations">@L["Nav_Simulations"]</a>
+                                <div class="navlinks navlinks--primary">
+                                    <a class="navlink @(ViewData["ActiveNav"] as string == "dna" ? "is-active" : "")" href="/dna">@L["Nav_DnaBuilder"]</a>
+                                    <a class="navlink @(ViewData["ActiveNav"] as string == "simulations" ? "is-active" : "")" href="/simulations">@L["Nav_Simulations"]</a>
+                                    <a class="navlink @(ViewData["ActiveNav"] as string == "public" ? "is-active" : "")" href="/simulations/public">@L["Nav_PublicSims"]</a>
 
-                    <a class="navlink @(ViewData["ActiveNav"] as string == "about" ? "is-active" : "")"
-                       href="/home/about">
-                        @L["Nav_About"]
-                    </a>
+                                    <a class="navlink @(ViewData["ActiveNav"] as string == "about" ? "is-active" : "")"
+                                           href="/home/about">
+                                        @L["Nav_About"]
+                                    </a>
 
-                    @if (User?.Identity?.IsAuthenticated == true && (User.IsInRole("Scientist") || User.IsInRole("Admin")))
-                    {
-                        <a class="navlink @(ViewData["ActiveNav"] as string == "lab" ? "is-active" : "")" href="/lab/sequences">@L["Nav_Lab"]</a>
-                    }
+                                    @if (User?.Identity?.IsAuthenticated == true && (User.IsInRole("Scientist") || User.IsInRole("Admin")))
+                                    {
+                                        <a class="navlink @(ViewData["ActiveNav"] as string == "lab" ? "is-active" : "")" href="/lab/sequences">@L["Nav_Lab"]</a>
+                                    }
 
-                    @if (User?.Identity?.IsAuthenticated == true && User.IsInRole("Admin"))
-                    {
-                        <a class="navlink @(ViewData["ActiveNav"] as string == "admin" ? "is-active" : "")" href="/admin/sequences">@L["Nav_SequencesPanel"]</a>
-                        <a class="navlink @(ViewData["ActiveNav"] as string == "admin" ? "is-active" : "")" href="/admin/users">@L["Nav_UsersPanel"]</a>
-                    }
-                </div>
+                                    @if (User?.Identity?.IsAuthenticated == true && User.IsInRole("Admin"))
+                                    {
+                                        <a class="navlink @(ViewData["ActiveNav"] as string == "admin" ? "is-active" : "")" href="/admin/sequences">@L["Nav_SequencesPanel"]</a>
+                                        <a class="navlink @(ViewData["ActiveNav"] as string == "admin" ? "is-active" : "")" href="/admin/users">@L["Nav_UsersPanel"]</a>
+                                    }
+                                </div>
 
-                <form asp-controller="Culture" asp-action="Set" method="post" class="lang-switch">
-                    <input type="hidden" name="returnUrl" value="@Context.Request.Path@Context.Request.QueryString" />
-                    <button type="submit" name="culture" value="en">EN</button>
-                    <button type="submit" name="culture" value="bg">BG</button>
-                </form>
+                                <form asp-controller="Culture" asp-action="Set" method="post" class="lang-switch">
+                                    <input type="hidden" name="returnUrl" value="@Context.Request.Path@Context.Request.QueryString" />
+                                    <button type="submit" name="culture" value="en">EN</button>
+                                    <button type="submit" name="culture" value="bg">BG</button>
+                                </form>
 
-                <div class="auth">
-                    <partial name="_LoginPartial" />
-                </div>
-            </nav>
-        </div>
-    </header>
+                                <div class="auth">
+                                    <partial name="_LoginPartial" />
+                                </div>
+                            </nav>
+                        </div>
+                    </header>
 
 
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
+                    <div class="container">
+                        <main role="main" class="pb-3">
+                            @RenderBody()
+                        </main>
+                    </div>
 
-    <footer class="site-footer">
-        <div class="container">
-            <div class="footer-bar">
-                <nav class="footer-nav" aria-label="Footer">
-                    <a href="/dna">@L["Nav_DnaBuilder"]</a>
-                    <a href="/simulations">@L["Nav_Simulations"]</a>
-                </nav>
+                    <footer class="site-footer">
+                        <div class="container">
+                            <div class="footer-bar">
+                                <nav class="footer-nav" aria-label="Footer">
+                                    <a href="/dna">@L["Nav_DnaBuilder"]</a>
+                                    <a href="/simulations">@L["Nav_Simulations"]</a>
+                                </nav>
 
-                <div class="footer-copy">© @DateTime.UtcNow.Year @L["Brand_Name"] - @L["Footer_Tagline"]</div>
-            </div>
-        </div>
-    </footer>
+                                <div class="footer-copy">© @DateTime.UtcNow.Year @L["Brand_Name"] - @L["Footer_Tagline"]</div>
+                            </div>
+                        </div>
+                    </footer>
 
-    <script type="module" src="~/js/reveal.js" asp-append-version="true"></script>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
-    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+                    <script type="module" src="~/js/reveal.js" asp-append-version="true"></script>
+                    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+                    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+                    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
 
-    @await RenderSectionAsync("Scripts", required: false)
-</body>
-</html>
+                    @await RenderSectionAsync("Scripts", required: false)
+                </body>
+            </html>

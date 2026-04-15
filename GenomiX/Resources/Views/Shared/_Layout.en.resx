@@ -1,39 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <root>
-  <resheader name="resmimetype">
-    <value>text/microsoft-resx</value>
-  </resheader>
-  <resheader name="version">
-    <value>2.0</value>
-  </resheader>
-  <resheader name="reader">
-    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </resheader>
-  <resheader name="writer">
-    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </resheader>
-  <data name="Brand_Name" xml:space="preserve">
+	<resheader name="resmimetype">
+		<value>text/microsoft-resx</value>
+	</resheader>
+	<resheader name="version">
+		<value>2.0</value>
+	</resheader>
+	<resheader name="reader">
+		<value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+	</resheader>
+	<resheader name="writer">
+		<value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+	</resheader>
+	<data name="Brand_Name" xml:space="preserve">
     <value>GenomiX</value>
   </data>
-  <data name="Footer_Tagline" xml:space="preserve">
+	<data name="Footer_Tagline" xml:space="preserve">
     <value>Built for learning genetics</value>
   </data>
-  <data name="Nav_DnaBuilder" xml:space="preserve">
+	<data name="Nav_DnaBuilder" xml:space="preserve">
     <value>DNA Builder</value>
   </data>
-  <data name="Nav_Lab" xml:space="preserve">
+	<data name="Nav_Lab" xml:space="preserve">
     <value>Lab</value>
   </data>
-  <data name="Nav_SequencesPanel" xml:space="preserve">
+	<data name="Nav_SequencesPanel" xml:space="preserve">
     <value>Sequences Panel</value>
   </data>
-  <data name="Nav_Simulations" xml:space="preserve">
+	<data name="Nav_Simulations" xml:space="preserve">
     <value>Simulations</value>
   </data>
-  <data name="Nav_UsersPanel" xml:space="preserve">
+	<data name="Nav_UsersPanel" xml:space="preserve">
     <value>Users Panel</value>
   </data>
-  <data name="Nav_About" xml:space="preserve">
+	<data name="Nav_About" xml:space="preserve">
     <value>About</value>
   </data>
+	<data name="Nav_PublicSims" xml:space="preserve">
+    <value>Community</value>
+  </data>
+
 </root>

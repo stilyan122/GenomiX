@@ -21,5 +21,11 @@ namespace GenomiX.ViewModels.Population
         public double DiseasePressure { get; set; }
         public double Resources { get; set; }
         public int Speed { get; set; }
+
+        public bool IsPublic { get; set; }
+        public string? OwnerName { get; set; }
+        public string? PublishedAt { get; set; }
+
+        public bool IsReadOnly { get; set; }
     }
 }

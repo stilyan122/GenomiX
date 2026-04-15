@@ -235,6 +235,7 @@
     flex-direction: column;
     gap: 10px;
     padding: 12px;
+    width: 100%;
 }
 
 /* ── Canvas ──────────────────────────────────────────────── */
@@ -1064,3 +1065,60 @@ body.env-panel-open {
         background: rgba(200,50,50,.35);
         box-shadow: 0 0 20px rgba(200,50,50,.25);
     }
+
+/* ── Galaxy 3D view ──────────────────────────────────────── */
+.gx-galaxy-wrap {
+    width: 100%;
+    height: 500px;
+    border-radius: 13px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,.07);
+    background: #020408;
+    position: relative;
+    flex-shrink: 0;
+}
+
+    /* Fullscreen — fill the whole screen */
+    .gx-galaxy-wrap:fullscreen {
+        border-radius: 0;
+        height: 100dvh !important;
+        width: 100dvw !important;
+    }
+
+    /* Fullscreen button inside galaxy wrap */
+    .gx-galaxy-wrap .gx-canvasfs {
+        position: absolute;
+        right: 10px;
+        top: 10px;
+        z-index: 20;
+        pointer-events: all;
+    }
+
+    /* Three.js canvas — fill the wrap but stay at z 0 so button stays on top */
+    .gx-galaxy-wrap > canvas {
+        position: absolute !important;
+        inset: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        z-index: 0;
+        display: block;
+    }
+
+/* 3D view button active state */
+#gx-galaxy-btn.is-active {
+    background: rgba(40,180,100,.18);
+    border-color: rgba(40,180,100,.45);
+    color: rgba(120,240,160,.97);
+}
+
+@media (max-width: 900px) {
+    .gx-galaxy-wrap {
+        height: 380px;
+    }
+}
+
+@media (max-width: 640px) {
+    .gx-galaxy-wrap {
+        height: 300px;
+    }
+}

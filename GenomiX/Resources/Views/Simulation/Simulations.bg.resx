@@ -1,100 +1,113 @@
 <?xml version="1.0" encoding="utf-8"?>
 <root>
-  <resheader name="resmimetype">
-    <value>text/microsoft-resx</value>
-  </resheader>
-  <resheader name="version">
-    <value>2.0</value>
-  </resheader>
-  <resheader name="reader">
-    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </resheader>
-  <resheader name="writer">
-    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </resheader>
+	<resheader name="resmimetype">
+		<value>text/microsoft-resx</value>
+	</resheader>
+	<resheader name="version">
+		<value>2.0</value>
+	</resheader>
+	<resheader name="reader">
+		<value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+	</resheader>
+	<resheader name="writer">
+		<value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+	</resheader>
 
-  <data name="SimIndex_PageTitle" xml:space="preserve">
+	<data name="SimIndex_PageTitle" xml:space="preserve">
     <value>Симулации</value>
   </data>
 
-  <data name="SimIndex_Kicker_Simulations" xml:space="preserve">
+	<data name="SimIndex_Kicker_Simulations" xml:space="preserve">
     <value>Симулации</value>
   </data>
 
-  <data name="SimIndex_Title" xml:space="preserve">
+	<data name="SimIndex_Title" xml:space="preserve">
     <value>Лаборатория за популации</value>
   </data>
 
-  <data name="SimIndex_Subtitle" xml:space="preserve">
+	<data name="SimIndex_Subtitle" xml:space="preserve">
     <value>Еволюция на живо с контрол на средата в реално време.</value>
   </data>
 
-  <data name="SimIndex_Btn_CreateSimulation" xml:space="preserve">
+	<data name="SimIndex_Btn_CreateSimulation" xml:space="preserve">
     <value>Създай симулация</value>
   </data>
 
-  <data name="SimIndex_Empty_Badge" xml:space="preserve">
+	<data name="SimIndex_Empty_Badge" xml:space="preserve">
     <value>Ново</value>
   </data>
 
-  <data name="SimIndex_Empty_Title" xml:space="preserve">
+	<data name="SimIndex_Empty_Title" xml:space="preserve">
     <value>Няма симулации</value>
   </data>
 
-  <data name="SimIndex_Empty_Text" xml:space="preserve">
+	<data name="SimIndex_Empty_Text" xml:space="preserve">
     <value>Създай първата си популация и започни да променяш средата, докато еволюира.</value>
   </data>
 
-  <data name="SimIndex_Runs_Label" xml:space="preserve">
+	<data name="SimIndex_Runs_Label" xml:space="preserve">
     <value>ръна</value>
   </data>
 
-  <data name="SimIndex_Legend_Organisms" xml:space="preserve">
+	<data name="SimIndex_Legend_Organisms" xml:space="preserve">
     <value>Организми</value>
   </data>
 
-  <data name="SimIndex_Legend_Environment" xml:space="preserve">
+	<data name="SimIndex_Legend_Environment" xml:space="preserve">
     <value>Среда</value>
   </data>
 
-  <data name="SimIndex_Legend_Ticks" xml:space="preserve">
+	<data name="SimIndex_Legend_Ticks" xml:space="preserve">
     <value>Тикове</value>
   </data>
 
-  <data name="SimIndex_Created_Label" xml:space="preserve">
+	<data name="SimIndex_Created_Label" xml:space="preserve">
     <value>Създадена</value>
   </data>
 
-  <data name="SimIndex_Stat_Organisms" xml:space="preserve">
+	<data name="SimIndex_Stat_Organisms" xml:space="preserve">
     <value>Организми</value>
   </data>
 
-  <data name="SimIndex_Stat_BaseModel" xml:space="preserve">
+	<data name="SimIndex_Stat_BaseModel" xml:space="preserve">
     <value>Базов модел</value>
   </data>
 
-  <data name="SimIndex_Stat_BaseModel_Hint" xml:space="preserve">
+	<data name="SimIndex_Stat_BaseModel_Hint" xml:space="preserve">
     <value>ДНК снимка за този рън</value>
   </data>
 
-  <data name="SimIndex_Btn_OpenLab" xml:space="preserve">
+	<data name="SimIndex_Btn_OpenLab" xml:space="preserve">
     <value>Отвори лаб</value>
   </data>
 
-  <data name="SimIndex_Btn_ViewDNA" xml:space="preserve">
+	<data name="SimIndex_Btn_ViewDNA" xml:space="preserve">
     <value>Виж ДНК</value>
   </data>
 
-  <data name="SimIndex_Btn_Edit" xml:space="preserve">
+	<data name="SimIndex_Btn_Edit" xml:space="preserve">
     <value>Редактирай</value>
   </data>
 
-  <data name="SimIndex_DeleteConfirm" xml:space="preserve">
+	<data name="SimIndex_DeleteConfirm" xml:space="preserve">
     <value>Да изтрия ли тази симулация? Това не може да се върне.</value>
   </data>
 
-  <data name="SimIndex_Btn_Delete" xml:space="preserve">
+	<data name="SimIndex_Btn_Delete" xml:space="preserve">
     <value>Изтрий</value>
+  </data>
+
+	<data name="SimIndex_Btn_Publish" xml:space="preserve">
+    <value>Публикувай</value>
+  </data>
+
+
+	<data name="Common_Back" xml:space="preserve">
+    <value>Назад</value>
+  </data>
+
+	<data name="SimIndex_Btn_Unpublish" xml:space="preserve">
+    <value>Скрий</value>
   </data>
 
 </root>

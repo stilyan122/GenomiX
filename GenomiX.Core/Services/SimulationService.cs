@@ -245,25 +245,19 @@ namespace GenomiX.Core.Services
         public async Task SaveStateAsync(Guid userId, Guid populationId,
             List<(Guid id, string status, double fitness)> organisms)
         {
-            // Verify ownership
             var owns = await _pops.GetAll()
                 .AnyAsync(p => p.Id == populationId && p.UserId == userId);
             if (!owns) throw new InvalidOperationException("Population not found.");
 
             var payload = organisms.ToDictionary(o => o.id);
-
-            // Load every organism for this population
             var dbOrgs = await _orgs.GetAll()
-                .Where(o => o.PopulationId == populationId)
-                .ToListAsync();
+                .Where(o => o.PopulationId == populationId).ToListAsync();
 
             foreach (var org in dbOrgs)
             {
                 if (!payload.TryGetValue(org.Id, out var dto)) continue;
-
                 if (dto.status == "dead")
                 {
-                    // Remove dead organisms so they don't ghost-appear on next load
                     await _orgs.DeleteAsync(org.Id);
                 }
                 else
@@ -274,6 +268,47 @@ namespace GenomiX.Core.Services
                     await _orgs.UpdateAsync(org);
                 }
             }
+        }
+
+        public async Task<bool> PublishAsync(Guid userId, Guid populationId)
+        {
+            var pop = await _pops.GetAll()
+                .FirstOrDefaultAsync(p => p.Id == populationId && p.UserId == userId);
+            if (pop == null) return false;
+            pop.IsPublic = true;
+            pop.PublishedAt = DateTimeOffset.UtcNow;
+            await _pops.UpdateAsync(pop);
+            return true;
+        }
+
+        public async Task<bool> UnpublishAsync(Guid userId, Guid populationId)
+        {
+            var pop = await _pops.GetAll()
+                .FirstOrDefaultAsync(p => p.Id == populationId && p.UserId == userId);
+            if (pop == null) return false;
+            pop.IsPublic = false;
+            pop.PublishedAt = null;
+            await _pops.UpdateAsync(pop);
+            return true;
+        }
+
+        public async Task<IReadOnlyList<Population>> GetPublicAsync()
+            => await _pops.GetAll()
+                .Where(p => p.IsPublic)
+                .Include(p => p.Organisms)
+                .Include(p => p.BaseModel)
+                .Include(p => p.User)
+                .OrderByDescending(p => p.PublishedAt)
+                .ToListAsync();
+
+        public async Task<Population> GetByIdAsync(Guid id)
+        {
+            return await _pops.GetAll()
+                .Include(p => p.Organisms)
+                .Include(p => p.BaseModel)
+                .Include(p => p.User)
+                .ToListAsync()
+                .ContinueWith(t => t.Result.FirstOrDefault(p => p.Id == id));
         }
     }
 }

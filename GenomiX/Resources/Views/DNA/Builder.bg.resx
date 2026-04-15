@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <root>
-  <!-- 
+	<!-- 
     Microsoft ResX Schema 
     
     Version 2.0
@@ -59,140 +59,190 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
-    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
-    <xsd:element name="root" msdata:IsDataSet="true">
-      <xsd:complexType>
-        <xsd:choice maxOccurs="unbounded">
-          <xsd:element name="metadata">
-            <xsd:complexType>
-              <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" />
-              </xsd:sequence>
-              <xsd:attribute name="name" use="required" type="xsd:string" />
-              <xsd:attribute name="type" type="xsd:string" />
-              <xsd:attribute name="mimetype" type="xsd:string" />
-              <xsd:attribute ref="xml:space" />
-            </xsd:complexType>
-          </xsd:element>
-          <xsd:element name="assembly">
-            <xsd:complexType>
-              <xsd:attribute name="alias" type="xsd:string" />
-              <xsd:attribute name="name" type="xsd:string" />
-            </xsd:complexType>
-          </xsd:element>
-          <xsd:element name="data">
-            <xsd:complexType>
-              <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
-                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
-              </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
-              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
-              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
-              <xsd:attribute ref="xml:space" />
-            </xsd:complexType>
-          </xsd:element>
-          <xsd:element name="resheader">
-            <xsd:complexType>
-              <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
-              </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" />
-            </xsd:complexType>
-          </xsd:element>
-        </xsd:choice>
-      </xsd:complexType>
-    </xsd:element>
-  </xsd:schema>
-  <resheader name="resmimetype">
-    <value>text/microsoft-resx</value>
-  </resheader>
-  <resheader name="version">
-    <value>2.0</value>
-  </resheader>
-  <resheader name="reader">
-    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </resheader>
-  <resheader name="writer">
-    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </resheader>
-  <data name="BasicMode" xml:space="preserve">
+	<xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+		<xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+		<xsd:element name="root" msdata:IsDataSet="true">
+			<xsd:complexType>
+				<xsd:choice maxOccurs="unbounded">
+					<xsd:element name="metadata">
+						<xsd:complexType>
+							<xsd:sequence>
+								<xsd:element name="value" type="xsd:string" minOccurs="0" />
+							</xsd:sequence>
+							<xsd:attribute name="name" use="required" type="xsd:string" />
+							<xsd:attribute name="type" type="xsd:string" />
+							<xsd:attribute name="mimetype" type="xsd:string" />
+							<xsd:attribute ref="xml:space" />
+						</xsd:complexType>
+					</xsd:element>
+					<xsd:element name="assembly">
+						<xsd:complexType>
+							<xsd:attribute name="alias" type="xsd:string" />
+							<xsd:attribute name="name" type="xsd:string" />
+						</xsd:complexType>
+					</xsd:element>
+					<xsd:element name="data">
+						<xsd:complexType>
+							<xsd:sequence>
+								<xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+								<xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+							</xsd:sequence>
+							<xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+							<xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+							<xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+							<xsd:attribute ref="xml:space" />
+						</xsd:complexType>
+					</xsd:element>
+					<xsd:element name="resheader">
+						<xsd:complexType>
+							<xsd:sequence>
+								<xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+							</xsd:sequence>
+							<xsd:attribute name="name" type="xsd:string" use="required" />
+						</xsd:complexType>
+					</xsd:element>
+				</xsd:choice>
+			</xsd:complexType>
+		</xsd:element>
+	</xsd:schema>
+	<resheader name="resmimetype">
+		<value>text/microsoft-resx</value>
+	</resheader>
+	<resheader name="version">
+		<value>2.0</value>
+	</resheader>
+	<resheader name="reader">
+		<value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+	</resheader>
+	<resheader name="writer">
+		<value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+	</resheader>
+	<data name="BasicMode" xml:space="preserve">
     <value>Основен режим</value>
   </data>
-  <data name="Exit" xml:space="preserve">
+	<data name="Exit" xml:space="preserve">
     <value>Изход</value>
   </data>
-  <data name="History" xml:space="preserve">
+	<data name="History" xml:space="preserve">
     <value>История</value>
   </data>
-  <data name="Kicker" xml:space="preserve">
+	<data name="Kicker" xml:space="preserve">
     <value>ДНК Конструктор</value>
   </data>
-  <data name="Label_Model" xml:space="preserve">
+	<data name="Label_Model" xml:space="preserve">
     <value>Модел</value>
   </data>
-  <data name="Legend_C" xml:space="preserve">
+	<data name="Legend_C" xml:space="preserve">
     <value>C (Въглерод)</value>
   </data>
-  <data name="Legend_H" xml:space="preserve">
+	<data name="Legend_H" xml:space="preserve">
     <value>H (Водород)</value>
   </data>
-  <data name="Legend_HBond" xml:space="preserve">
+	<data name="Legend_HBond" xml:space="preserve">
     <value>Водородна връзка</value>
   </data>
-  <data name="Legend_N" xml:space="preserve">
+	<data name="Legend_N" xml:space="preserve">
     <value>N (Азот)</value>
   </data>
-  <data name="Legend_O" xml:space="preserve">
+	<data name="Legend_O" xml:space="preserve">
     <value>O (Кислород)</value>
   </data>
-  <data name="Legend_P" xml:space="preserve">
+	<data name="Legend_P" xml:space="preserve">
     <value>P (Фосфор)</value>
   </data>
-  <data name="Pill_2D" xml:space="preserve">
+	<data name="Pill_2D" xml:space="preserve">
     <value>2D стълба</value>
   </data>
-  <data name="Pill_3D" xml:space="preserve">
+	<data name="Pill_3D" xml:space="preserve">
     <value>3D спирала</value>
   </data>
-  <data name="Pill_Inspector" xml:space="preserve">
+	<data name="Pill_Inspector" xml:space="preserve">
     <value>Инспектор</value>
   </data>
-  <data name="Redo" xml:space="preserve">
+	<data name="Redo" xml:space="preserve">
     <value>Повтори</value>
   </data>
-  <data name="RepairDNA" xml:space="preserve">
+	<data name="RepairDNA" xml:space="preserve">
     <value>Поправи ДНК</value>
   </data>
-  <data name="SaveModel" xml:space="preserve">
+	<data name="SaveModel" xml:space="preserve">
     <value>Запази модела</value>
   </data>
-  <data name="ScanDiseases" xml:space="preserve">
+	<data name="ScanDiseases" xml:space="preserve">
     <value>AI анализ за генни заболявания</value>
   </data>
-  <data name="CompareDNA" xml:space="preserve">
+	<data name="CompareDNA" xml:space="preserve">
     <value>Сравни хромозоми</value>
   </data>
-  <data name="ScanDNA" xml:space="preserve">
+	<data name="ScanDNA" xml:space="preserve">
     <value>Сканирай ДНК за мутации</value>
   </data>
-  <data name="ScientificMode" xml:space="preserve">
+	<data name="ScientificMode" xml:space="preserve">
     <value>Научен режим</value>
   </data>
-  <data name="Title" xml:space="preserve">
+	<data name="Title" xml:space="preserve">
     <value>ДНК Конструктор</value>
   </data>
-  <data name="Undo" xml:space="preserve">
+	<data name="Undo" xml:space="preserve">
     <value>Отмени</value>
   </data>
-  <data name="ViewerHint" xml:space="preserve">
+	<data name="ViewerHint" xml:space="preserve">
     <value>Използвай ⟨ ⟩ за местене на база; кликни по лентата за напредъка, за да прескочиш.</value>
   </data>
-  <data name="WorkspaceTitle" xml:space="preserve">
+	<data name="WorkspaceTitle" xml:space="preserve">
     <value>Работно пространство</value>
   </data>
-  <data name="BackToModels" xml:space="preserve">
+	<data name="BackToModels" xml:space="preserve">
     <value>Назад към моделите</value>
   </data>
+
+	<data name="Translate" xml:space="preserve">
+    <value>Транслация</value>
+  </data>
+	<data name="Translate_PanelTitle" xml:space="preserve">
+    <value>ДНК → Протеин</value>
+  </data>
+	<data name="Translate_mRNA" xml:space="preserve">
+    <value>иРНК</value>
+  </data>
+	<data name="Translate_Protein" xml:space="preserve">
+    <value>Протеин</value>
+  </data>
+	<data name="Translate_Stat_Length" xml:space="preserve">
+    <value>Аминокиселини</value>
+  </data>
+	<data name="Translate_Stat_StartAt" xml:space="preserve">
+    <value>Старт позиция</value>
+  </data>
+	<data name="Translate_Stat_Stop" xml:space="preserve">
+    <value>Стоп кодон</value>
+  </data>
+	<data name="Translate_Stat_Frame" xml:space="preserve">
+    <value>Рамка на четене</value>
+  </data>
+	<data name="Translate_NoStart" xml:space="preserve">
+    <value>Не е намерен старт кодон (ATG) в тази последователност.</value>
+  </data>
+	<data name="Translate_Copy" xml:space="preserve">
+    <value>Копирай протеин</value>
+  </data>
+	<data name="Translate_Copied" xml:space="preserve">
+    <value>✓ Копирано</value>
+  </data>
+	<data name="Translate_Legend_Nonpolar" xml:space="preserve">
+    <value>Неполярни</value>
+  </data>
+	<data name="Translate_Legend_Polar" xml:space="preserve">
+    <value>Полярни</value>
+  </data>
+	<data name="Translate_Legend_Basic" xml:space="preserve">
+    <value>Основни (+)</value>
+  </data>
+	<data name="Translate_Legend_Acidic" xml:space="preserve">
+    <value>Киселинни (−)</value>
+  </data>
+	<data name="Translate_Legend_Stop" xml:space="preserve">
+    <value>Стоп</value>
+  </data>
+
 </root>

@@ -68,9 +68,19 @@ namespace GenomiX.Core.Interfaces
         /// <param name="populationId">The unique identifier of the population to delete.</param>
         Task DeleteForUserAsync(Guid userId, Guid populationId);
 
-        /// <summary>
-        /// Saves the current organism states (status, fitness) from the canvas back to the database.
-        /// </summary>
+        /// <summary>Saves current organism states to the database.</summary>
         Task SaveStateAsync(Guid userId, Guid populationId, List<(Guid id, string status, double fitness)> organisms);
+
+        /// <summary>Publishes a simulation to the public gallery (Scientist/Admin only).</summary>
+        Task<bool> PublishAsync(Guid userId, Guid populationId);
+
+        /// <summary>Removes a simulation from the public gallery.</summary>
+        Task<bool> UnpublishAsync(Guid userId, Guid populationId);
+
+        /// <summary>Returns all publicly published simulations.</summary>
+        Task<IReadOnlyList<Population>> GetPublicAsync();
+
+        /// <summary>Get population by id.</summary>
+        Task<Population> GetByIdAsync(Guid id);
     }
 }

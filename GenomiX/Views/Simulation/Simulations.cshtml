@@ -78,8 +78,6 @@
                             </div>
                         </div>
 
-                        @* 2-column action grid: primary action spans full width on top,
-                           secondary actions in a row below *@
                         <div class="gx-simtile__actions gx-simtile__actions--grid">
                             <a class="gx-btn gx-btn--primary gx-btn--full" href="/simulations/run/@p.Id">
                                 @L["SimIndex_Btn_OpenLab"]
@@ -88,6 +86,19 @@
                             <div class="gx-simtile__actions-row">
                                 <a class="gx-btn gx-btn--ghost" href="/dna/builder/@p.BaseModelId">@L["SimIndex_Btn_ViewDNA"]</a>
                                 <a class="gx-btn gx-btn--ghost" href="/simulations/edit/@p.Id">@L["SimIndex_Btn_Edit"]</a>
+
+                                @if (User.IsInRole("Scientist") || User.IsInRole("Admin"))
+                                {
+                                    if (p.IsPublic)
+                                    {
+                                        <a class="gx-btn gx-btn--ghost gx-btn--published" href="/simulations/@p.Id/publish" title="Manage publication">@L["SimIndex_Btn_Unpublish"]</a>
+                                    }
+                                    else
+                                    {
+                                        <a class="gx-btn gx-btn--ghost" href="/simulations/@p.Id/publish" title="Publish to public gallery">@L["SimIndex_Btn_Publish"]</a>
+                                    }
+                                }
+
                                 <form method="post" action="/simulations/delete/@p.Id" style="display:contents"
                                       onsubmit="return confirm('@L["SimIndex_DeleteConfirm"]');">
                                     @Html.AntiForgeryToken()

@@ -77,8 +77,15 @@
                     @L["CompareDNA"]
                 </button>
 
-                <button id="repair-dna-btn" type="button" 
-                class="gx-btn gx-btn--danger is-hidden">@L["RepairDNA"]</button>
+                <button id="translate-btn" class="gx-btn gx-btn--ghost" type="button"
+                        title="@L["Translate_PanelTitle"]">
+                    @L["Translate"]
+                </button>
+
+                <button id="repair-dna-btn" type="button"
+                        class="gx-btn gx-btn--danger is-hidden">
+                    @L["RepairDNA"]
+                </button>
 
                 <button id="undo-btn"
                         class="gx-btn gx-btn--soft"
@@ -104,14 +111,14 @@
 
             </div>
 
-          <div id="dnaMount"
-               data-s1="@Model.Strand1"
-               data-s2="@Model.Strand2">
-          </div>
+            <div id="dnaMount"
+                 data-s1="@Model.Strand1"
+                 data-s2="@Model.Strand2">
+            </div>
 
-          <input type="hidden" id="gx-model-id" value="@Model.ModelId" />
+            <input type="hidden" id="gx-model-id" value="@Model.ModelId" />
 
-          <div id="dna-visual" class="gx-dna__canvas">
+            <div id="dna-visual" class="gx-dna__canvas">
                 <div id="gx-legend-3d" class="gx-dna-legend gx-hidden">
                     <div class="row"><span class="dot c"></span><span>@L["Legend_C"]</span></div>
                     <div class="row"><span class="dot n"></span><span>@L["Legend_N"]</span></div>
@@ -120,28 +127,92 @@
                     <div class="row"><span class="dot h"></span><span>@L["Legend_H"]</span></div>
                     <div class="row"><span class="hbond"></span><span>@L["Legend_HBond"]</span></div>
                 </div>
-          </div>
+            </div>
         </section>
+
+        @* ── Translation panel — hidden until Translate button is clicked ── *@
+        <section id="gx-translate-panel" class="gx-translate-panel" hidden>
+            <div class="gx-translate-panel__hd">
+                <div class="gx-translate-panel__title">
+                    <span class="gx-translate-panel__icon">🔬</span>
+                    @L["Translate_PanelTitle"]
+                </div>
+
+                <div class="gx-translate-stats" id="gx-tr-stats">
+                    <div class="gx-tr-stat">
+                        <span class="gx-tr-stat__k">@L["Translate_Stat_Length"]</span>
+                        <span class="gx-tr-stat__v" id="gx-tr-aacount">—</span>
+                    </div>
+                    <div class="gx-tr-stat">
+                        <span class="gx-tr-stat__k">@L["Translate_Stat_StartAt"]</span>
+                        <span class="gx-tr-stat__v mono" id="gx-tr-startpos">—</span>
+                    </div>
+                    <div class="gx-tr-stat">
+                        <span class="gx-tr-stat__k">@L["Translate_Stat_Stop"]</span>
+                        <span class="gx-tr-stat__v mono" id="gx-tr-stopcodon">—</span>
+                    </div>
+                    <div class="gx-tr-stat">
+                        <span class="gx-tr-stat__k">@L["Translate_Stat_Frame"]</span>
+                        <span class="gx-tr-stat__v mono" id="gx-tr-frame">—</span>
+                    </div>
+                </div>
+
+                <div class="gx-translate-legend">
+                    <span class="gx-tr-leg gx-tr-leg--nonpolar">@L["Translate_Legend_Nonpolar"]</span>
+                    <span class="gx-tr-leg gx-tr-leg--polar">@L["Translate_Legend_Polar"]</span>
+                    <span class="gx-tr-leg gx-tr-leg--basic">@L["Translate_Legend_Basic"]</span>
+                    <span class="gx-tr-leg gx-tr-leg--acidic">@L["Translate_Legend_Acidic"]</span>
+                    <span class="gx-tr-leg gx-tr-leg--stop">@L["Translate_Legend_Stop"]</span>
+                </div>
+
+                <button type="button" class="gx-btn gx-btn--ghost gx-translate-panel__close" id="gx-tr-close">✕</button>
+            </div>
+
+            <div class="gx-translate-panel__body">
+                @* No-start-codon notice *@
+                <div class="gx-tr-nostart" id="gx-tr-nostart" hidden>
+                    @L["Translate_NoStart"]
+                </div>
+
+                @* Codon scroll track *@
+                <div class="gx-codon-track" id="gx-codon-track"></div>
+
+                @* Protein sequence string *@
+                <div class="gx-protein-seq" id="gx-protein-seq-wrap" hidden>
+                    <span class="gx-protein-seq__label">@L["Translate_Protein"]</span>
+                    <code class="gx-protein-seq__str" id="gx-protein-seq"></code>
+                    <button type="button" class="gx-btn gx-btn--ghost gx-protein-seq__copy" id="gx-tr-copy">
+                        @L["Translate_Copy"]
+                    </button>
+                </div>
+            </div>
+        </section>
+
     </div>
 </section>
 
+@section Styles {
+    <link rel="stylesheet" href="~/css/dna/dna-translate.css" asp-append-version="true" />
+}
+
 @section Scripts {
     <script type="module" src="~/js/dna/dna-page.js" asp-append-version="true"></script>
+    <script type="module" src="~/js/dna/dna-translate.js" asp-append-version="true"></script>
 
     <script type="module">
         document.addEventListener("DOMContentLoaded", () => {
-            const mount = document.getElementById("dnaMount");
-            const s1 = mount?.dataset?.s1 ?? "";
-            const s2 = mount?.dataset?.s2 ?? "";
+        const mount = document.getElementById("dnaMount");
+        const s1 = mount?.dataset?.s1 ?? "";
+        const s2 = mount?.dataset?.s2 ?? "";
             
-            const textarea = document.getElementById("sequence");
-            if (textarea) textarea.value = `${s1}\n${s2}`;
+        const textarea = document.getElementById("sequence");
+        if (textarea) textarea.value = `${s1}\n${s2}`;
             
-            const btn = document.getElementById("visualize-btn");
-            btn?.click();
+        const btn = document.getElementById("visualize-btn");
+        btn?.click();
             
-            const mode = document.getElementById("basicMode");
-            mode?.dispatchEvent(new Event("change", { bubbles: true }));
+        const mode = document.getElementById("basicMode");
+        mode?.dispatchEvent(new Event("change", { bubbles: true }));
         });
     </script>
 }

@@ -538,9 +538,9 @@
 }
 
 .gx-simtile__actions-row {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     gap: 8px;
-    flex-wrap: wrap;
 }
 
     .gx-simtile__actions-row .gx-btn {
@@ -812,3 +812,206 @@
         filter: none
     }
 }
+
+/* ── Public simulation tile ──────────────────────────────── */
+.gx-simtile--public {
+    border-color: rgba(80,200,120,.20);
+}
+
+.gx-simtile__pub-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .10em;
+    text-transform: uppercase;
+    color: rgba(80,220,130,.90);
+    background: rgba(80,220,130,.10);
+    border: 1px solid rgba(80,220,130,.22);
+    border-radius: 999px;
+    padding: 3px 10px;
+    margin-bottom: 10px;
+    position: relative;
+    z-index: 1;
+}
+
+.gx-simtile__owner {
+    font-size: 12px;
+    color: rgba(160,185,230,.55);
+    margin-top: 3px;
+}
+
+/* Published / watch button */
+.gx-btn--published {
+    border-color: rgba(80,220,130,.35) !important;
+    color: rgba(80,220,130,.90) !important;
+}
+
+.gx-btn--watch {
+    background: rgba(60,180,100,.18);
+    border-color: rgba(60,180,100,.40);
+    color: rgba(100,240,150,.97);
+    font-weight: 800;
+}
+
+    .gx-btn--watch:hover {
+        background: rgba(60,180,100,.28);
+        box-shadow: 0 0 14px rgba(60,180,100,.20);
+    }
+
+/* ── Publish confirmation page ───────────────────────────── */
+.gx-publish-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    align-items: start;
+}
+
+@media (max-width: 860px) {
+    .gx-publish-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+.gx-publish-preview {
+    position: relative;
+    overflow: hidden;
+    padding: 20px;
+}
+
+.gx-publish-preview__glow {
+    position: absolute;
+    inset: -80px -60px auto -60px;
+    height: 240px;
+    background: radial-gradient(260px 140px at 20% 40%, rgba(60,200,120,.18), transparent 65%), radial-gradient(240px 120px at 80% 60%, rgba(80,160,255,.14), transparent 70%);
+    filter: blur(20px);
+    pointer-events: none;
+}
+
+.gx-publish-preview__top {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.gx-publish-preview__name {
+    font-size: 22px;
+    font-weight: 900;
+    color: rgba(230,242,255,.97);
+    margin: 4px 0 6px;
+}
+
+.gx-publish-preview__meta {
+    font-size: 12px;
+    color: rgba(150,175,220,.55);
+}
+
+.gx-publish-badge {
+    flex-shrink: 0;
+    font-size: 11px;
+    font-weight: 800;
+    padding: 5px 14px;
+    border-radius: 999px;
+    border: 1px solid;
+    white-space: nowrap;
+}
+
+.gx-publish-badge--draft {
+    background: rgba(100,116,139,.12);
+    border-color: rgba(100,116,139,.28);
+    color: rgba(180,195,220,.70);
+}
+
+.gx-publish-badge--live {
+    background: rgba(60,200,120,.12);
+    border-color: rgba(60,200,120,.30);
+    color: rgba(80,230,140,.95);
+}
+
+.gx-publish-stats {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+}
+
+/* reuse gx-ext-stat from extinction overlay */
+
+/* ── Info card ────────────────────────────────────────────── */
+.gx-publish-info {
+    padding: 20px;
+}
+
+.gx-publish-info__title {
+    font-size: 14px;
+    font-weight: 800;
+    color: rgba(215,230,255,.90);
+    margin-bottom: 14px;
+}
+
+.gx-publish-info__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+    .gx-publish-info__list li {
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+        font-size: 13px;
+        color: rgba(185,205,240,.78);
+        line-height: 1.5;
+    }
+
+.gx-publish-info__icon {
+    font-size: 16px;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+/* ── Actions row ──────────────────────────────────────────── */
+.gx-publish-actions {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding: 16px 20px;
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,.07);
+    background: rgba(255,255,255,.025);
+}
+
+.gx-publish-already {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: rgba(80,230,140,.85);
+    flex: 1;
+}
+
+.gx-btn--publish {
+    background: rgba(60,200,120,.20);
+    border: 1px solid rgba(60,200,120,.45);
+    color: rgba(100,240,160,.97);
+    font-weight: 800;
+    padding: 11px 24px;
+    border-radius: 14px;
+    transition: background .15s, box-shadow .15s;
+}
+
+    .gx-btn--publish:hover {
+        background: rgba(60,200,120,.32);
+        box-shadow: 0 0 18px rgba(60,200,120,.22);
+    }

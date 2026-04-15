@@ -1,0 +1,458 @@
+﻿/* ═══════════════════════════════════════════════════════════
+   GenomiX — DNA → Protein Translation Panel
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── Panel shell ─────────────────────────────────────────── */
+.gx-translate-panel {
+    margin-top: 16px;
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,.09);
+    background: rgba(8,11,26,.75);
+    overflow: hidden;
+    animation: gxTrSlideDown .22s cubic-bezier(.2,0,.3,1);
+}
+
+@keyframes gxTrSlideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ── Header ──────────────────────────────────────────────── */
+.gx-translate-panel__hd {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 18px;
+    border-bottom: 1px solid rgba(255,255,255,.07);
+    background: rgba(255,255,255,.025);
+}
+
+.gx-translate-panel__title {
+    font-size: 15px;
+    font-weight: 800;
+    color: rgba(225,240,255,.95);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.gx-translate-panel__icon {
+    font-size: 18px;
+    line-height: 1;
+}
+
+.gx-translate-panel__close {
+    margin-left: auto;
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    font-size: 13px;
+}
+
+/* ── Stats chips ─────────────────────────────────────────── */
+.gx-translate-stats {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.gx-tr-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 6px 12px;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,.07);
+    background: rgba(255,255,255,.03);
+    min-width: 80px;
+}
+
+.gx-tr-stat__k {
+    font-size: 9px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: rgba(150,180,230,.45);
+    white-space: nowrap;
+}
+
+.gx-tr-stat__v {
+    font-size: 16px;
+    font-weight: 900;
+    font-variant-numeric: tabular-nums;
+    color: rgba(210,230,255,.96);
+    line-height: 1.2;
+}
+
+/* ── Legend ──────────────────────────────────────────────── */
+.gx-translate-legend {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.gx-tr-leg {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 999px;
+    border: 1px solid;
+}
+
+.gx-tr-leg--nonpolar {
+    background: rgba(245,158,11,.12);
+    border-color: rgba(245,158,11,.30);
+    color: rgba(252,196,100,.95);
+}
+
+.gx-tr-leg--polar {
+    background: rgba(20,184,166,.12);
+    border-color: rgba(20,184,166,.30);
+    color: rgba(94,234,212,.95);
+}
+
+.gx-tr-leg--basic {
+    background: rgba(59,130,246,.12);
+    border-color: rgba(59,130,246,.30);
+    color: rgba(147,197,253,.95);
+}
+
+.gx-tr-leg--acidic {
+    background: rgba(239,68,68,.12);
+    border-color: rgba(239,68,68,.30);
+    color: rgba(252,165,165,.95);
+}
+
+.gx-tr-leg--stop {
+    background: rgba(100,116,139,.12);
+    border-color: rgba(100,116,139,.30);
+    color: rgba(203,213,225,.95);
+}
+
+/* ── Panel body ──────────────────────────────────────────── */
+.gx-translate-panel__body {
+    padding: 16px 18px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+/* No start codon notice */
+.gx-tr-nostart {
+    padding: 16px;
+    border-radius: 12px;
+    border: 1px dashed rgba(255,200,80,.25);
+    background: rgba(255,200,80,.05);
+    color: rgba(252,196,100,.80);
+    font-size: 13px;
+    text-align: center;
+}
+
+/* ── Codon track ─────────────────────────────────────────── */
+.gx-codon-track {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    overflow-x: auto;
+    padding: 4px 2px 10px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,.08) transparent;
+    min-height: 140px;
+}
+
+/* ── Codon blocks ────────────────────────────────────────── */
+.gx-codon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 10px 8px 8px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,.08);
+    background: rgba(255,255,255,.03);
+    min-width: 68px;
+    flex-shrink: 0;
+    transition: transform .12s, box-shadow .12s;
+    position: relative;
+}
+
+    .gx-codon:hover {
+        transform: translateY(-3px);
+        z-index: 2;
+    }
+
+/* Colour variants */
+.gx-codon--nonpolar {
+    border-color: rgba(245,158,11,.22);
+    background: rgba(245,158,11,.07);
+}
+
+    .gx-codon--nonpolar:hover {
+        box-shadow: 0 6px 20px rgba(245,158,11,.18);
+    }
+
+.gx-codon--polar {
+    border-color: rgba(20,184,166,.22);
+    background: rgba(20,184,166,.07);
+}
+
+    .gx-codon--polar:hover {
+        box-shadow: 0 6px 20px rgba(20,184,166,.18);
+    }
+
+.gx-codon--basic {
+    border-color: rgba(59,130,246,.25);
+    background: rgba(59,130,246,.08);
+}
+
+    .gx-codon--basic:hover {
+        box-shadow: 0 6px 20px rgba(59,130,246,.20);
+    }
+
+.gx-codon--acidic {
+    border-color: rgba(239,68,68,.25);
+    background: rgba(239,68,68,.08);
+}
+
+    .gx-codon--acidic:hover {
+        box-shadow: 0 6px 20px rgba(239,68,68,.20);
+    }
+
+.gx-codon--stop {
+    border-color: rgba(100,116,139,.25);
+    background: rgba(100,116,139,.08);
+    opacity: .85;
+}
+
+.gx-codon--start {
+    border-color: rgba(34,197,94,.35) !important;
+    background: rgba(34,197,94,.10) !important;
+    box-shadow: 0 0 0 2px rgba(34,197,94,.12);
+}
+
+    .gx-codon--start:hover {
+        box-shadow: 0 6px 20px rgba(34,197,94,.22), 0 0 0 2px rgba(34,197,94,.15);
+    }
+
+/* UTR block */
+.gx-codon--utr {
+    opacity: .45;
+    min-width: 80px;
+    border-style: dashed;
+    justify-content: flex-end;
+}
+
+/* Codon content */
+.gx-codon__dna {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: .06em;
+    color: rgba(210,230,255,.92);
+}
+
+.gx-codon__dna--utr {
+    font-size: 11px;
+    letter-spacing: .04em;
+    word-break: break-all;
+    text-align: center;
+}
+
+.gx-codon__arrow {
+    font-size: 10px;
+    color: rgba(150,170,210,.40);
+}
+
+.gx-codon__mrna {
+    font-size: 11px;
+    letter-spacing: .04em;
+    color: rgba(150,200,255,.60);
+}
+
+.gx-codon__aa {
+    font-size: 22px;
+    font-weight: 900;
+    line-height: 1;
+    margin: 2px 0;
+    color: inherit;
+}
+
+.gx-codon--nonpolar .gx-codon__aa {
+    color: rgba(252,196,100,.97);
+}
+
+.gx-codon--polar .gx-codon__aa {
+    color: rgba(94,234,212,.97);
+}
+
+.gx-codon--basic .gx-codon__aa {
+    color: rgba(147,197,253,.97);
+}
+
+.gx-codon--acidic .gx-codon__aa {
+    color: rgba(252,165,165,.97);
+}
+
+.gx-codon--stop .gx-codon__aa {
+    color: rgba(203,213,225,.80);
+}
+
+.gx-codon--start .gx-codon__aa {
+    color: rgba(134,239,172,.97);
+}
+
+.gx-codon__name {
+    font-size: 10px;
+    color: rgba(150,175,220,.55);
+    text-align: center;
+}
+
+.gx-codon__badge {
+    position: absolute;
+    top: -9px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: .10em;
+    padding: 2px 7px;
+    border-radius: 999px;
+    white-space: nowrap;
+}
+
+.gx-codon__badge--start {
+    background: rgba(34,197,94,.25);
+    border: 1px solid rgba(34,197,94,.40);
+    color: rgba(134,239,172,.97);
+}
+
+.gx-codon__badge--stop {
+    background: rgba(100,116,139,.25);
+    border: 1px solid rgba(100,116,139,.40);
+    color: rgba(203,213,225,.90);
+}
+
+/* ── Peptide bond connector ──────────────────────────────── */
+.gx-codon-bond {
+    width: 20px;
+    flex-shrink: 0;
+    align-self: center;
+    height: 2px;
+    background: linear-gradient(90deg, rgba(100,140,255,.30), rgba(100,140,255,.15));
+    position: relative;
+    margin: 0 -2px;
+}
+
+    .gx-codon-bond::before,
+    .gx-codon-bond::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: rgba(100,140,255,.40);
+    }
+
+    .gx-codon-bond::before {
+        left: 0;
+    }
+
+    .gx-codon-bond::after {
+        right: 0;
+    }
+
+/* UTR separator */
+.gx-codon-sep {
+    width: 24px;
+    flex-shrink: 0;
+    align-self: center;
+    border-top: 1px dashed rgba(100,140,255,.20);
+}
+
+/* ── Protein sequence string ─────────────────────────────── */
+.gx-protein-seq {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding: 10px 14px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,.07);
+    background: rgba(255,255,255,.025);
+}
+
+.gx-protein-seq__label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .10em;
+    text-transform: uppercase;
+    color: rgba(150,180,230,.45);
+    flex-shrink: 0;
+}
+
+.gx-protein-seq__str {
+    font-family: ui-monospace, 'SFMono-Regular', Menlo, Monaco, Consolas, monospace;
+    font-size: 13px;
+    color: rgba(200,225,255,.90);
+    letter-spacing: .12em;
+    word-break: break-all;
+    flex: 1;
+}
+
+.gx-protein-seq__copy {
+    flex-shrink: 0;
+    font-size: 11px;
+    padding: 5px 12px;
+    height: auto;
+}
+
+/* ── Responsive ──────────────────────────────────────────── */
+@media (max-width: 760px) {
+    .gx-translate-panel__hd {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .gx-translate-panel__close {
+        margin-left: 0;
+        position: absolute;
+        top: 12px;
+        right: 12px;
+    }
+
+    .gx-translate-stats {
+        width: 100%;
+    }
+
+    .gx-tr-stat {
+        flex: 1 1 80px;
+    }
+
+    .gx-codon {
+        min-width: 60px;
+        padding: 8px 6px 6px;
+    }
+
+    .gx-codon__dna {
+        font-size: 12px;
+    }
+
+    .gx-codon__aa {
+        font-size: 18px;
+    }
+}

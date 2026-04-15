@@ -1,4 +1,5 @@
 ﻿import { createMutationTracker } from "./sim-mutation-tracker.js";
+import { createGalaxyView } from "./sim-galaxy.js";
 
 const getToken = () => document.querySelector('input[name="__RequestVerificationToken"]')?.value || "";
 
@@ -45,45 +46,134 @@ function fitCSS(f, a = 1) { const [r, g, b] = fitRGB(f); return `rgba(${Math.rou
 
 // ── Biome ─────────────────────────────────────────────────────────────────
 function biomeInfo(temp, rad, dis) {
-    if (rad > 0.55) return { name: "☢️ Radiation Zone", cls: "is-rad", bg: [46, 5, 4] };
-    if (dis > 0.55) return { name: "🦠 Plague Zone", cls: "is-plague", bg: [24, 4, 42] };
-    if (temp < -2) return { name: "❄️ Frozen Tundra", cls: "is-cold", bg: [4, 12, 46] };
-    if (temp > 40) return { name: "🔥 Scorched Desert", cls: "is-hot", bg: [58, 10, 4] };
-    return { name: "🌍 Temperate Biome", cls: "", bg: [5, 10, 20] };
+    if (rad > 0.55) return { name: "☢️ Radiation Zone", cls: "is-rad", id: "rad", bg: [46, 5, 4] };
+    if (dis > 0.55) return { name: "🦠 Plague Zone", cls: "is-plague", id: "plague", bg: [24, 4, 42] };
+    if (temp < -2) return { name: "❄️ Frozen Tundra", cls: "is-cold", id: "tundra", bg: [4, 12, 46] };
+    if (temp > 40) return { name: "🔥 Scorched Desert", cls: "is-hot", id: "desert", bg: [58, 10, 4] };
+    return { name: "🌍 Temperate Biome", cls: "", id: "temperate", bg: [5, 10, 20] };
 }
 
+// Pre-seeded environment object positions (stable across frames)
+const ENV_OBJS = Array.from({ length: 22 }, (_, i) => ({
+    x: 0.04 + (i * 0.618033 % 0.92),          // Fibonacci spread across width
+    yd: 0.38 + (i * 0.381966 % 0.20),          // y near horizon (ground level)
+    scale: 0.55 + (i % 3) * 0.22,
+    ph: i * 1.3,
+}));
+
 // ── Background ────────────────────────────────────────────────────────────
-function drawBackground(ctx, w, h) {
+function drawBackground(ctx, w, h, biome) {
+    const id = biome?.id ?? 'temperate';
     const hor = h * 0.30;
+
+    // Sky gradient per biome
+    const SKY = {
+        temperate: [['rgba(6,12,28,1)', 'rgba(4,8,18,1)'], ['rgba(8,44,24,1)', 'rgba(3,16,9,1)']],
+        desert: [['rgba(42,18,6,1)', 'rgba(28,10,4,1)'], ['rgba(52,28,8,1)', 'rgba(30,12,4,1)']],
+        tundra: [['rgba(6,14,42,1)', 'rgba(4,10,32,1)'], ['rgba(18,34,58,1)', 'rgba(8,18,38,1)']],
+        rad: [['rgba(22,4,4,1)', 'rgba(14,2,2,1)'], ['rgba(14,6,2,1)', 'rgba(8,3,1,1)']],
+        plague: [['rgba(8,2,18,1)', 'rgba(5,1,12,1)'], ['rgba(14,4,22,1)', 'rgba(6,2,12,1)']],
+    };
+    const [skyC, gndC] = SKY[id] ?? SKY.temperate;
     const sky = ctx.createLinearGradient(0, 0, 0, hor);
-    sky.addColorStop(0, "rgba(8,14,30,1)"); sky.addColorStop(1, "rgba(5,9,18,1)");
+    sky.addColorStop(0, skyC[0]); sky.addColorStop(1, skyC[1]);
     ctx.fillStyle = sky; ctx.fillRect(0, 0, w, hor);
+
     const gnd = ctx.createLinearGradient(0, hor, 0, h);
-    gnd.addColorStop(0, "rgba(8,44,24,1)"); gnd.addColorStop(1, "rgba(3,16,9,1)");
+    gnd.addColorStop(0, gndC[0]); gnd.addColorStop(1, gndC[1]);
     ctx.fillStyle = gnd; ctx.fillRect(0, hor, w, h - hor);
-    [[0.18, 38, "rgba(5,28,18,.28)"], [0.48, 24, "rgba(7,46,26,.28)"], [0.82, 14, "rgba(10,65,35,.30)"]].forEach(([p, amp, fill]) => {
+
+    // Rolling hills silhouette
+    const hillColor = {
+        temperate: 'rgba(5,28,18,.28)',
+        desert: 'rgba(60,28,8,.30)',
+        tundra: 'rgba(18,34,68,.30)',
+        rad: 'rgba(40,8,4,.28)',
+        plague: 'rgba(24,6,36,.28)',
+    }[id] ?? 'rgba(5,28,18,.28)';
+
+    [[0.18, 38, 0.6], [0.48, 24, 0.9], [0.82, 14, 1.2]].forEach(([p, amp, freq]) => {
         ctx.save(); ctx.beginPath(); ctx.moveTo(0, h);
-        for (let x = 0; x <= w; x += 12) { const t = (x - cam.x * p) * .0036; ctx.lineTo(x, hor - cam.y * p + Math.sin(t) * amp + Math.sin(t * 1.7) * amp * .28); }
-        ctx.lineTo(w, h); ctx.closePath(); ctx.fillStyle = fill; ctx.fill(); ctx.restore();
+        for (let x = 0; x <= w; x += 10) {
+            const tt = (x - cam.x * p) * .0036 * freq;
+            ctx.lineTo(x, hor - cam.y * p + Math.sin(tt) * amp + Math.sin(tt * 1.7) * amp * .28);
+        }
+        ctx.lineTo(w, h); ctx.closePath(); ctx.fillStyle = hillColor; ctx.fill(); ctx.restore();
     });
+
+    // ── Environment objects ───────────────────────────────────────────────
+    ctx.save();
+    ctx.font = '18px system-ui, Apple Color Emoji, Segoe UI Emoji';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+
+    const objEmoji = {
+        temperate: ['🌲', '🌳', '🌿', '🌲', '🌳'],
+        desert: ['🌵', '🪨', '🌵', '💀', '🪨'],
+        tundra: ['❄️', '🧊', '🌨', '❄️', '🪨'],
+        rad: ['☢️', '🪣', '💀', '🔴', '☢️'],
+        plague: ['💀', '🦠', '💀', '🌫', '💀'],
+    }[id] ?? ['🌲', '🌳', '🌿'];
+
+    ENV_OBJS.forEach((o, i) => {
+        const emoji = objEmoji[i % objEmoji.length];
+        const px = o.x * w;
+        const py = hor + (o.yd - 0.38) * h * 0.22;  // cluster near horizon
+        const fs = Math.round(14 * o.scale + (id === 'temperate' ? 4 : 2));
+        ctx.font = `${fs}px system-ui, Apple Color Emoji, Segoe UI Emoji`;
+        ctx.globalAlpha = 0.55 + o.scale * 0.28;
+        ctx.fillText(emoji, px, py);
+    });
+    ctx.globalAlpha = 1;
+    ctx.restore();
 }
 
 const hspts = Array.from({ length: 3 }, () => ({ x: Math.random(), y: .36 + Math.random() * .55, ph: Math.random() * Math.PI * 2 }));
 
 function drawBiomeOverlay(ctx, w, h, biome, env, t) {
     const [br, bg, bb] = biome.bg;
-    ctx.fillStyle = `rgba(${br},${bg},${bb},.12)`; ctx.fillRect(0, 0, w, h);
+    ctx.fillStyle = `rgba(${br},${bg},${bb},.10)`; ctx.fillRect(0, 0, w, h);
+
+    // Radiation hotspots
     if (env.rad > .35) hspts.forEach(hs => {
         const p = .5 + .5 * Math.sin(t * .8 + hs.ph), r = (50 + p * 35) * env.rad;
         const g = ctx.createRadialGradient(hs.x * w, hs.y * h, 0, hs.x * w, hs.y * h, r);
-        g.addColorStop(0, `rgba(220,52,16,${.055 * env.rad * p})`); g.addColorStop(1, "rgba(220,52,16,0)");
+        g.addColorStop(0, `rgba(220,52,16,${.055 * env.rad * p})`); g.addColorStop(1, 'rgba(220,52,16,0)');
         ctx.fillStyle = g; ctx.beginPath(); ctx.arc(hs.x * w, hs.y * h, r, 0, Math.PI * 2); ctx.fill();
     });
+
+    // Plague clouds
     if (env.dis > .45) for (let i = 0; i < 3; i++) {
-        const ox = ((Math.sin(t * .28 + i * 1.2) * .14 + .5 + i * .18) % 1), oy = ((Math.cos(t * .22 + i * .95) * .10 + .58 + i * .08) % 1), r = 70 * env.dis;
+        const ox = ((Math.sin(t * .28 + i * 1.2) * .14 + .5 + i * .18) % 1);
+        const oy = ((Math.cos(t * .22 + i * .95) * .10 + .58 + i * .08) % 1);
+        const r = 70 * env.dis;
         const g = ctx.createRadialGradient(ox * w, oy * h, 0, ox * w, oy * h, r);
-        g.addColorStop(0, `rgba(150,42,220,${.042 * env.dis})`); g.addColorStop(1, "rgba(150,42,220,0)");
+        g.addColorStop(0, `rgba(150,42,220,${.042 * env.dis})`); g.addColorStop(1, 'rgba(150,42,220,0)');
         ctx.fillStyle = g; ctx.beginPath(); ctx.arc(ox * w, oy * h, r, 0, Math.PI * 2); ctx.fill();
+    }
+
+    // Tundra snow drift particles
+    if (biome.id === 'tundra') {
+        ctx.fillStyle = 'rgba(200,220,255,.55)';
+        for (let i = 0; i < 18; i++) {
+            const sx = ((i * 0.618 + t * 0.04) % 1) * w;
+            const sy = ((i * 0.381 + t * 0.06 * (1 + i % 3)) % 1) * h;
+            ctx.beginPath(); ctx.arc(sx, sy, 1.2 + (i % 3) * 0.6, 0, Math.PI * 2); ctx.fill();
+        }
+    }
+
+    // Desert heat shimmer (horizontal wavy lines near horizon)
+    if (biome.id === 'desert' && env.temp > 36) {
+        const hor = h * 0.30;
+        ctx.strokeStyle = 'rgba(255,160,60,.08)';
+        ctx.lineWidth = 1;
+        for (let row = 0; row < 5; row++) {
+            const y0 = hor + row * 12;
+            ctx.beginPath(); ctx.moveTo(0, y0);
+            for (let x = 0; x <= w; x += 8) {
+                ctx.lineTo(x, y0 + Math.sin(x * 0.04 + t * 3 + row) * 2.5);
+            }
+            ctx.stroke();
+        }
     }
 }
 
@@ -124,6 +214,120 @@ function drawFood(ctx, w, h, t) {
 // ── Agents ────────────────────────────────────────────────────────────────
 const EMOJI = { mouse: "🐭", pig: "🐷", cow: "🐮", rabbit: "🐰", fox: "🦊", bird: "🐦" };
 const FLASH = { mutation: [255, 110, 25], death: [255, 35, 65], reproduction: [55, 215, 130] };
+
+// ── Particle system ───────────────────────────────────────────────────────────
+// particles[]: { x, y, vx, vy, life, maxLife, r, g, b, size, type }
+const particles = [];
+
+function spawnDeathBurst(px, py, fitR, fitG, fitB) {
+    // Main explosion — 18 sparks scatter outward
+    for (let i = 0; i < 18; i++) {
+        const angle = (i / 18) * Math.PI * 2 + Math.random() * .4;
+        const speed = 60 + Math.random() * 120;
+        const life = .45 + Math.random() * .35;
+        particles.push({
+            x: px, y: py,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed,
+            life, maxLife: life,
+            r: 255, g: 40 + Math.random() * 80, b: 20,
+            size: 2 + Math.random() * 3,
+            type: 'spark'
+        });
+    }
+    // 6 larger colour blobs using organism's fitness colour
+    for (let i = 0; i < 6; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = 30 + Math.random() * 60;
+        const life = .55 + Math.random() * .25;
+        particles.push({
+            x: px, y: py,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed,
+            life, maxLife: life,
+            r: fitR, g: fitG, b: fitB,
+            size: 4 + Math.random() * 5,
+            type: 'blob'
+        });
+    }
+    // Shockwave ring
+    particles.push({ x: px, y: py, vx: 0, vy: 0, life: .40, maxLife: .40, r: 255, g: 80, b: 30, size: 0, type: 'ring', maxR: 40 });
+}
+
+function spawnBirthBurst(px, py) {
+    // 12 green/cyan orbs shoot outward
+    for (let i = 0; i < 12; i++) {
+        const angle = (i / 12) * Math.PI * 2;
+        const speed = 45 + Math.random() * 80;
+        const life = .50 + Math.random() * .30;
+        particles.push({
+            x: px + (Math.random() - .5) * 8,
+            y: py + (Math.random() - .5) * 8,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed,
+            life, maxLife: life,
+            r: 55 + Math.random() * 40, g: 220, b: 130 + Math.random() * 60,
+            size: 2.5 + Math.random() * 2.5,
+            type: 'spark'
+        });
+    }
+    // Two expanding rings
+    for (let i = 0; i < 2; i++) {
+        particles.push({ x: px, y: py, vx: 0, vy: 0, life: .35 + i * .15, maxLife: .35 + i * .15, r: 60, g: 230, b: 140, size: 0, type: 'ring', maxR: 28 + i * 14 });
+    }
+    // Central flash
+    particles.push({ x: px, y: py, vx: 0, vy: 0, life: .22, maxLife: .22, r: 180, g: 255, b: 200, size: 16, type: 'glow' });
+}
+
+function stepParticles(dt) {
+    for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.life -= dt;
+        if (p.life <= 0) { particles.splice(i, 1); continue; }
+        if (p.type !== 'ring' && p.type !== 'glow') {
+            p.x += p.vx * dt;
+            p.y += p.vy * dt;
+            // Gravity / drag
+            p.vx *= 0.88;
+            p.vy *= 0.88;
+            p.vy += 18 * dt; // slight gravity on sparks
+        }
+    }
+}
+
+function drawParticles(ctx, w, h) {
+    const scaleX = w, scaleY = h;
+    for (const p of particles) {
+        const t = p.life / p.maxLife; // 1 = fresh, 0 = dead
+
+        if (p.type === 'ring') {
+            const radius = p.maxR * (1 - t);
+            ctx.globalAlpha = t * .75;
+            ctx.strokeStyle = `rgb(${p.r},${p.g},${p.b})`;
+            ctx.lineWidth = 2 * t;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, radius, 0, Math.PI * 2);
+            ctx.stroke();
+        } else if (p.type === 'glow') {
+            const r = p.size * (1 + (1 - t));
+            const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, r);
+            grad.addColorStop(0, `rgba(${p.r},${p.g},${p.b},${t * .80})`);
+            grad.addColorStop(1, `rgba(${p.r},${p.g},${p.b},0)`);
+            ctx.globalAlpha = 1;
+            ctx.fillStyle = grad;
+            ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, Math.PI * 2); ctx.fill();
+        } else {
+            // spark / blob
+            const alpha = p.type === 'blob' ? t * .70 : t * .90;
+            ctx.globalAlpha = alpha;
+            ctx.fillStyle = `rgb(${p.r},${p.g},${p.b})`;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size * (p.type === 'blob' ? (.4 + t * .6) : t), 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
+    ctx.globalAlpha = 1;
+}
 
 function drawAgents(ctx, w, h, agents, flashes) {
     ctx.textAlign = "center"; ctx.textBaseline = "middle";
@@ -249,7 +453,7 @@ function updateStress(env) {
 
 function updateBiome(env) {
     const chip = document.getElementById("gx-biome-chip"); if (!chip) return;
-    const b = biomeInfo(env.temp, env.rad, env.dis);
+    const b = biomeInfo(env.temp, env.rad, env.dis, env.res);
     chip.textContent = b.name; chip.className = "gx-biome-chip" + (b.cls ? " " + b.cls : "");
 }
 
@@ -309,6 +513,11 @@ document.addEventListener("DOMContentLoaded", () => {
         };
         agentMap.set(a.id, a); agents.push(a);
     });
+
+    // Seed the HUD dead counter from loaded data
+    const seedDead = agents.filter(a => a.status === "dead").length;
+    if (vDead) vDead.textContent = String(seedDead);
+
     tracker.onTick([], 0, agents.map(a => ({ id: a.id, name: a.name, species: a.species, status: a.status, fitness: a.fitness })));
     bindPopup(host, canvas, agentMap);
 
@@ -357,12 +566,20 @@ document.addEventListener("DOMContentLoaded", () => {
         r.organisms.forEach(o => {
             const a = agentMap.get(o.id);
             if (a) {
-                // Existing organism — update status and fitness
+                const prevStatus = a.status;
                 a.status = o.status;
                 a.fitness = o.fitness;
+                // Spawn particles when status changes
+                if (prevStatus !== 'dead' && o.status === 'dead') {
+                    const [fr, fg, fb] = fitRGB(a.fitness);
+                    const rect = canvas?.getBoundingClientRect();
+                    if (rect) spawnDeathBurst(a.x * rect.width, a.y * rect.height, Math.round(fr), Math.round(fg), Math.round(fb));
+                } else if (prevStatus !== 'reproduced' && o.status === 'reproduced') {
+                    const rect = canvas?.getBoundingClientRect();
+                    if (rect) spawnBirthBurst(a.x * rect.width, a.y * rect.height);
+                }
             } else {
                 // New offspring — create a fresh agent near its parent's position
-                // Server sends X/Y but they're 0–1 world coords; use them if non-zero
                 const px = (o.x && o.x > 0) ? o.x : Math.random();
                 const py = (o.y && o.y > 0) ? o.y : (.42 + Math.random() * .52);
                 const sp = o.species || "mouse";
@@ -380,6 +597,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 };
                 agentMap.set(newAgent.id, newAgent);
                 agents.push(newAgent);
+                // Birth burst for offspring
+                const rect = canvas?.getBoundingClientRect();
+                if (rect) spawnBirthBurst(px * rect.width, py * rect.height);
             }
         });
     }
@@ -412,22 +632,28 @@ document.addEventListener("DOMContentLoaded", () => {
     // Animation
     let lastT = performance.now(), timeAcc = 0, flashes = {}, running = false, inFlight = false, loopTimer = 0;
 
-    // Extinction tracking
-    let peakAlive = agents.length, totalBorn = agents.length, extinctionShown = false;
+    // Extinction tracking — count only non-dead organisms at start
+    const initialAlive = agents.filter(a => a.status !== "dead").length;
+    let peakAlive = initialAlive, totalBorn = initialAlive, extinctionShown = false;
 
     function frame(now) {
         const dt = clamp((now - lastT) / 1000, 0, .05); lastT = now; timeAcc += dt;
         flashes = tracker.tickFlashes(dt);
         if (ctx && canvas && host) {
             const r = host.getBoundingClientRect(), w = r.width || 1, h = r.height || 1;
-            const env = getEnv(), biome = biomeInfo(env.temp, env.rad, env.dis);
+            const env = getEnv(), biome = biomeInfo(env.temp, env.rad, env.dis, env.res);
             ctx.clearRect(0, 0, w, h);
-            drawBackground(ctx, w, h);
+            drawBackground(ctx, w, h, biome);
             ctx.save(); ctx.translate(cam.x, cam.y);
             drawBiomeOverlay(ctx, w, h, biome, env, timeAcc);
             if (running) { stepAgents(dt, w, h); drawFood(ctx, w, h, timeAcc); } else foods.length = 0;
             drawAgents(ctx, w, h, agents, flashes);
             ctx.restore();
+            // Particles drawn in screen space (no cam offset) so they don't pan with camera
+            stepParticles(dt);
+            drawParticles(ctx, w, h);
+            // Keep 3D view in sync with current biome
+            if (galaxyActive && galaxy) galaxy.setBiome(biome);
         }
         requestAnimationFrame(frame);
     }
@@ -565,7 +791,77 @@ document.addEventListener("DOMContentLoaded", () => {
     envClose?.addEventListener("click", closeEnvPanel);
     envBackdrop?.addEventListener("click", closeEnvPanel);
 
-    // ── Extinction ────────────────────────────────────────────────────────────
+    // ── Galaxy 3D view ────────────────────────────────────────────────────────
+    const galaxyBtn = document.getElementById("gx-galaxy-btn");
+    const galaxyWrap = document.getElementById("gx-galaxy-wrap");
+    const canvas2dWrap = document.getElementById("gx-pop-canvas");
+    const galaxyFsBtn = document.getElementById("gx-galaxy-fs");
+
+    // Fullscreen for 3D panel
+    galaxyFsBtn?.addEventListener("click", async e => {
+        e.stopPropagation();
+        try {
+            if (document.fullscreenElement) await document.exitFullscreen();
+            else await galaxyWrap?.requestFullscreen?.();
+        } catch (err) { log("Fullscreen: " + err.message); }
+    });
+    document.addEventListener("fullscreenchange", () => {
+        if (galaxy) galaxy.onResize();
+    });
+
+    let galaxy = null, galaxyActive = false;
+
+    function onGalaxyHover(data, cx, cy) {
+        const popup = document.getElementById("gx-org-popup");
+        if (!popup) return;
+        if (!data) { popup.hidden = true; return; }
+        // Reuse existing buildPopup — find agent by id
+        const a = agentMap.get(data.id);
+        if (!a) { popup.hidden = true; return; }
+        popup.hidden = false;
+        popup.innerHTML = buildPopup(a);
+        let tx = cx + 18, ty = cy - 20;
+        if (tx + 240 > window.innerWidth - 8) tx = cx - 254;
+        if (ty + 200 > window.innerHeight - 8) ty = cy - 210;
+        if (ty < 8) ty = 8;
+        popup.style.left = `${tx}px`;
+        popup.style.top = `${ty}px`;
+    }
+
+    galaxyBtn?.addEventListener("click", () => {
+        galaxyActive = !galaxyActive;
+        galaxyBtn.classList.toggle("is-active", galaxyActive);
+        galaxyBtn.textContent = galaxyActive
+            ? (lang === "bg" ? "🌿 2D изглед" : "🌿 2D View")
+            : (lang === "bg" ? "🌿 3D изглед" : "🌿 3D View");
+
+        if (galaxyActive) {
+            galaxyWrap.style.display = "block";
+            canvas2dWrap.style.display = "none";
+            if (!galaxy) {
+                galaxy = createGalaxyView(agents, agentMap, foods, EMOJI, FOOD_EMOJI, onGalaxyHover, getEnv);
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        galaxy.mount(galaxyWrap);
+                        // Apply current biome immediately on first mount
+                        const env = getEnv();
+                        galaxy.setBiome(biomeInfo(env.temp, env.rad, env.dis, env.res));
+                    });
+                });
+            } else {
+                // Already mounted — just show it and force biome sync
+                const env = getEnv();
+                galaxy.setBiome(biomeInfo(env.temp, env.rad, env.dis, env.res), true);
+                galaxy.onResize();
+            }
+        } else {
+            // Restore 2D — show the canvas wrap first, then resize the pixel buffer
+            // after the browser has reflowed (display:none → block needs one rAF)
+            galaxyWrap.style.display = "none";
+            canvas2dWrap.style.display = "";
+            requestAnimationFrame(() => resizeCanvas());
+        }
+    });
     const CAUSES = {
         en: {
             radiation: ["☢️ Radiation Poisoning", rad => rad > 0.55],
@@ -636,4 +932,13 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     log(lang === "bg" ? "Симулацията е готова ✅" : "Simulation ready ✅");
+
+    // If all organisms were dead when the page loaded (saved after extinction), show the screen
+    if (initialAlive === 0 && agents.length > 0) {
+        extinctionShown = true;
+        const lastFit = agents.length > 0
+            ? agents.reduce((s, a) => s + a.fitness, 0) / agents.length
+            : 0;
+        setTimeout(() => showExtinction(0, lastFit), 600);
+    }
 });
