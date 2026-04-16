@@ -1,62 +1,33 @@
-﻿// ─── GenomiX — DNA → Protein Translation ────────────────────────────────────
-// Self-contained module. Reads sequence from #dnaMount data-s1 attribute,
-// translates from the first ATG (start codon) to the first stop codon,
-// and renders a visual codon block track.
-
-// ── Standard genetic code (64 codons) ────────────────────────────────────────
-const CODON_TABLE = {
-    // Phenylalanine
+﻿const CODON_TABLE = {
     TTT: 'Phe', TTC: 'Phe',
-    // Leucine
     TTA: 'Leu', TTG: 'Leu', CTT: 'Leu', CTC: 'Leu', CTA: 'Leu', CTG: 'Leu',
-    // Isoleucine
     ATT: 'Ile', ATC: 'Ile', ATA: 'Ile',
-    // Methionine / START
     ATG: 'Met',
-    // Valine
     GTT: 'Val', GTC: 'Val', GTA: 'Val', GTG: 'Val',
-    // Serine
     TCT: 'Ser', TCC: 'Ser', TCA: 'Ser', TCG: 'Ser', AGT: 'Ser', AGC: 'Ser',
-    // Proline
     CCT: 'Pro', CCC: 'Pro', CCA: 'Pro', CCG: 'Pro',
-    // Threonine
     ACT: 'Thr', ACC: 'Thr', ACA: 'Thr', ACG: 'Thr',
-    // Alanine
     GCT: 'Ala', GCC: 'Ala', GCA: 'Ala', GCG: 'Ala',
-    // Tyrosine
     TAT: 'Tyr', TAC: 'Tyr',
-    // STOP codons
     TAA: 'Stop', TAG: 'Stop', TGA: 'Stop',
-    // Histidine
     CAT: 'His', CAC: 'His',
-    // Glutamine
     CAA: 'Gln', CAG: 'Gln',
-    // Asparagine
     AAT: 'Asn', AAC: 'Asn',
-    // Lysine
     AAA: 'Lys', AAG: 'Lys',
-    // Aspartic acid
     GAT: 'Asp', GAC: 'Asp',
-    // Glutamic acid
     GAA: 'Glu', GAG: 'Glu',
-    // Cysteine
     TGT: 'Cys', TGC: 'Cys',
-    // Tryptophan
     TGG: 'Trp',
-    // Arginine
     CGT: 'Arg', CGC: 'Arg', CGA: 'Arg', CGG: 'Arg', AGA: 'Arg', AGG: 'Arg',
-    // Glycine
     GGT: 'Gly', GGC: 'Gly', GGA: 'Gly', GGG: 'Gly',
 };
 
-// Single-letter amino acid codes
 const AA1 = {
     Phe: 'F', Leu: 'L', Ile: 'I', Met: 'M', Val: 'V', Ser: 'S', Pro: 'P',
     Thr: 'T', Ala: 'A', Tyr: 'Y', His: 'H', Gln: 'Q', Asn: 'N', Lys: 'K',
     Asp: 'D', Glu: 'E', Cys: 'C', Trp: 'W', Arg: 'R', Gly: 'G', Stop: '*',
 };
 
-// Biochemical class → CSS modifier
 const AA_CLASS = {
     Phe: 'nonpolar', Leu: 'nonpolar', Ile: 'nonpolar', Met: 'nonpolar', Val: 'nonpolar',
     Pro: 'nonpolar', Ala: 'nonpolar', Trp: 'nonpolar', Gly: 'nonpolar',
@@ -66,12 +37,10 @@ const AA_CLASS = {
     Stop: 'stop',
 };
 
-// ── Translation algorithm ─────────────────────────────────────────────────────
 function translate(dnaRaw) {
     const seq = dnaRaw.toUpperCase().replace(/[^ATCG]/g, '');
     if (seq.length < 3) return { error: 'tooShort', seq };
 
-    // Find first ATG
     const startIdx = seq.indexOf('ATG');
     if (startIdx === -1) return { error: 'noStart', seq };
 
@@ -100,7 +69,6 @@ function translate(dnaRaw) {
     };
 }
 
-// ── Codon block renderer ──────────────────────────────────────────────────────
 function buildCodonBlock(entry) {
     const { codon, aa, isStart } = entry;
     const cls = AA_CLASS[aa] ?? 'nonpolar';
@@ -121,11 +89,8 @@ function buildCodonBlock(entry) {
     `;
     return div;
 }
-
-// Builds a small grey "UTR block" for sequence before ATG
 function buildUTRBlock(seq) {
     if (!seq) return null;
-    // Show at most the last 9 nt of 5' UTR, then an ellipsis if longer
     const show = seq.length > 9 ? `…${seq.slice(-9)}` : seq;
     const div = document.createElement('div');
     div.className = 'gx-codon gx-codon--utr';
@@ -136,7 +101,6 @@ function buildUTRBlock(seq) {
     return div;
 }
 
-// ── UI update ─────────────────────────────────────────────────────────────────
 function renderTranslation(result) {
     const track = document.getElementById('gx-codon-track');
     const noStart = document.getElementById('gx-tr-nostart');
@@ -161,23 +125,19 @@ function renderTranslation(result) {
         return;
     }
 
-    // Stats
     if (statAA) statAA.textContent = result.proteinLength;
     if (statPos) statPos.textContent = `bp ${result.startIdx + 1}`;
     if (statStop) statStop.textContent = result.stopCodon ?? '(none)';
     if (statFr) statFr.textContent = `+${result.frame}`;
 
-    // UTR block
     const utrBlock = buildUTRBlock(result.preSeq);
     if (utrBlock) {
         track.appendChild(utrBlock);
-        // Connector
         const sep = document.createElement('div');
         sep.className = 'gx-codon-sep';
         track.appendChild(sep);
     }
 
-    // Codon blocks with peptide bond connectors
     result.codons.forEach((entry, i) => {
         track.appendChild(buildCodonBlock(entry));
         if (i < result.codons.length - 1 && entry.aa !== 'Stop') {
@@ -188,14 +148,12 @@ function renderTranslation(result) {
         }
     });
 
-    // Protein sequence
     if (result.protein && seqWrap && seqEl) {
         seqEl.textContent = result.protein;
         seqWrap.hidden = false;
     }
 }
 
-// ── Panel toggle ──────────────────────────────────────────────────────────────
 function initTranslate() {
     const btn = document.getElementById('translate-btn');
     const panel = document.getElementById('gx-translate-panel');
@@ -214,7 +172,6 @@ function initTranslate() {
             return;
         }
 
-        // Translate on first open (or always, to catch edits)
         const s1 = mount.dataset.s1 ?? '';
         const result = translate(s1);
         renderTranslation(result);
@@ -222,8 +179,6 @@ function initTranslate() {
 
         panel.hidden = false;
         btn.classList.add('is-active');
-
-        // Smooth scroll to panel
         setTimeout(() => panel.scrollIntoView({ behavior: 'smooth', block: 'start' }), 60);
     });
 
@@ -232,7 +187,6 @@ function initTranslate() {
         btn.classList.remove('is-active');
     });
 
-    // Copy protein sequence
     copyBtn?.addEventListener('click', async () => {
         const seq = document.getElementById('gx-protein-seq')?.textContent ?? '';
         if (!seq) return;
@@ -242,7 +196,7 @@ function initTranslate() {
             copyBtn.textContent = copyBtn.closest('[data-copied]')?.dataset.copied
                 ?? (document.documentElement.lang?.startsWith('bg') ? '✓ Копирано' : '✓ Copied');
             setTimeout(() => { copyBtn.textContent = orig; }, 1600);
-        } catch { /* clipboard blocked */ }
+        } catch { }
     });
 }
 

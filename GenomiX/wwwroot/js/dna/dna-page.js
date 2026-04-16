@@ -685,7 +685,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function ensureCodonOverlay() {
         if (codonOverlay) return;
-        // Defer slightly so the ladder-wrap is in the DOM
         requestAnimationFrame(() => {
             codonOverlay = createCodonOverlay(viewerApi);
             if (lastS1) codonOverlay.setSequence(lastS1);
@@ -700,13 +699,10 @@ document.addEventListener("DOMContentLoaded", () => {
             return viewerApi;
         }
 
-        // setScientific tears down the old DOM and returns a brand-new API instance
-        // when the mode actually changes — we MUST capture that return value.
         const maybeNew = viewerApi.setScientific?.(currentModeSci);
         if (maybeNew && maybeNew !== viewerApi) {
             viewerApi = maybeNew;
             attachModelChanged(viewerApi);
-            // Codon overlay DOM was destroyed with the old viewer — rebuild it
             codonOverlay?.destroy?.();
             codonOverlay = null;
             ensureCodonOverlay();
@@ -1113,8 +1109,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function openCompareModal(original, current) {
         const { backdrop, modal } = ensureCompareModal();
-
-        // Dispose any previous 3D chromosome scenes
         ["gx-chrom-normal", "gx-chrom-mutated"].forEach(id => {
             document.getElementById(id)?._gxDispose?.();
         });
@@ -1153,7 +1147,6 @@ document.addEventListener("DOMContentLoaded", () => {
         document.body.classList.add("gx-ai-modal-open");
 
         const close = () => {
-            // Dispose 3D scenes on close to free GPU memory
             ["gx-chrom-normal", "gx-chrom-mutated"].forEach(id => {
                 document.getElementById(id)?._gxDispose?.();
             });
@@ -1165,7 +1158,6 @@ document.addEventListener("DOMContentLoaded", () => {
         backdrop.onclick = close;
         document.getElementById("gx-compare-close")?.addEventListener("click", close);
 
-        // Slight defer so the modal is in the DOM and has dimensions
         requestAnimationFrame(() => {
             renderChromosomeAbnormalitiesCompare({
                 normalMount: document.getElementById("gx-chrom-normal"),

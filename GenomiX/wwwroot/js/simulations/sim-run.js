@@ -17,7 +17,6 @@ function debounce(fn, ms = 200) { let t = 0; return (...a) => { clearTimeout(t);
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 const lerp = (a, b, t) => a + (b - a) * t;
 
-// ── Pan only — NO wheel zoom (it fights page scroll) ──────────────────────
 const cam = { x: 0, y: 0, dragging: false, lx: 0, ly: 0 };
 
 function bindPan(host, canvas) {
@@ -36,7 +35,6 @@ function bindPan(host, canvas) {
     window.addEventListener("pointerup", () => { cam.dragging = false; });
 }
 
-// ── Fitness color ─────────────────────────────────────────────────────────
 function fitRGB(f) {
     if (f >= 0.65) return [lerp(60, 90, (f - .65) / .35), lerp(200, 235, (f - .65) / .35), lerp(110, 210, (f - .65) / .35)];
     if (f >= 0.35) return [lerp(235, 60, (f - .35) / .30), lerp(195, 200, (f - .35) / .30), lerp(40, 110, (f - .35) / .30)];
@@ -44,7 +42,6 @@ function fitRGB(f) {
 }
 function fitCSS(f, a = 1) { const [r, g, b] = fitRGB(f); return `rgba(${Math.round(r)},${Math.round(g)},${Math.round(b)},${a})`; }
 
-// ── Biome ─────────────────────────────────────────────────────────────────
 function biomeInfo(temp, rad, dis) {
     if (rad > 0.55) return { name: "☢️ Radiation Zone", cls: "is-rad", id: "rad", bg: [46, 5, 4] };
     if (dis > 0.55) return { name: "🦠 Plague Zone", cls: "is-plague", id: "plague", bg: [24, 4, 42] };
@@ -53,20 +50,17 @@ function biomeInfo(temp, rad, dis) {
     return { name: "🌍 Temperate Biome", cls: "", id: "temperate", bg: [5, 10, 20] };
 }
 
-// Pre-seeded environment object positions (stable across frames)
 const ENV_OBJS = Array.from({ length: 22 }, (_, i) => ({
-    x: 0.04 + (i * 0.618033 % 0.92),          // Fibonacci spread across width
-    yd: 0.38 + (i * 0.381966 % 0.20),          // y near horizon (ground level)
+    x: 0.04 + (i * 0.618033 % 0.92),         
+    yd: 0.38 + (i * 0.381966 % 0.20),         
     scale: 0.55 + (i % 3) * 0.22,
     ph: i * 1.3,
 }));
 
-// ── Background ────────────────────────────────────────────────────────────
 function drawBackground(ctx, w, h, biome) {
     const id = biome?.id ?? 'temperate';
     const hor = h * 0.30;
 
-    // Sky gradient per biome
     const SKY = {
         temperate: [['rgba(6,12,28,1)', 'rgba(4,8,18,1)'], ['rgba(8,44,24,1)', 'rgba(3,16,9,1)']],
         desert: [['rgba(42,18,6,1)', 'rgba(28,10,4,1)'], ['rgba(52,28,8,1)', 'rgba(30,12,4,1)']],
@@ -83,7 +77,6 @@ function drawBackground(ctx, w, h, biome) {
     gnd.addColorStop(0, gndC[0]); gnd.addColorStop(1, gndC[1]);
     ctx.fillStyle = gnd; ctx.fillRect(0, hor, w, h - hor);
 
-    // Rolling hills silhouette
     const hillColor = {
         temperate: 'rgba(5,28,18,.28)',
         desert: 'rgba(60,28,8,.30)',
@@ -101,7 +94,6 @@ function drawBackground(ctx, w, h, biome) {
         ctx.lineTo(w, h); ctx.closePath(); ctx.fillStyle = hillColor; ctx.fill(); ctx.restore();
     });
 
-    // ── Environment objects ───────────────────────────────────────────────
     ctx.save();
     ctx.font = '18px system-ui, Apple Color Emoji, Segoe UI Emoji';
     ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
@@ -117,7 +109,7 @@ function drawBackground(ctx, w, h, biome) {
     ENV_OBJS.forEach((o, i) => {
         const emoji = objEmoji[i % objEmoji.length];
         const px = o.x * w;
-        const py = hor + (o.yd - 0.38) * h * 0.22;  // cluster near horizon
+        const py = hor + (o.yd - 0.38) * h * 0.22;  
         const fs = Math.round(14 * o.scale + (id === 'temperate' ? 4 : 2));
         ctx.font = `${fs}px system-ui, Apple Color Emoji, Segoe UI Emoji`;
         ctx.globalAlpha = 0.55 + o.scale * 0.28;
@@ -133,7 +125,6 @@ function drawBiomeOverlay(ctx, w, h, biome, env, t) {
     const [br, bg, bb] = biome.bg;
     ctx.fillStyle = `rgba(${br},${bg},${bb},.10)`; ctx.fillRect(0, 0, w, h);
 
-    // Radiation hotspots
     if (env.rad > .35) hspts.forEach(hs => {
         const p = .5 + .5 * Math.sin(t * .8 + hs.ph), r = (50 + p * 35) * env.rad;
         const g = ctx.createRadialGradient(hs.x * w, hs.y * h, 0, hs.x * w, hs.y * h, r);
@@ -141,7 +132,6 @@ function drawBiomeOverlay(ctx, w, h, biome, env, t) {
         ctx.fillStyle = g; ctx.beginPath(); ctx.arc(hs.x * w, hs.y * h, r, 0, Math.PI * 2); ctx.fill();
     });
 
-    // Plague clouds
     if (env.dis > .45) for (let i = 0; i < 3; i++) {
         const ox = ((Math.sin(t * .28 + i * 1.2) * .14 + .5 + i * .18) % 1);
         const oy = ((Math.cos(t * .22 + i * .95) * .10 + .58 + i * .08) % 1);
@@ -151,7 +141,6 @@ function drawBiomeOverlay(ctx, w, h, biome, env, t) {
         ctx.fillStyle = g; ctx.beginPath(); ctx.arc(ox * w, oy * h, r, 0, Math.PI * 2); ctx.fill();
     }
 
-    // Tundra snow drift particles
     if (biome.id === 'tundra') {
         ctx.fillStyle = 'rgba(200,220,255,.55)';
         for (let i = 0; i < 18; i++) {
@@ -161,7 +150,6 @@ function drawBiomeOverlay(ctx, w, h, biome, env, t) {
         }
     }
 
-    // Desert heat shimmer (horizontal wavy lines near horizon)
     if (biome.id === 'desert' && env.temp > 36) {
         const hor = h * 0.30;
         ctx.strokeStyle = 'rgba(255,160,60,.08)';
@@ -177,17 +165,13 @@ function drawBiomeOverlay(ctx, w, h, biome, env, t) {
     }
 }
 
-// ── Food ──────────────────────────────────────────────────────────────────
-// Each food item has a type that matches the diet of the species that spawns it.
 const FOOD_EMOJI = { seed: "🌾", plant: "🌿", worm: "🐛", meat: "🥩" };
 const SPECIES_FOOD = { mouse: "seed", rabbit: "seed", cow: "plant", pig: "plant", bird: "worm", fox: "meat" };
 const foods = [];
-let _foodTypes = ["seed"]; // updated each tick from alive species
-
+let _foodTypes = ["seed"]; 
 function updateFoodTypes(agentsList) {
     const alive = agentsList.filter(a => a.status !== "dead");
     if (!alive.length) return;
-    // Collect unique food types from alive species
     const types = [...new Set(alive.map(a => SPECIES_FOOD[a.species] || "seed"))];
     _foodTypes = types;
 }
@@ -211,16 +195,12 @@ function drawFood(ctx, w, h, t) {
     ctx.globalAlpha = 1;
 }
 
-// ── Agents ────────────────────────────────────────────────────────────────
 const EMOJI = { mouse: "🐭", pig: "🐷", cow: "🐮", rabbit: "🐰", fox: "🦊", bird: "🐦" };
 const FLASH = { mutation: [255, 110, 25], death: [255, 35, 65], reproduction: [55, 215, 130] };
 
-// ── Particle system ───────────────────────────────────────────────────────────
-// particles[]: { x, y, vx, vy, life, maxLife, r, g, b, size, type }
 const particles = [];
 
 function spawnDeathBurst(px, py, fitR, fitG, fitB) {
-    // Main explosion — 18 sparks scatter outward
     for (let i = 0; i < 18; i++) {
         const angle = (i / 18) * Math.PI * 2 + Math.random() * .4;
         const speed = 60 + Math.random() * 120;
@@ -235,7 +215,6 @@ function spawnDeathBurst(px, py, fitR, fitG, fitB) {
             type: 'spark'
         });
     }
-    // 6 larger colour blobs using organism's fitness colour
     for (let i = 0; i < 6; i++) {
         const angle = Math.random() * Math.PI * 2;
         const speed = 30 + Math.random() * 60;
@@ -250,12 +229,10 @@ function spawnDeathBurst(px, py, fitR, fitG, fitB) {
             type: 'blob'
         });
     }
-    // Shockwave ring
     particles.push({ x: px, y: py, vx: 0, vy: 0, life: .40, maxLife: .40, r: 255, g: 80, b: 30, size: 0, type: 'ring', maxR: 40 });
 }
 
 function spawnBirthBurst(px, py) {
-    // 12 green/cyan orbs shoot outward
     for (let i = 0; i < 12; i++) {
         const angle = (i / 12) * Math.PI * 2;
         const speed = 45 + Math.random() * 80;
@@ -271,11 +248,9 @@ function spawnBirthBurst(px, py) {
             type: 'spark'
         });
     }
-    // Two expanding rings
     for (let i = 0; i < 2; i++) {
         particles.push({ x: px, y: py, vx: 0, vy: 0, life: .35 + i * .15, maxLife: .35 + i * .15, r: 60, g: 230, b: 140, size: 0, type: 'ring', maxR: 28 + i * 14 });
     }
-    // Central flash
     particles.push({ x: px, y: py, vx: 0, vy: 0, life: .22, maxLife: .22, r: 180, g: 255, b: 200, size: 16, type: 'glow' });
 }
 
@@ -287,10 +262,9 @@ function stepParticles(dt) {
         if (p.type !== 'ring' && p.type !== 'glow') {
             p.x += p.vx * dt;
             p.y += p.vy * dt;
-            // Gravity / drag
             p.vx *= 0.88;
             p.vy *= 0.88;
-            p.vy += 18 * dt; // slight gravity on sparks
+            p.vy += 18 * dt; 
         }
     }
 }
@@ -298,7 +272,7 @@ function stepParticles(dt) {
 function drawParticles(ctx, w, h) {
     const scaleX = w, scaleY = h;
     for (const p of particles) {
-        const t = p.life / p.maxLife; // 1 = fresh, 0 = dead
+        const t = p.life / p.maxLife;
 
         if (p.type === 'ring') {
             const radius = p.maxR * (1 - t);
@@ -317,7 +291,6 @@ function drawParticles(ctx, w, h) {
             ctx.fillStyle = grad;
             ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, Math.PI * 2); ctx.fill();
         } else {
-            // spark / blob
             const alpha = p.type === 'blob' ? t * .70 : t * .90;
             ctx.globalAlpha = alpha;
             ctx.fillStyle = `rgb(${p.r},${p.g},${p.b})`;
@@ -334,31 +307,24 @@ function drawAgents(ctx, w, h, agents, flashes) {
     for (const a of agents) {
         const px = a.x * w, py = a.y * h;
         const dead = a.status === "dead", rep = a.status === "reproduced";
-        // Shadow
         ctx.globalAlpha = dead ? .18 : .55; ctx.fillStyle = "rgba(0,0,0,.28)";
         ctx.beginPath(); ctx.ellipse(px, py + 10, 9, 3.5, 0, 0, Math.PI * 2); ctx.fill();
         ctx.globalAlpha = dead ? .28 : 1;
-        // Fitness bg circle
         if (!dead) { ctx.fillStyle = fitCSS(a.fitness, .50); ctx.beginPath(); ctx.arc(px, py, 12, 0, Math.PI * 2); ctx.fill(); }
-        // Status ring
         ctx.strokeStyle = dead ? "rgba(255,80,80,.55)" : rep ? "rgba(100,160,255,.65)" : "rgba(65,220,125,.65)";
         ctx.lineWidth = dead ? 1.5 : 2; ctx.beginPath(); ctx.arc(px, py, 13.5, 0, Math.PI * 2); ctx.stroke();
-        // Flash ring
         const fl = flashes?.[a.id];
         if (fl && fl.t > 0) { const [fr, fg, fb] = FLASH[fl.type] || FLASH.mutation; ctx.strokeStyle = `rgba(${fr},${fg},${fb},${fl.t * .68})`; ctx.lineWidth = 2; const r = 15 + (1 - fl.t) * 20; ctx.beginPath(); ctx.arc(px, py, r, 0, Math.PI * 2); ctx.stroke(); }
-        // Emoji — always reset font and alpha before drawing
         ctx.globalAlpha = dead ? .30 : 1;
         ctx.font = "15px system-ui,Segoe UI Emoji,Apple Color Emoji,Segoe UI Symbol";
         ctx.fillStyle = dead ? "rgba(190,190,190,.6)" : "rgba(255,255,255,.98)";
         ctx.fillText(EMOJI[a.species] || "🧬", px, py - 1);
-        // Status dot
         ctx.globalAlpha = 1; ctx.fillStyle = dead ? "rgba(255,80,80,.95)" : rep ? "rgba(100,160,255,.95)" : "rgba(65,220,125,.95)";
         ctx.beginPath(); ctx.arc(px + 11, py - 10, 3, 0, Math.PI * 2); ctx.fill();
     }
     ctx.globalAlpha = 1;
 }
 
-// ── Popup card ────────────────────────────────────────────────────────────
 function buildPopup(found) {
     if (!found) return "";
     const [r, g, b] = fitRGB(found.fitness);
@@ -393,7 +359,6 @@ function buildPopup(found) {
 function bindPopup(host, canvas, agentMap) {
     const popup = document.getElementById("gx-org-popup");
     if (!popup || !host) return;
-    // Move to <body> so it's above every stacking context (canvas, panels, etc.)
     document.body.appendChild(popup);
     host.addEventListener("mousemove", e => {
         const rect = canvas.getBoundingClientRect();
@@ -407,7 +372,6 @@ function bindPopup(host, canvas, agentMap) {
         if (found) {
             popup.hidden = false;
             popup.innerHTML = buildPopup(found);
-            // Position using viewport coords — popup is position:fixed
             const pw = 240, ph = 200;
             let tx = e.clientX + 18;
             let ty = e.clientY - 20;
@@ -423,7 +387,6 @@ function bindPopup(host, canvas, agentMap) {
     host.addEventListener("mouseleave", () => { popup.hidden = true; });
 }
 
-// ── Side panel ────────────────────────────────────────────────────────────
 
 function updateSpecies(agents) {
     const grid = document.getElementById("gx-species-grid"); if (!grid) return;
@@ -457,7 +420,6 @@ function updateBiome(env) {
     chip.textContent = b.name; chip.className = "gx-biome-chip" + (b.cls ? " " + b.cls : "");
 }
 
-// ── Main ──────────────────────────────────────────────────────────────────
 document.addEventListener("DOMContentLoaded", () => {
     const root = document.getElementById("sim-root"); if (!root) return;
     const popId = root.dataset.popId;
@@ -471,10 +433,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const statusEl = document.getElementById("sim-status"), statusDot = document.getElementById("sim-statusdot");
     const logBody = document.getElementById("gx-run-logBody");
 
-    // Mutation tracker
     const tracker = createMutationTracker(lang);
-    // FIX: inject into the dedicated slot defined in Run.cshtml rather than
-    // appending to the full button container (which put it after the env toggle)
     tracker.injectToggleBtn(
         document.getElementById("gx-tracker-btn-slot") ??
         document.querySelector(".gx-runhdr__right")
@@ -489,7 +448,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const getEnv = () => ({ temp: Number(sTemp?.value ?? 22), rad: Number(sRad?.value ?? .1), dis: Number(sDis?.value ?? .1), res: Number(sRes?.value ?? .7) });
     const factorsPayload = () => ({ temperature: Number(sTemp.value), radiation: Number(sRad.value), diseasePressure: Number(sDis.value), resources: Number(sRes.value), speed: Number(sSpeed.value) });
 
-    // Canvas
     const host = document.getElementById("gx-pop-canvas");
     const canvas = document.getElementById("sim-canvas");
     const fsBtn = document.getElementById("gx-canvasfs");
@@ -497,7 +455,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     bindPan(host, canvas);
 
-    // Seed agents
     const seedEl = document.getElementById("sim-seed");
     const seed = seedEl ? JSON.parse(seedEl.textContent || "{}") : {};
     const seedOrgs = Array.isArray(seed.organisms) ? seed.organisms : [];
@@ -514,21 +471,16 @@ document.addEventListener("DOMContentLoaded", () => {
         agentMap.set(a.id, a); agents.push(a);
     });
 
-    // Seed the HUD dead counter from loaded data
     const seedDead = agents.filter(a => a.status === "dead").length;
     if (vDead) vDead.textContent = String(seedDead);
 
     tracker.onTick([], 0, agents.map(a => ({ id: a.id, name: a.name, species: a.species, status: a.status, fitness: a.fitness })));
     bindPopup(host, canvas, agentMap);
 
-    // Canvas resize — reads fixed CSS height, does NOT cause growth
     function resizeCanvas() {
         if (!canvas || !host || !ctx) return;
         const r = host.getBoundingClientRect();
         const dpr = clamp(window.devicePixelRatio || 1, 1, 2);
-        // Only update if dimensions actually changed
-        // Don't set canvas.style dimensions - CSS handles sizing via inset:0
-        // Only update the pixel buffer size for crisp rendering
         const newW = Math.floor(r.width * dpr), newH = Math.floor(r.height * dpr);
         if (canvas.width === newW && canvas.height === newH) return;
         canvas.width = newW; canvas.height = newH;
@@ -538,7 +490,6 @@ document.addEventListener("DOMContentLoaded", () => {
     window.addEventListener("resize", resizeCanvas, { passive: true });
     document.addEventListener("fullscreenchange", resizeCanvas);
 
-    // Agent step
     function stepAgents(dt, w, h) {
         const res = clamp(Number(sRes?.value ?? .7), 0, 1);
         if (Math.random() < .025 + res * .055) spawnFood(1);
@@ -569,7 +520,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 const prevStatus = a.status;
                 a.status = o.status;
                 a.fitness = o.fitness;
-                // Spawn particles when status changes
                 if (prevStatus !== 'dead' && o.status === 'dead') {
                     const [fr, fg, fb] = fitRGB(a.fitness);
                     const rect = canvas?.getBoundingClientRect();
@@ -579,7 +529,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     if (rect) spawnBirthBurst(a.x * rect.width, a.y * rect.height);
                 }
             } else {
-                // New offspring — create a fresh agent near its parent's position
                 const px = (o.x && o.x > 0) ? o.x : Math.random();
                 const py = (o.y && o.y > 0) ? o.y : (.42 + Math.random() * .52);
                 const sp = o.species || "mouse";
@@ -597,7 +546,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 };
                 agentMap.set(newAgent.id, newAgent);
                 agents.push(newAgent);
-                // Birth burst for offspring
                 const rect = canvas?.getBoundingClientRect();
                 if (rect) spawnBirthBurst(px * rect.width, py * rect.height);
             }
@@ -614,13 +562,11 @@ document.addEventListener("DOMContentLoaded", () => {
         if (typeof r.reproduced === "number") vRep.textContent = r.reproduced;
         if (typeof r.avgFitness === "number") vAvg.textContent = r.avgFitness.toFixed(3);
         syncFromResult(r);
-        // Count newly added organisms as "born"
         totalBorn = Math.max(totalBorn, agents.length);
         const env = getEnv(); updateStress(env); updateSpecies(agents); updateBiome(env);
         updateFoodTypes(agents);
         if (Array.isArray(r.organisms))
             tracker.onTick(r.organisms.map(o => ({ id: o.id, status: o.status, fitness: o.fitness })), r.tick ?? 0);
-        // Extinction check
         if (r.alive === 0 && running && !extinctionShown) {
             setUiRunning(false);
             clearTimeout(loopTimer);
@@ -629,10 +575,8 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // Animation
     let lastT = performance.now(), timeAcc = 0, flashes = {}, running = false, inFlight = false, loopTimer = 0;
 
-    // Extinction tracking — count only non-dead organisms at start
     const initialAlive = agents.filter(a => a.status !== "dead").length;
     let peakAlive = initialAlive, totalBorn = initialAlive, extinctionShown = false;
 
@@ -649,10 +593,8 @@ document.addEventListener("DOMContentLoaded", () => {
             if (running) { stepAgents(dt, w, h); drawFood(ctx, w, h, timeAcc); } else foods.length = 0;
             drawAgents(ctx, w, h, agents, flashes);
             ctx.restore();
-            // Particles drawn in screen space (no cam offset) so they don't pan with camera
             stepParticles(dt);
             drawParticles(ctx, w, h);
-            // Keep 3D view in sync with current biome
             if (galaxyActive && galaxy) galaxy.setBiome(biome);
         }
         requestAnimationFrame(frame);
@@ -669,7 +611,6 @@ document.addEventListener("DOMContentLoaded", () => {
         statusDot?.classList.toggle("is-running", running);
     }
 
-    // Fullscreen — stopPropagation prevents triggering pan
     fsBtn?.addEventListener("click", async e => {
         e.stopPropagation();
         try {
@@ -678,7 +619,6 @@ document.addEventListener("DOMContentLoaded", () => {
         } catch (err) { log("Fullscreen: " + err.message); }
     });
 
-    // Factor push
     const pushFactors = debounce(async () => {
         try {
             await postJson(`/simulations/${popId}/factors`, factorsPayload());
@@ -690,7 +630,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 200);
     [sTemp, sRad, sDis, sRes, sSpeed].forEach(el => el?.addEventListener("input", pushFactors));
 
-    // Tick
     async function doTick(steps) {
         if (inFlight) return; inFlight = true;
         try { applyTickResult(await postJson(`/simulations/${popId}/tick`, { steps })); }
@@ -713,7 +652,6 @@ document.addEventListener("DOMContentLoaded", () => {
         catch (e) { if (statusEl) statusEl.textContent = e?.message || "Error"; }
     });
 
-    // Save — snapshot current agent states to DB
     btnSave?.addEventListener("click", async () => {
         const origText = btnSave.textContent;
         btnSave.disabled = true;
@@ -731,7 +669,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     window.addEventListener("beforeunload", () => clearTimeout(loopTimer));
 
-    // Scenarios
     const scenSel = document.getElementById("gx-scenario"), scenApply = document.getElementById("gx-scenario-apply");
     const SCEN = [
         { id: "gold", name: "🌿 Golden Valley", f: { temperature: 22, radiation: .05, diseasePressure: .08, resources: .85, speed: 10 }, desc: "Stable growth — watch fitness rise." },
@@ -750,9 +687,6 @@ document.addEventListener("DOMContentLoaded", () => {
         catch (e) { if (statusEl) statusEl.textContent = e?.message || "Error"; }
     });
 
-    // ── Floating environment panel ────────────────────────────────────────────
-    // Move panel + backdrop to <body> so they're above every stacking context.
-    // CSS display:none keeps them hidden by default — no JS tricks needed.
     const envPanel = document.getElementById("gx-env-panel");
     const envBackdrop = document.getElementById("gx-env-backdrop");
     if (envPanel) document.body.appendChild(envPanel);
@@ -763,9 +697,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function openEnvPanel() {
         if (!envPanel) return;
-        // Both display AND transform must be set via inline style.
-        // Inline style beats CSS class rules, so even if the CSS has
-        // display:flex + transform:translateX(100%), these win.
         envPanel.style.display = "flex";
         envPanel.style.transform = "translateX(0)";
         envPanel.style.transition = "transform .28s cubic-bezier(.4,0,.2,1)";
@@ -780,7 +711,6 @@ document.addEventListener("DOMContentLoaded", () => {
     function closeEnvPanel() {
         if (!envPanel) return;
         envPanel.style.transform = "translateX(100%)";
-        // Wait for slide-out animation before hiding
         setTimeout(() => { if (envPanel) envPanel.style.display = "none"; }, 280);
         envBackdrop && (envBackdrop.style.display = "none");
         document.body.style.paddingRight = "";
@@ -791,13 +721,11 @@ document.addEventListener("DOMContentLoaded", () => {
     envClose?.addEventListener("click", closeEnvPanel);
     envBackdrop?.addEventListener("click", closeEnvPanel);
 
-    // ── Galaxy 3D view ────────────────────────────────────────────────────────
     const galaxyBtn = document.getElementById("gx-galaxy-btn");
     const galaxyWrap = document.getElementById("gx-galaxy-wrap");
     const canvas2dWrap = document.getElementById("gx-pop-canvas");
     const galaxyFsBtn = document.getElementById("gx-galaxy-fs");
 
-    // Fullscreen for 3D panel
     galaxyFsBtn?.addEventListener("click", async e => {
         e.stopPropagation();
         try {
@@ -815,7 +743,6 @@ document.addEventListener("DOMContentLoaded", () => {
         const popup = document.getElementById("gx-org-popup");
         if (!popup) return;
         if (!data) { popup.hidden = true; return; }
-        // Reuse existing buildPopup — find agent by id
         const a = agentMap.get(data.id);
         if (!a) { popup.hidden = true; return; }
         popup.hidden = false;
@@ -843,20 +770,16 @@ document.addEventListener("DOMContentLoaded", () => {
                 requestAnimationFrame(() => {
                     requestAnimationFrame(() => {
                         galaxy.mount(galaxyWrap);
-                        // Apply current biome immediately on first mount
                         const env = getEnv();
                         galaxy.setBiome(biomeInfo(env.temp, env.rad, env.dis, env.res));
                     });
                 });
             } else {
-                // Already mounted — just show it and force biome sync
                 const env = getEnv();
                 galaxy.setBiome(biomeInfo(env.temp, env.rad, env.dis, env.res), true);
                 galaxy.onResize();
             }
         } else {
-            // Restore 2D — show the canvas wrap first, then resize the pixel buffer
-            // after the browser has reflowed (display:none → block needs one rAF)
             galaxyWrap.style.display = "none";
             canvas2dWrap.style.display = "";
             requestAnimationFrame(() => resizeCanvas());
@@ -901,7 +824,6 @@ document.addEventListener("DOMContentLoaded", () => {
         const overlay = document.getElementById("gx-extinction");
         if (!overlay) return;
 
-        // Populate stats
         const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
         set("gx-ext-ticks", ticks);
         set("gx-ext-peak", peakAlive);
@@ -909,14 +831,11 @@ document.addEventListener("DOMContentLoaded", () => {
         set("gx-ext-avgfit", Number(lastAvgFitness).toFixed(3));
         set("gx-ext-cause", analyzeExtinctionCause());
 
-        // Show overlay
         overlay.removeAttribute("hidden");
         overlay.style.display = "flex";
 
-        // Canvas darkens — switch all agents to dead visually
         agents.forEach(a => { a.status = "dead"; });
 
-        // Dismiss button
         const dismiss = document.getElementById("gx-ext-dismiss");
         dismiss?.addEventListener("click", () => {
             overlay.style.opacity = "0";
@@ -933,7 +852,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     log(lang === "bg" ? "Симулацията е готова ✅" : "Simulation ready ✅");
 
-    // If all organisms were dead when the page loaded (saved after extinction), show the screen
     if (initialAlive === 0 && agents.length > 0) {
         extinctionShown = true;
         const lastFit = agents.length > 0

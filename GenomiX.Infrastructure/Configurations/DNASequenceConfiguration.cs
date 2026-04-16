@@ -5,9 +5,6 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace GenomiX.Infrastructure.Configurations
 {
-    /// <summary>
-    /// DNA_Sequences: immutable strand snapshots.
-    /// </summary>
     public class DNASequenceConfiguration : IEntityTypeConfiguration<DNASequence>
     {
         public void Configure(EntityTypeBuilder<DNASequence> builder)

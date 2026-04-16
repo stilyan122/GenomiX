@@ -1,16 +1,6 @@
-﻿// ─── GenomiX — 3D Simulation World View ──────────────────────────────────────
-// Performance targets:
-//   • NO per-frame GC — particle pool pre-allocated, no new THREE objects in loop
-//   • Organisms: cylindrical billboard planes (stay upright, face camera on Y only)
-//   • Food: flat planes lying on the ground (no billboarding needed)
-//   • Decor: cylindrical billboard planes
-//   • setBiome() called from 2D frame loop — instant env reaction
-//   • onResize() for fullscreen
-
-const GROUND_SIZE = 240;
+﻿const GROUND_SIZE = 240;
 const EMOJI_TEX = 80;
-const MAX_PARTICLES = 60;   // hard cap — no heap churn beyond this
-
+const MAX_PARTICLES = 60;
 const BIOME_CFG = {
     temperate: { ground: 0x1c5230, fog: 0x060d1a, fN: 180, fF: 520, sky: 0x060d1a, amb: 0x556688, sun: 0xaaccff, decor: ['🌲', '🌳', '🌿', '🌲', '🌳', '🌱'] },
     desert: { ground: 0x9a6218, fog: 0x3a1804, fN: 130, fF: 400, sky: 0x1a0a02, amb: 0x886644, sun: 0xffcc66, decor: ['🌵', '🪨', '🌵', '💀', '🪨', '🌵'] },
@@ -29,19 +19,14 @@ export function createGalaxyView(agents, agentMap, foods, EMOJI, FOOD_EMOJI, onH
     let mounted = false;
     let currentBiomeId = '';
 
-    // Scene objects updated per biome
     let groundMesh, skyMesh, ambientLight, sunLight;
-    const decorPlanes = [];   // cylindrical billboard planes
+    const decorPlanes = []; 
 
-    // Emoji texture cache
     const texCache = new Map();
 
-    // Organism/food planes
-    const orgPlanes = new Map(); // id → { plane, lastStatus }
-    const foodPlanes = new Map(); // index → plane
+    const orgPlanes = new Map(); 
+    const foodPlanes = new Map();
 
-    // ── Particle pool — pre-allocated, no GC ─────────────────────────────────
-    // Slots: { mesh, active, vx, vy, vz, life, maxLife, isRing, maxScale }
     const pool = [];
     for (let i = 0; i < MAX_PARTICLES; i++) {
         const m = new THREE.Mesh(
@@ -51,7 +36,6 @@ export function createGalaxyView(agents, agentMap, foods, EMOJI, FOOD_EMOJI, onH
         m.visible = false;
         pool.push({ mesh: m, active: false, vx: 0, vy: 0, vz: 0, life: 0, maxLife: 1, isRing: false, maxScale: 1 });
     }
-    // Ring pool (separate geometry)
     const ringPool = [];
     for (let i = 0; i < 8; i++) {
         const m = new THREE.Mesh(
@@ -62,7 +46,6 @@ export function createGalaxyView(agents, agentMap, foods, EMOJI, FOOD_EMOJI, onH
         ringPool.push({ mesh: m, active: false, life: 0, maxLife: 1, maxScale: 1 });
     }
 
-    // Camera state
     let isDragging = false, prevMouse = { x: 0, y: 0 };
     let camTheta = 0.4, camPhi = 1.0, camRadius = 190;
     let autoTheta = 0.4;
@@ -71,7 +54,6 @@ export function createGalaxyView(agents, agentMap, foods, EMOJI, FOOD_EMOJI, onH
     const raycaster = new THREE.Raycaster();
     const mouse2d = new THREE.Vector2();
 
-    // ── Emoji texture ─────────────────────────────────────────────────────────
     function getEmojiTex(emoji) {
         if (texCache.has(emoji)) return texCache.get(emoji);
         const c = document.createElement('canvas');
@@ -85,7 +67,6 @@ export function createGalaxyView(agents, agentMap, foods, EMOJI, FOOD_EMOJI, onH
         return tex;
     }
 
-    // ── Plane factory ─────────────────────────────────────────────────────────
     function makePlane(emoji, size) {
         const m = new THREE.Mesh(
             new THREE.PlaneGeometry(size, size),
@@ -94,7 +75,6 @@ export function createGalaxyView(agents, agentMap, foods, EMOJI, FOOD_EMOJI, onH
         return m;
     }
 
-    // Cylindrical billboard: rotate plane around Y to face camera, stay upright
     function cylindricalBillboard(plane) {
         if (!camera) return;
         const dx = camera.position.x - plane.position.x;
@@ -102,16 +82,12 @@ export function createGalaxyView(agents, agentMap, foods, EMOJI, FOOD_EMOJI, onH
         plane.rotation.set(0, Math.atan2(dx, dz), 0);
     }
 
-    // ── Coordinate mapping ────────────────────────────────────────────────────
     function simToWorld(sx, sy, y) {
         return new THREE.Vector3((sx - 0.5) * GROUND_SIZE, y, ((sy ?? 0.5) - 0.5) * GROUND_SIZE);
     }
     const orgY = a => a.status === 'dead' ? 1.0 : 4 + a.fitness * 3;
     const orgSz = a => a.status === 'dead' ? 5 : 7 + a.fitness * 5;
 
-    // ── Biome update ─────────────────────────────────────────────────────────
-    // 40 decor positions spread across the whole ground using a seeded grid
-    // with per-cell jitter — no diagonal line, covers all four quadrants evenly
     const DECOR_POS = (() => {
         const pos = [];
         const cols = 5, rows = 4;
@@ -158,7 +134,6 @@ export function createGalaxyView(agents, agentMap, foods, EMOJI, FOOD_EMOJI, onH
         });
     }
 
-    // ── Ground ────────────────────────────────────────────────────────────────
     function buildGround(color) {
         const geo = new THREE.PlaneGeometry(GROUND_SIZE, GROUND_SIZE, 36, 36);
         const pos = geo.attributes.position;
@@ -193,7 +168,6 @@ export function createGalaxyView(agents, agentMap, foods, EMOJI, FOOD_EMOJI, onH
         return new THREE.Points(geo, new THREE.PointsMaterial({ color: 0xddeeff, size: 2.0, sizeAttenuation: true }));
     }
 
-    // ── Organisms ─────────────────────────────────────────────────────────────
     function addOrgPlane(a) {
         const plane = makePlane(EMOJI[a.species] || '🧬', orgSz(a));
         plane.position.copy(simToWorld(a.x, a.y, orgY(a)));
@@ -232,15 +206,12 @@ export function createGalaxyView(agents, agentMap, foods, EMOJI, FOOD_EMOJI, onH
             }
         });
 
-        // Billboard decor too
         decorPlanes.forEach(p => cylindricalBillboard(p));
     }
 
-    // ── Food — flat on the ground ─────────────────────────────────────────────
     let prevFoodCount = -1;
     function syncFood() {
         const n = foods.length;
-        // Fast path: if count unchanged, just update opacity
         if (n === prevFoodCount) {
             foods.forEach((f, i) => {
                 const p = foodPlanes.get(i);
@@ -249,15 +220,12 @@ export function createGalaxyView(agents, agentMap, foods, EMOJI, FOOD_EMOJI, onH
             return;
         }
         prevFoodCount = n;
-        // Remove stale
         foodPlanes.forEach((plane, key) => {
             if (key >= n) { scene.remove(plane); foodPlanes.delete(key); }
         });
-        // Add new
         foods.forEach((f, i) => {
             if (!foodPlanes.has(i)) {
                 const plane = makePlane(FOOD_EMOJI[f.type] || '🌿', 6);
-                // Lie flat on the ground, rotated around X
                 plane.rotation.x = -Math.PI / 2;
                 plane.position.copy(simToWorld(f.x, f.y, 0.3));
                 scene.add(plane);
@@ -267,7 +235,6 @@ export function createGalaxyView(agents, agentMap, foods, EMOJI, FOOD_EMOJI, onH
         });
     }
 
-    // ── Particle pool helpers ─────────────────────────────────────────────────
     function getFreeSlot() {
         return pool.find(s => !s.active);
     }
@@ -331,7 +298,6 @@ export function createGalaxyView(agents, agentMap, foods, EMOJI, FOOD_EMOJI, onH
         });
     }
 
-    // ── Camera ────────────────────────────────────────────────────────────────
     function updateCamera() {
         camera.position.set(
             camRadius * Math.sin(camPhi) * Math.cos(camTheta),
@@ -341,7 +307,6 @@ export function createGalaxyView(agents, agentMap, foods, EMOJI, FOOD_EMOJI, onH
         camera.lookAt(0, 4, 0);
     }
 
-    // ── Mount ─────────────────────────────────────────────────────────────────
     function mount(container) {
         if (mounted) return;
         mounted = true;
@@ -356,48 +321,42 @@ export function createGalaxyView(agents, agentMap, foods, EMOJI, FOOD_EMOJI, onH
         updateCamera();
 
         renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));  // cap at 1.5x for perf
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));  
         renderer.setSize(W, H);
         renderer.shadowMap.enabled = true;
         renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         renderer.setClearColor(0x060d1a, 1);
-        // Insert before existing children (the fullscreen button) so the button stays on top
         if (container.firstChild) {
             container.insertBefore(renderer.domElement, container.firstChild);
         } else {
             container.appendChild(renderer.domElement);
         }
 
-        // Lights
         ambientLight = new THREE.AmbientLight(0x556688, 1.0); scene.add(ambientLight);
         sunLight = new THREE.DirectionalLight(0xaaccff, 1.6);
         sunLight.position.set(80, 140, 60); sunLight.castShadow = true;
-        sunLight.shadow.mapSize.width = sunLight.shadow.mapSize.height = 512; // 512 not 1024 — faster
+        sunLight.shadow.mapSize.width = sunLight.shadow.mapSize.height = 512; 
         sunLight.shadow.camera.left = sunLight.shadow.camera.bottom = -130;
         sunLight.shadow.camera.right = sunLight.shadow.camera.top = 130;
         sunLight.shadow.camera.far = 480;
         scene.add(sunLight);
         scene.add(new THREE.HemisphereLight(0x223355, 0x1a4820, 0.7));
 
-        // Sky + environment
         skyMesh = new THREE.Mesh(new THREE.SphereGeometry(950, 20, 14), new THREE.MeshBasicMaterial({ color: 0x060d1a, side: THREE.BackSide }));
         scene.add(skyMesh);
         groundMesh = buildGround(0x1c5230); scene.add(groundMesh);
         scene.add(buildGrid());
         scene.add(buildStars());
 
-        // Add particle meshes to scene
         pool.forEach(s => scene.add(s.mesh));
         ringPool.forEach(r => scene.add(r.mesh));
 
-        // Initial biome
         const env = getEnv ? getEnv() : {};
         applyBiome(biomeIdFromInfo(env ? require_biome_from_env(env) : { id: 'temperate' }));
 
         rebuildSpheres();
         autoTheta = camTheta;
 
-        // Resize
         const ro = new ResizeObserver(entries => {
             if (!renderer) return;
             const { width, height } = entries[0].contentRect;
@@ -408,7 +367,6 @@ export function createGalaxyView(agents, agentMap, foods, EMOJI, FOOD_EMOJI, onH
         });
         ro.observe(container);
 
-        // Controls
         renderer.domElement.addEventListener('pointerdown', e => {
             isDragging = false; prevMouse = { x: e.clientX, y: e.clientY };
             renderer.domElement.setPointerCapture(e.pointerId);
@@ -457,8 +415,6 @@ export function createGalaxyView(agents, agentMap, foods, EMOJI, FOOD_EMOJI, onH
         requestAnimationFrame(loop);
     }
 
-    // ── Public API ────────────────────────────────────────────────────────────
-    // Called every frame from 2D loop with current biome object
     function setBiome(biome, force = false) {
         if (!mounted) return;
         applyBiome(biomeIdFromInfo(biome), force);
@@ -493,7 +449,6 @@ export function createGalaxyView(agents, agentMap, foods, EMOJI, FOOD_EMOJI, onH
     return { mount, unmount, rebuildSpheres, setBiome, onResize };
 }
 
-// Helper used only at init time — avoids importing biomeInfo
 function require_biome_from_env(env) {
     if (env.rad > 0.55) return { id: 'rad' };
     if (env.dis > 0.55) return { id: 'plague' };

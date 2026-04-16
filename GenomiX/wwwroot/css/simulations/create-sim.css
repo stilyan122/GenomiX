@@ -1,8 +1,4 @@
-﻿/* ═══════════════════════════════════════════════════════════
-   Simulation Create page
-   ═══════════════════════════════════════════════════════════ */
-
-.gx-simcreate {
+﻿.gx-simcreate {
     display: grid;
     grid-template-columns: 1.6fr .9fr;
     gap: 14px;
@@ -35,8 +31,6 @@
     pointer-events: none;
 }
 
-/* FIX: Was 3-column (1.2fr 1fr .7fr) — 4 fields made the last one wrap
-   alone. Changed to 2-column to produce a clean 2×2 grid. */
 .gx-simform__grid {
     position: relative;
     display: grid;
@@ -95,7 +89,6 @@
     background: rgba(255,255,255,.10);
 }
 
-/* FIX: .gx-simform__section was used in Create.cshtml but never defined */
 .gx-simform__section {
     position: relative;
     z-index: 1;
@@ -154,8 +147,6 @@
     flex-wrap: wrap;
 }
 
-/* FIX: .gx-muted was used in Create.cshtml for the "live environment" note
-   but was never defined */
 .gx-muted {
     font-size: 12px;
     opacity: .55;
@@ -204,13 +195,6 @@
     font-size: 13px;
 }
 
-/* NOTE: The ~130-line .gx-run__* block that was here (canvas, main, hud, side,
-   log, sideActions, etc.) has been removed entirely. Those classes belonged to
-   an old two-column run layout that was replaced by the current .gx-runpage
-   design in Run.cshtml and run-sim.css. They were dead code and will not be
-   missed. If you ever roll back Run.cshtml, restore from git. */
-
-/* ── Responsive ─────────────────────────────────────────── */
 @media (max-width: 1100px) {
     .gx-simcreate {
         grid-template-columns: 1fr;

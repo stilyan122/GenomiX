@@ -24,7 +24,6 @@
     el.setAttribute("placeholder", text);
   });
 
-  // confirm texts (optional)
   document.querySelectorAll("[data-i18n-confirm]").forEach(el => {
     const key = el.getAttribute("data-i18n-confirm");
     if (!key) return;
@@ -33,7 +32,6 @@
     el.setAttribute("data-confirm-text", text);
   });
 
-  // expose small helper for onclick usage
   window.gxConfirm = function (el, fallback) {
     const msg = el?.getAttribute?.("data-confirm-text") || fallback || "";
     return window.confirm(msg);

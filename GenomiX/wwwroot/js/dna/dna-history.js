@@ -1,29 +1,20 @@
-﻿// ─── Mutation Timeline Panel ───────────────────────────────────────────────
-//
-// Full-featured side-drawer timeline showing every edit recorded in the
-// undo/redo stacks with rich descriptions, mini position strips, session
-// stats, type-filters, jump-to-position, and undo/redo-to-here support.
-
-export function createHistoryController({
+﻿export function createHistoryController({
     undoStack,
     redoStack,
     getPairs,
     setCurrentIndex,
     closeEditPop,
     updateView,
-    onUndo,      // optional: () => void  — call the viewer's undo()
-    onRedo,      // optional: () => void  — call the viewer's redo()
+    onUndo,    
+    onRedo,    
 }) {
-    // ── State ──────────────────────────────────────────────────────────────
     let panel = null;
     let panelOpen = false;
     let activeFilter = "all";
-    let sessionStart = null;   // timestamp of first edit
+    let sessionStart = null;   
     let tickTimer = null;
 
     const historyBtn = document.getElementById("history-btn");
-
-    // ── Op metadata helpers ────────────────────────────────────────────────
 
     const OP_META = {
         mutate: { label: "Substitution", short: "SUB", color: "#7090ff", icon: "⇄" },
@@ -55,8 +46,6 @@ export function createHistoryController({
         }
     }
 
-    // ── Session time ───────────────────────────────────────────────────────
-
     function fmtDuration(ms) {
         const s = Math.floor(ms / 1000);
         if (s < 60) return `${s}s`;
@@ -80,8 +69,6 @@ export function createHistoryController({
         return new Date(ts).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
     }
 
-    // ── Stats ─────────────────────────────────────────────────────────────
-
     function computeStats() {
         const all = [...undoStack, ...redoStack];
         const byType = {};
@@ -99,8 +86,6 @@ export function createHistoryController({
         return { total: all.length, byType, netLen, positions: positions.size };
     }
 
-    // ── Mini position strip ────────────────────────────────────────────────
-
     function makeStrip(opIndex, seqLen, opType) {
         const W = 200, H = 12;
         const safLen = Math.max(1, seqLen);
@@ -114,8 +99,6 @@ export function createHistoryController({
             <rect x="${px - 1}" y="3" width="2" height="6" rx="1" fill="white" opacity="0.6"/>
         </svg>`;
     }
-
-    // ── Copy report ────────────────────────────────────────────────────────
 
     function buildTextReport() {
         const stats = computeStats();
@@ -139,8 +122,6 @@ export function createHistoryController({
         return lines.join("\n");
     }
 
-    // ── Jump / undo-to-here ────────────────────────────────────────────────
-
     function jumpToPos(op) {
         const idx = op.index ?? op.idx ?? op.from ?? null;
         if (idx == null) return;
@@ -150,24 +131,16 @@ export function createHistoryController({
     }
 
     function undoToEntry(undoStackIndex) {
-        // undoStackIndex: position in undoStack (0=oldest, length-1=most recent)
-        // we want state after applying op[undoStackIndex]
-        // so undo (undoStack.length - 1 - undoStackIndex) times
         if (!onUndo) return;
         const steps = undoStack.length - 1 - undoStackIndex;
         for (let i = 0; i < steps; i++) onUndo();
     }
 
     function redoToEntry(redoStackIndex) {
-        // redoStackIndex: position in redoStack (0=oldest-undone, length-1=most-recently-undone)
-        // to restore up to and including redoStack[redoStackIndex]
-        // redo (redoStack.length - redoStackIndex) times
         if (!onRedo) return;
         const steps = redoStack.length - redoStackIndex;
         for (let i = 0; i < steps; i++) onRedo();
     }
-
-    // ── Build panel DOM ────────────────────────────────────────────────────
 
     function buildPanel() {
         const el = document.createElement("div");
@@ -241,13 +214,11 @@ export function createHistoryController({
                 const orig = btn.textContent;
                 btn.textContent = "✓ Copied!";
                 setTimeout(() => { btn.textContent = orig; }, 1800);
-            } catch { /* ignore */ }
+            } catch { }
         });
 
         return el;
     }
-
-    // ── Render entry ───────────────────────────────────────────────────────
 
     function renderEntry({ op, lane, stepNum, undoIdx, redoIdx, seqLen }) {
         const m = meta(op.type);
@@ -299,7 +270,6 @@ export function createHistoryController({
             </div>
         `;
 
-        // Action button clicks
         el.addEventListener("click", e => {
             const action = e.target.closest("[data-action]")?.dataset.action;
             if (!action) return;
@@ -317,8 +287,6 @@ export function createHistoryController({
         return el;
     }
 
-    // ── Render full timeline ───────────────────────────────────────────────
-
     function renderTimeline() {
         if (!panel) return;
 
@@ -330,8 +298,6 @@ export function createHistoryController({
 
         const stats = computeStats();
         const seqLen = getPairs().length;
-
-        // Update stats bar
         panel.querySelector("#gx-tls-total").textContent = stats.total;
         panel.querySelector("#gx-tls-net").textContent = (stats.netLen >= 0 ? "+" : "") + stats.netLen + " bp";
         panel.querySelector("#gx-tls-pos").textContent = stats.positions;
@@ -339,27 +305,21 @@ export function createHistoryController({
             panel.querySelector("#gx-tls-time").textContent = fmtDuration(Date.now() - sessionStart);
         }
 
-        // Build ordered list: undoStack newest-first, then redoStack newest-first
         const entries = [];
         let globalStep = undoStack.length + redoStack.length;
 
-        // undoStack: index 0=oldest ... length-1=most recent
         for (let i = undoStack.length - 1; i >= 0; i--) {
             entries.push({ op: undoStack[i], lane: "undo", stepNum: globalStep--, undoIdx: i, redoIdx: null });
         }
 
-        // Current-state divider marker
         entries.push({ divider: true });
 
-        // redoStack: index length-1=most-recently-undone ... 0=oldest-undone
         for (let j = redoStack.length - 1; j >= 0; j--) {
             entries.push({ op: redoStack[j], lane: "redo", stepNum: globalStep--, undoIdx: null, redoIdx: j });
         }
 
-        // Filter
         const filtered = entries.filter(e => e.divider || activeFilter === "all" || e.op.type === activeFilter);
 
-        // Render
         body.innerHTML = "";
 
         if (stats.total === 0) {
@@ -388,8 +348,6 @@ export function createHistoryController({
         if (footCount) footCount.textContent = renderedCount > 0 ? `${renderedCount} entries` : "";
     }
 
-    // ── Session timer tick ─────────────────────────────────────────────────
-
     function startTick() {
         if (tickTimer) return;
         tickTimer = setInterval(() => {
@@ -400,14 +358,11 @@ export function createHistoryController({
         }, 1000);
     }
 
-    // ── Open / close ───────────────────────────────────────────────────────
-
     function openPanel() {
         if (!panel) panel = buildPanel();
         panelOpen = true;
         panel.classList.add("is-open");
         historyBtn?.classList.add("is-active");
-        // Shift main content so page stays centered in the visible area
         const panelW = window.innerWidth <= 860 ? 0 : 400;
         document.body.style.transition = "padding-right .32s cubic-bezier(.4,0,.2,1)";
         document.body.style.paddingRight = panelW ? `${panelW}px` : "";
@@ -427,17 +382,13 @@ export function createHistoryController({
         else openPanel();
     }
 
-    // ── Public: renderHistory (called by viewer on every record/undo/redo) ──
-
     function renderHistory() {
-        // Track first edit timestamp
         if (undoStack.length > 0 && !sessionStart) {
             sessionStart = undoStack[0].timestamp;
         }
 
         if (panelOpen) renderTimeline();
 
-        // Update button badge
         updateHistoryBtn();
     }
 
@@ -456,8 +407,6 @@ export function createHistoryController({
             badge.remove();
         }
     }
-
-    // ── Mount / dispose ────────────────────────────────────────────────────
 
     const onOutsideClick = e => {
         if (!panelOpen || !panel) return;
@@ -482,7 +431,6 @@ export function createHistoryController({
         sessionStart = null;
     }
 
-    // Legacy compat: expose closeHistory for any existing callers
     function closeHistory() { closePanel(); }
 
     return { mount, dispose, renderHistory, closeHistory };

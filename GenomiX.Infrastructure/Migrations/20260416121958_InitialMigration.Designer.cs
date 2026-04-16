@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GenomiX.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260415061306_InitialMigration")]
+    [Migration("20260416121958_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />

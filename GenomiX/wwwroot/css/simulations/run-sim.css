@@ -1,18 +1,13 @@
-﻿/* ═══════════════════════════════════════════════════════════
-   Simulation Run — full-width canvas + floating env panel
-   ═══════════════════════════════════════════════════════════ */
-
+﻿
 .gx-runpage {
     padding: 16px 0 48px;
 }
 
-    /* Override the global 1320px cap — run page needs all available screen space */
     .gx-runpage .container--wide {
         max-width: 100% !important;
         width: 100% !important;
     }
 
-/* ── Header ─────────────────────────────────────────────── */
 .gx-runhdr {
     display: flex;
     align-items: flex-start;
@@ -46,7 +41,6 @@
     flex-shrink: 0;
 }
 
-/* FIX: playback buttons grouped with a subtle separator from nav/env */
 .gx-runhdr__controls {
     display: flex;
     gap: 6px;
@@ -56,7 +50,6 @@
     border-right: 1px solid rgba(255,255,255,.10);
 }
 
-/* Start button — bright green "go" cue, pulses when idle */
 #sim-run {
     background: rgba(50,210,110,.18);
     border-color: rgba(50,210,110,.45);
@@ -78,7 +71,6 @@
         box-shadow: none;
     }
 
-/* Save button */
 #sim-save {
     background: rgba(100,160,255,.10);
     border-color: rgba(100,160,255,.25);
@@ -102,12 +94,9 @@
     font-size: 13px;
 }
 
-/* env toggle button — plain header button, no special positioning needed */
 .gx-env-toggle-btn {
     gap: 5px;
 }
-
-/* ── HUD ─────────────────────────────────────────────────── */
 .gx-hud {
     display: flex;
     gap: 8px;
@@ -131,12 +120,10 @@
     flex: 2 1 160px;
 }
 
-/* FIX: biome chip gets slightly more room than numeric chips */
 .gx-hudchip--biome {
     flex: 2 1 160px;
 }
 
-/* Avg fitness label is long — give it extra room and allow label to wrap */
 .gx-hudchip--avg {
     flex: 1 1 120px;
     min-width: 110px;
@@ -147,7 +134,7 @@
     letter-spacing: .06em;
     text-transform: uppercase;
     opacity: .50;
-    white-space: normal; /* allow wrap on long labels like "Средна пригодност" */
+    white-space: normal; 
     line-height: 1.3;
 }
 
@@ -169,7 +156,6 @@
     color: rgba(100,160,255,.95);
 }
 
-/* FIX: biome chip display — text instead of a big number */
 .gx-biome-chip {
     font-size: 13px;
     font-weight: 700;
@@ -229,7 +215,6 @@
     opacity: .80;
 }
 
-/* ── Main card — full width ──────────────────────────────── */
 .gx-runmain {
     display: flex;
     flex-direction: column;
@@ -238,7 +223,6 @@
     width: 100%;
 }
 
-/* ── Canvas ──────────────────────────────────────────────── */
 .gx-popcanvas {
     position: relative;
     width: 100%;
@@ -270,7 +254,6 @@
     height: 100dvh !important;
 }
 
-/* Legend */
 .gx-poplegend {
     position: absolute;
     top: 10px;
@@ -316,7 +299,6 @@
     background: rgba(255,85,100,.95);
 }
 
-/* Food legend — emoji indicator, ::before dot is hidden */
 .gx-leg--food::before {
     background: transparent;
     width: 0;
@@ -329,7 +311,6 @@
     margin-left: -4px;
 }
 
-/* Fullscreen button */
 .gx-canvasfs {
     position: absolute;
     right: 10px;
@@ -351,8 +332,6 @@
         color: #fff;
     }
 
-/* Organism popup — position:fixed so it floats above everything.
-   JS moves it to <body> and positions using e.clientX/Y. */
 .gx-org-popup {
     position: fixed;
     z-index: 9999;
@@ -383,7 +362,6 @@
     }
 }
 
-/* Accent header strip — background tinted by fitness color via JS inline style */
 .gx-org-popup__header {
     padding: 13px 14px 11px;
     background: rgba(255,255,255,.04);
@@ -423,7 +401,6 @@
     margin-top: 2px;
 }
 
-/* Body area */
 .gx-org-popup__body {
     padding: 11px 14px 13px;
     display: flex;
@@ -432,10 +409,9 @@
 }
 
 .gx-org-popup__divider {
-    display: none; /* replaced by header/body split */
+    display: none;
 }
 
-/* Fitness row */
 .gx-org-popup__fitness-row {
     display: flex;
     align-items: center;
@@ -462,7 +438,6 @@
     color: rgba(140,165,220,.50);
 }
 
-/* Fitness bar */
 .gx-org-popup__bar {
     height: 5px;
     background: rgba(255,255,255,.06);
@@ -476,7 +451,6 @@
     transition: width .3s;
 }
 
-/* Status badge */
 .gx-org-popup__badge {
     display: inline-flex;
     align-items: center;
@@ -507,12 +481,10 @@
         border-color: rgba(100,160,255,.25);
     }
 
-/* Legacy stat rows — kept for compat, hidden in new layout */
 .gx-org-popup__stat {
     display: none;
 }
 
-/* Log — FIX: increased max-height from 90px to 160px */
 .gx-runlog {
     border-radius: 11px;
     border: 1px solid rgba(255,255,255,.07);
@@ -544,7 +516,6 @@
     margin-top: 2px;
 }
 
-/* ── Floating environment panel ──────────────────────────── */
 .gx-env-panel {
     position: fixed;
     top: 0;
@@ -561,7 +532,7 @@
     transform: translateX(100%);
     transition: transform .30s cubic-bezier(.4,0,.2,1);
     will-change: transform;
-    overflow: hidden; /* must stay hidden — content must not bleed when panel is off-screen */
+    overflow: hidden; 
 }
 
     .gx-env-panel.is-open {
@@ -616,7 +587,6 @@
     scrollbar-color: rgba(255,255,255,.07) transparent;
 }
 
-/* Sliders inside panel */
 .gx-simsliders--run {
     display: flex;
     flex-direction: column;
@@ -672,14 +642,12 @@
     cursor: pointer;
 }
 
-/* Divider */
 .gx-env-divider {
     height: 1px;
     background: rgba(255,255,255,.07);
     flex-shrink: 0;
 }
 
-/* FIX: scenario section now lives in the env panel */
 .gx-env-scenario-section {
     display: flex;
     flex-direction: column;
@@ -692,7 +660,6 @@
     align-items: center;
 }
 
-/* Species section */
 .gx-species-section__title {
     font-size: 10px;
     letter-spacing: .07em;
@@ -759,7 +726,6 @@
     transition: width .5s ease;
 }
 
-/* Stress */
 .gx-stress-row {
     display: flex;
     align-items: center;
@@ -796,7 +762,6 @@
     text-align: right;
 }
 
-/* Backdrop */
 .gx-env-backdrop {
     display: none;
     position: fixed;
@@ -821,12 +786,10 @@
     }
 }
 
-/* Body shift when panel opens */
 body.env-panel-open {
     transition: padding-right .30s cubic-bezier(.4,0,.2,1);
 }
 
-/* ── Responsive ──────────────────────────────────────────── */
 @media (max-width: 900px) {
     .gx-runhdr {
         flex-direction: column;
@@ -885,15 +848,10 @@ body.env-panel-open {
     }
 }
 
-/* ═══════════════════════════════════════════════════════════
-   Extinction Event Overlay
-   ═══════════════════════════════════════════════════════════ */
-
 .gx-extinction {
     flex-direction: column;
 }
 
-/* Animated particle / aurora background */
 .gx-extinction__bg {
     position: absolute;
     inset: 0;
@@ -1000,7 +958,6 @@ body.env-panel-open {
     padding: 4px 14px;
 }
 
-/* Stats row */
 .gx-extinction__stats {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -1042,7 +999,6 @@ body.env-panel-open {
     line-height: 1.3;
 }
 
-/* Actions */
 .gx-extinction__actions {
     display: flex;
     gap: 12px;
@@ -1066,7 +1022,6 @@ body.env-panel-open {
         box-shadow: 0 0 20px rgba(200,50,50,.25);
     }
 
-/* ── Galaxy 3D view ──────────────────────────────────────── */
 .gx-galaxy-wrap {
     width: 100%;
     height: 500px;
@@ -1077,15 +1032,12 @@ body.env-panel-open {
     position: relative;
     flex-shrink: 0;
 }
-
-    /* Fullscreen — fill the whole screen */
     .gx-galaxy-wrap:fullscreen {
         border-radius: 0;
         height: 100dvh !important;
         width: 100dvw !important;
     }
 
-    /* Fullscreen button inside galaxy wrap */
     .gx-galaxy-wrap .gx-canvasfs {
         position: absolute;
         right: 10px;
@@ -1094,7 +1046,6 @@ body.env-panel-open {
         pointer-events: all;
     }
 
-    /* Three.js canvas — fill the wrap but stay at z 0 so button stays on top */
     .gx-galaxy-wrap > canvas {
         position: absolute !important;
         inset: 0 !important;
@@ -1104,7 +1055,6 @@ body.env-panel-open {
         display: block;
     }
 
-/* 3D view button active state */
 #gx-galaxy-btn.is-active {
     background: rgba(40,180,100,.18);
     border-color: rgba(40,180,100,.45);

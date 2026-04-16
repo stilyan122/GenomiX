@@ -1,22 +1,13 @@
-﻿// ─── Simulation Live Mutation Tracker ────────────────────────────────────
-//
-// Tracks per-organism changes between ticks (mutations, deaths, reproduction),
-// renders a right-drawer panel with live feed, stats and filters,
-// and exposes a flash API for the canvas renderer.
-
-export function createMutationTracker(lang = "en") {
+﻿export function createMutationTracker(lang = "en") {
     const bg = lang === "bg";
 
-    // ── Event store ─────────────────────────────────────────────────────
-    const events = [];      // all recorded events, newest first
-    let orgMap = {};      // id → { status, fitness, name, species }
+    const events = [];     
+    let orgMap = {};     
     let tick = 0;
     let filter = "all";
 
-    // Per-organism flash state for canvas rendering: id → { t: 0..1, type }
     const flashes = {};
 
-    // ── Labels ───────────────────────────────────────────────────────────
     const T = {
         title: bg ? "Мутационен тракер" : "Mutation Tracker",
         all: bg ? "Всички" : "All",
@@ -50,7 +41,6 @@ export function createMutationTracker(lang = "en") {
     };
     function spEmoji(sp) { return SPECIES_EMOJI[sp] || "🧬"; }
 
-    // ── Event detection ───────────────────────────────────────────────────
 
     function detectChanges(orgs, currentTick) {
         const newEvents = [];
@@ -59,7 +49,6 @@ export function createMutationTracker(lang = "en") {
             const prev = orgMap[o.id];
 
             if (!prev) {
-                // First time seeing this org — just record baseline
                 orgMap[o.id] = { status: o.status, fitness: o.fitness, name: o.name || o.id, species: o.species || "mouse" };
                 continue;
             }
@@ -106,14 +95,12 @@ export function createMutationTracker(lang = "en") {
                 flashes[o.id] = { t: 1, type: "mutation" };
             }
 
-            // Update map
             orgMap[o.id] = { status: o.status, fitness: o.fitness, name: prev.name, species: prev.species };
         }
 
         return newEvents;
     }
 
-    // ── Stats ─────────────────────────────────────────────────────────────
 
     function stats() {
         const total = events.length;
@@ -124,7 +111,6 @@ export function createMutationTracker(lang = "en") {
         return { total, muts, deaths, repros, rate };
     }
 
-    // ── Text report ───────────────────────────────────────────────────────
 
     function buildReport() {
         const s = stats();
@@ -143,7 +129,6 @@ export function createMutationTracker(lang = "en") {
         return lines.join("\n");
     }
 
-    // ── Panel DOM ─────────────────────────────────────────────────────────
 
     let panel = null;
     let panelOpen = false;
@@ -216,17 +201,14 @@ export function createMutationTracker(lang = "en") {
         return el;
     }
 
-    // ── Render event entry ────────────────────────────────────────────────
 
     function renderEntry(e) {
         const m = TYPE_META[e.type];
         const el = document.createElement("div");
         el.className = `gx-mut-entry gx-mut-entry--${e.type}`;
 
-        // Bottom row varies by event type
         let bottomRow = "";
         if (e.type === "reproduction") {
-            // Show parent fitness that triggered reproduction + offspring spawned
             const pct = Math.round((e.prevFitness ?? e.newFitness ?? 0) * 100);
             bottomRow = `
                 <div class="gx-mut-entry__repro">
@@ -240,7 +222,6 @@ export function createMutationTracker(lang = "en") {
                     <span class="gx-mut-entry__fitbar"><span class="gx-mut-entry__fitfill" style="width:0%;background:${m.color}"></span></span>
                 </div>`;
         } else {
-            // mutation
             const df = e.delta >= 0 ? `+${e.delta.toFixed(3)}` : e.delta.toFixed(3);
             bottomRow = `
                 <div class="gx-mut-entry__delta ${e.delta < 0 ? "is-neg" : "is-pos"}">
@@ -268,7 +249,6 @@ export function createMutationTracker(lang = "en") {
         return el;
     }
 
-    // ── Render feed ────────────────────────────────────────────────────────
 
     function renderFeed() {
         if (!panel) return;
@@ -297,10 +277,9 @@ export function createMutationTracker(lang = "en") {
         if (empty) empty.hidden = true;
         filtered.forEach(e => body.appendChild(renderEntry(e)));
         if (footCount) footCount.textContent = `${filtered.length} events`;
-        body.scrollTop = 0; // newest at top
+        body.scrollTop = 0; 
     }
 
-    // ── Update button badge ───────────────────────────────────────────────
 
     function updateBadge() {
         if (!toggleBtn) return;
@@ -313,7 +292,6 @@ export function createMutationTracker(lang = "en") {
         badgeEl.style.display = events.length > 0 ? "grid" : "none";
     }
 
-    // ── Panel open/close ─────────────────────────────────────────────────
 
     function openPanel() {
         if (!panel) panel = buildPanel();
@@ -340,13 +318,9 @@ export function createMutationTracker(lang = "en") {
         closePanel();
     };
 
-    // ── Public API ────────────────────────────────────────────────────────
-
-    /** Call after each tick with the full organisms array and current tick number */
     function onTick(orgs, currentTick, orgMeta) {
         tick = currentTick;
 
-        // Merge name/species from orgMeta on first call
         if (orgMeta) {
             for (const m of orgMeta) {
                 if (!orgMap[m.id]) {
@@ -358,15 +332,12 @@ export function createMutationTracker(lang = "en") {
         const newEvts = detectChanges(orgs, currentTick);
 
         if (newEvts.length > 0) {
-            // Prepend (newest first)
             events.unshift(...newEvts.reverse());
             updateBadge();
             if (panelOpen) renderFeed();
         }
     }
 
-    /** Tick flash states: call each animation frame to decay flash values.
-     *  Returns a snapshot of current flashes for the canvas renderer. */
     function tickFlashes(dt) {
         const snapshot = {};
         for (const [id, f] of Object.entries(flashes)) {
@@ -377,7 +348,6 @@ export function createMutationTracker(lang = "en") {
         return snapshot;
     }
 
-    /** Inject the toggle button into an existing DOM element */
     function injectToggleBtn(containerEl) {
         if (!containerEl || document.getElementById("gx-mut-toggle")) return;
 

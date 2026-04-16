@@ -1,13 +1,4 @@
-﻿// ─── Codon Reading Frame Overlay ───────────────────────────────────────────
-//
-// Renders colored codon blocks above the DNA ladder, one block per three
-// base-pairs. Synchronized with the ladder's scroll transform via
-// MutationObserver. Supports reading frames 0, 1, 2. Shows rich tooltips
-// on hover. The toggle button is injected into the viewer actions bar.
-
-// ── Codon table (DNA coding strand: T→U substitution) ────────────────────
-
-const CODON_TABLE = {
+﻿const CODON_TABLE = {
     UUU: "F", UUC: "F", UUA: "L", UUG: "L", CUU: "L", CUC: "L", CUA: "L", CUG: "L",
     AUU: "I", AUC: "I", AUA: "I", AUG: "M", GUU: "V", GUC: "V", GUA: "V", GUG: "V",
     UCU: "S", UCC: "S", UCA: "S", UCG: "S", CCU: "P", CCC: "P", CCA: "P", CCG: "P",
@@ -17,8 +8,6 @@ const CODON_TABLE = {
     UGU: "C", UGC: "C", UGA: "*", UGG: "W", CGU: "R", CGC: "R", CGA: "R", CGG: "R",
     AGU: "S", AGC: "S", AGA: "R", AGG: "R", GGU: "G", GGC: "G", GGA: "G", GGG: "G",
 };
-
-// ── Amino acid catalog ────────────────────────────────────────────────────
 
 const AA = {
     A: { name: "Alanine", abbr: "Ala", cat: "nonpolar", color: "#4a7ee8" },
@@ -67,38 +56,28 @@ function codonInfo(dnaTriplet) {
     return { dna: dnaTriplet, mrna, aa, ...aaData(aa) };
 }
 
-// ── Layout constants ──────────────────────────────────────────────────────
-
-const PAIR_W = 54;   // base-pair width + margin (52px + 2px)
-const CODON_W = PAIR_W * 3;  // = 162px
-
-// ── Main export ───────────────────────────────────────────────────────────
+const PAIR_W = 54;   
+const CODON_W = PAIR_W * 3; 
 
 export function createCodonOverlay(viewerApiRef) {
     let frame = 0;
     let visible = false;
     let s1Seq = "";
 
-    // DOM refs
-    let barEl = null;  // the scrolling codon block row
-    let controlsEl = null;  // frame picker + toggle, fixed in ladder-wrap
-    let tooltipEl = null;  // floating hover tooltip
-    let ladderEl = null;  // .dna-ladder (observed for transform)
-    let wrapEl = null;  // .dna-ladder-wrap (parent)
-    let toggleBtnEl = null;  // button in viewerbar
-    let txObserver = null;  // MutationObserver for ladder transform
-
-    // ── Find DOM anchors ──────────────────────────────────────────────────
+    let barEl = null;  
+    let controlsEl = null;  
+    let tooltipEl = null;  
+    let ladderEl = null; 
+    let wrapEl = null;  
+    let toggleBtnEl = null; 
+    let txObserver = null;  
 
     function findAnchors() {
-        // Scientific mode has .dna-ladder-wrap; basic mode uses #dna-visual directly
         wrapEl = document.querySelector(".dna-ladder-wrap")
             ?? document.getElementById("dna-visual");
         ladderEl = wrapEl?.querySelector(".dna-ladder");
         return !!(wrapEl && ladderEl);
     }
-
-    // ── Extract translateX from ladder style ──────────────────────────────
 
     function extractTX(str) {
         const m = (str || "").match(/translateX\((-?[\d.]+)px\)/);
@@ -109,7 +88,6 @@ export function createCodonOverlay(viewerApiRef) {
         if (!barEl || !ladderEl) return;
         const tx = extractTX(ladderEl.style.transform);
         const trans = ladderEl.style.transition || "";
-        // Copy transition timing but strip translateY part (bar has no Y movement)
         barEl.style.transition = trans;
         barEl.style.transform = `translateX(${tx}px)`;
     }
@@ -125,15 +103,11 @@ export function createCodonOverlay(viewerApiRef) {
         txObserver = null;
     }
 
-    // ── Build codon bar element ───────────────────────────────────────────
-
     function buildBar() {
         const el = document.createElement("div");
         el.className = "gx-codon-bar";
         return el;
     }
-
-    // ── Build tooltip ─────────────────────────────────────────────────────
 
     function buildTooltip() {
         const el = document.createElement("div");
@@ -197,8 +171,6 @@ export function createCodonOverlay(viewerApiRef) {
         if (tooltipEl) tooltipEl.style.display = "none";
     }
 
-    // ── Render codon blocks ───────────────────────────────────────────────
-
     function render() {
         if (!barEl || !visible || !s1Seq) return;
         barEl.innerHTML = "";
@@ -206,7 +178,6 @@ export function createCodonOverlay(viewerApiRef) {
         const s1 = s1Seq;
         const len = s1.length;
 
-        // Partial "leader" block before frame starts
         if (frame > 0) {
             const leaderEl = document.createElement("div");
             leaderEl.className = "gx-codon-block gx-codon-block--leader";
@@ -246,7 +217,6 @@ export function createCodonOverlay(viewerApiRef) {
                 : `<span class="gx-codon-block__aa">${info.aa}</span>
                    <span class="gx-codon-block__mrna">${info.mrna}</span>`;
 
-            // Hover tooltip
             block.addEventListener("mouseenter", () => showTooltip(block, info, i));
             block.addEventListener("mouseleave", hideTooltip);
 
@@ -255,8 +225,6 @@ export function createCodonOverlay(viewerApiRef) {
 
         syncBarTransform();
     }
-
-    // ── Frame picker controls ─────────────────────────────────────────────
 
     function buildControls() {
         const el = document.createElement("div");
@@ -284,8 +252,6 @@ export function createCodonOverlay(viewerApiRef) {
 
         return el;
     }
-
-    // ── Toggle overlay visibility ─────────────────────────────────────────
 
     function show() {
         if (!findAnchors()) return;
@@ -323,8 +289,6 @@ export function createCodonOverlay(viewerApiRef) {
 
     function toggle() { visible ? hide() : show(); }
 
-    // ── Inject toggle button into viewer actions bar ───────────────────────
-
     function injectToggleBtn() {
         const isBg = document.documentElement.lang?.toLowerCase().startsWith("bg");
         const label = isBg ? "Кодони" : "Codons";
@@ -336,12 +300,9 @@ export function createCodonOverlay(viewerApiRef) {
         toggleBtnEl.textContent = label;
         toggleBtnEl.addEventListener("click", toggle);
 
-        // Insert before undo button (after compare)
         const undoBtn = document.getElementById("undo-btn");
         undoBtn.insertAdjacentElement('beforebegin', toggleBtnEl);
     }
-
-    // ── Public API ────────────────────────────────────────────────────────
 
     function setSequence(s1) {
         s1Seq = s1 || "";
@@ -357,8 +318,6 @@ export function createCodonOverlay(viewerApiRef) {
         toggleBtnEl?.remove();
         barEl = controlsEl = tooltipEl = ladderEl = wrapEl = toggleBtnEl = null;
     }
-
-    // ── Init ──────────────────────────────────────────────────────────────
 
     injectToggleBtn();
 

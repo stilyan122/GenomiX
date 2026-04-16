@@ -1,8 +1,6 @@
 ﻿import * as THREE from "https://esm.sh/three@0.159.0";
 import { OrbitControls } from "https://esm.sh/three@0.159.0/examples/jsm/controls/OrbitControls.js";
 
-// ─── Mutation classification ───────────────────────────────────────────────
-
 function reverseString(s) { return [...(s || "")].reverse().join(""); }
 
 function longestCommonPrefix(a, b) {
@@ -30,30 +28,23 @@ function classifyMainMutation(original, mutated) {
     return { type: "substitution", start: pre, originalSegment: sA, mutatedSegment: sB, originalRange: [pre, eA - 1], mutatedRange: [pre, eB - 1] };
 }
 
-// ─── Chromosome geometry ───────────────────────────────────────────────────
-// Design: clean, pill-shaped X chromosome, glossy gradient material,
-// distinct mutation highlight band, gold centromere, tight sister chromatids.
-
 const R_SEGS = 32;
 const ARM_LEN = 3.2;
 const R_MAX = 0.38;
 const R_CENT = 0.14;
 const R_TIP = 0.07;
-const CHROM_X = 0.22;    // sister chromatid X-offset
-const CENT_FRAC = 0.40;    // centromere at 40% from top
+const CHROM_X = 0.22;    
+const CENT_FRAC = 0.40;    
 
-// Smooth radius profile for LatheGeometry
 function chromProfile(nSteps = 64) {
     const pts = [];
     for (let i = 0; i <= nSteps; i++) {
-        const t = i / nSteps;                        // 0=top 1=bottom
+        const t = i / nSteps;                        
         const y = ARM_LEN - t * ARM_LEN * 2;
 
-        // Tip taper
         const tipT = Math.min(t, 1 - t) / 0.10;
         const tipFac = Math.min(1, tipT);
 
-        // Centromere constriction
         const centD = Math.abs(t - CENT_FRAC);
         const centFac = Math.min(1, centD / 0.12);
 
@@ -64,10 +55,8 @@ function chromProfile(nSteps = 64) {
     return pts;
 }
 
-// Build vertex color array for a LatheGeometry
-// Mutation UV range guaranteed at least MIN_BAND_FRAC wide so 1bp is visible
 function paintChromosome(geo, seqLen, mRange, isMutatedSide, mutType) {
-    const MIN_BAND = 0.06;  // minimum visible band width as fraction of chromosome
+    const MIN_BAND = 0.06;  
     const pos = geo.attributes.position;
     const uv = geo.attributes.uv;
     const n = pos.count;
@@ -75,7 +64,6 @@ function paintChromosome(geo, seqLen, mRange, isMutatedSide, mutType) {
     const safe = Math.max(1, seqLen);
     const hasMut = mutType !== "none";
 
-    // Expand mutation range to minimum visible size
     let uvS = hasMut && mRange ? mRange[0] / safe : 0;
     let uvE = hasMut && mRange ? mRange[1] / safe : 0;
     if (hasMut && uvE - uvS < MIN_BAND) {
@@ -84,11 +72,8 @@ function paintChromosome(geo, seqLen, mRange, isMutatedSide, mutType) {
         uvE = Math.min(1, mid + MIN_BAND / 2);
     }
 
-    // Centromere zone
     const centS = CENT_FRAC - 0.07;
     const centE = CENT_FRAC + 0.07;
-
-    // Mutation colors by type
     const mutColors = {
         substitution: isMutatedSide ? [1.0, 0.12, 0.26] : [1.0, 0.47, 0.10],
         deletion: isMutatedSide ? [1.0, 0.12, 0.26] : [1.0, 0.47, 0.10],
@@ -103,16 +88,13 @@ function paintChromosome(geo, seqLen, mRange, isMutatedSide, mutType) {
         let r, g, b;
 
         if (uvY >= centS && uvY <= centE) {
-            // Centromere: soft grey-blue
             r = 0.48; g = 0.56; b = 0.68;
         } else if (hasMut && uvY >= uvS && uvY <= uvE) {
-            // Mutation band
             [r, g, b] = mc;
         } else {
-            // G-banding: alternating blue tones
             const bandIdx = Math.floor(uvY * 12);
-            if (bandIdx % 2 === 0) { r = 0.29; g = 0.50; b = 0.83; }  // light
-            else { r = 0.17; g = 0.32; b = 0.60; }  // dark
+            if (bandIdx % 2 === 0) { r = 0.29; g = 0.50; b = 0.83; }  
+            else { r = 0.17; g = 0.32; b = 0.60; }  
         }
 
         colors[i * 3] = r; colors[i * 3 + 1] = g; colors[i * 3 + 2] = b;
@@ -120,7 +102,6 @@ function paintChromosome(geo, seqLen, mRange, isMutatedSide, mutType) {
     geo.setAttribute("color", new THREE.BufferAttribute(colors, 3));
 }
 
-// Build one complete chromosome (2 chromatids + centromere)
 function buildChromosomeGroup(seqLen, mutation, isMutatedSide) {
     const group = new THREE.Group();
     const safe = Math.max(1, seqLen);
@@ -130,7 +111,6 @@ function buildChromosomeGroup(seqLen, mutation, isMutatedSide) {
     for (const xSign of [-1, 1]) {
         const xOff = xSign * CHROM_X;
 
-        // Main chromatid body
         const geo = new THREE.LatheGeometry(pts, R_SEGS);
         geo.computeVertexNormals();
         paintChromosome(geo, safe, mRange, isMutatedSide, mutation.type);
@@ -144,7 +124,6 @@ function buildChromosomeGroup(seqLen, mutation, isMutatedSide) {
         mesh.position.x = xOff;
         group.add(mesh);
 
-        // Specular highlight strip (inner back-face tube)
         const hlPts = pts.map(p => new THREE.Vector2(p.x * 0.28, p.y));
         const hlGeo = new THREE.LatheGeometry(hlPts, 14);
         const hlMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.08, side: THREE.BackSide });
@@ -153,7 +132,6 @@ function buildChromosomeGroup(seqLen, mutation, isMutatedSide) {
         hlMesh.position.x = xOff;
         group.add(hlMesh);
 
-        // Glow outline (only on mutated bands) — outer shell slightly transparent
         if (mutation.type !== "none") {
             const glowPts = pts.map(p => new THREE.Vector2(p.x * 1.06, p.y));
             const glowGeo = new THREE.LatheGeometry(glowPts, R_SEGS);
@@ -166,12 +144,10 @@ function buildChromosomeGroup(seqLen, mutation, isMutatedSide) {
         }
     }
 
-    // Centromere sphere
     const centY = ARM_LEN - CENT_FRAC * ARM_LEN * 2;
     const hasMut = mutation.type !== "none";
     const mutFracS = hasMut && mRange ? mRange[0] / safe : 0;
     const mutFracE = hasMut && mRange ? mRange[1] / safe : 0;
-    // Centromere is highlighted only if mutation overlaps it
     const centHit = hasMut && mutFracS <= CENT_FRAC + 0.10 && mutFracE >= CENT_FRAC - 0.10;
     const centCol = centHit ? (isMutatedSide ? 0xff1f42 : 0xff7810) : 0xe8c97a;
 
@@ -181,7 +157,6 @@ function buildChromosomeGroup(seqLen, mutation, isMutatedSide) {
     cMesh.position.set(0, centY, 0);
     group.add(cMesh);
 
-    // Centromere glow
     const cgGeo = new THREE.SphereGeometry(0.33, 14, 10);
     const cgMat = new THREE.MeshBasicMaterial({ color: centCol, transparent: true, opacity: 0.18, side: THREE.BackSide });
     const cgMesh = new THREE.Mesh(cgGeo, cgMat);
@@ -190,8 +165,6 @@ function buildChromosomeGroup(seqLen, mutation, isMutatedSide) {
 
     return group;
 }
-
-// ─── Mount scene ──────────────────────────────────────────────────────────
 
 function mountChromosome3D(container, { sequence, label, mutation, isMutatedSide, lang }) {
     container._gxDispose?.();
@@ -223,7 +196,6 @@ function mountChromosome3D(container, { sequence, label, mutation, isMutatedSide
     controls.enablePan = false;
     controls.target.set(0, 0.4, 0);
 
-    // Lighting
     scene.add(new THREE.AmbientLight(0x223355, 1.4));
     const key = new THREE.DirectionalLight(0xffffff, 3.2); key.position.set(5, 8, 8); scene.add(key);
     const fill = new THREE.DirectionalLight(0x5577cc, 1.6); fill.position.set(-4, 2, 3); scene.add(fill);
@@ -235,7 +207,6 @@ function mountChromosome3D(container, { sequence, label, mutation, isMutatedSide
     group.rotation.z = 0.07;
     scene.add(group);
 
-    // ── Overlays ──────────────────────────────────────────────────────────
     const mk = (cls, html) => {
         const d = document.createElement("div");
         d.className = cls;
@@ -288,8 +259,6 @@ function mountChromosome3D(container, { sequence, label, mutation, isMutatedSide
     };
 }
 
-// ─── Mutation info ─────────────────────────────────────────────────────────
-
 function mutationInfoHtml(mutation, lang) {
     const bg = lang === "bg";
     const L = {
@@ -334,8 +303,6 @@ function mutationInfoHtml(mutation, lang) {
             <div class="gx-chrom-meta-row gx-chrom-meta-row--seq"><span class="gx-chrom-meta-k gx-chrom-meta-k--mut">${L.mut}</span><code class="gx-chrom-meta-seq gx-chrom-meta-seq--mut">${trunc(mutation.mutatedSegment || "—")}</code></div>
         </div></div>`;
 }
-
-// ─── Export ────────────────────────────────────────────────────────────────
 
 export function renderChromosomeAbnormalitiesCompare({
     normalMount, mutatedMount, infoMount, originalSequence, mutatedSequence

@@ -1,10 +1,4 @@
-﻿/* ═══════════════════════════════════════════════════════════════════════════
-   GenomiX — Simulation Mutation Tracker Panel
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-/* ── Drawer panel ────────────────────────────────────────────────────────── */
-
-.gx-mut-panel {
+﻿.gx-mut-panel {
     position: fixed;
     top: 0;
     right: 0;
@@ -27,8 +21,6 @@
     .gx-mut-panel.is-open {
         transform: translateX(0);
     }
-
-/* ── Header ──────────────────────────────────────────────────────────────── */
 
 .gx-mut-hd {
     display: flex;
@@ -84,8 +76,6 @@
         color: #fff;
     }
 
-/* ── Stats bar ───────────────────────────────────────────────────────────── */
-
 .gx-mut-stats {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
@@ -131,8 +121,6 @@
     text-align: center;
     white-space: nowrap;
 }
-
-/* ── Filter tabs ─────────────────────────────────────────────────────────── */
 
 .gx-mut-filters {
     display: flex;
@@ -185,8 +173,6 @@
     color: rgba(140,255,190,.98);
 }
 
-/* ── Feed body ───────────────────────────────────────────────────────────── */
-
 .gx-mut-body {
     flex: 1;
     overflow-y: auto;
@@ -207,8 +193,6 @@
         border-radius: 4px;
     }
 
-/* ── Empty state ─────────────────────────────────────────────────────────── */
-
 .gx-mut-empty {
     flex: 1;
     display: flex;
@@ -221,8 +205,6 @@
     white-space: pre-line;
     padding: 40px 20px;
 }
-
-/* ── Event entry ─────────────────────────────────────────────────────────── */
 
 .gx-mut-entry {
     display: flex;
@@ -358,8 +340,6 @@
     transition: width .3s ease;
 }
 
-/* ── Footer ──────────────────────────────────────────────────────────────── */
-
 .gx-mut-foot {
     display: flex;
     align-items: center;
@@ -394,8 +374,6 @@
     font-variant-numeric: tabular-nums;
 }
 
-/* ── Toggle button badge ─────────────────────────────────────────────────── */
-
 .gx-mut-toggle-btn {
     position: relative;
 }
@@ -425,10 +403,6 @@
     color: rgba(255,190,140,.98);
 }
 
-/* ── Canvas flash rings ──────────────────────────────────────────────────── */
-/* (drawn via JS on canvas — no CSS needed) */
-
-/* ── Responsive ──────────────────────────────────────────────────────────── */
 
 @media (max-width: 860px) {
     .gx-mut-panel {
@@ -440,7 +414,6 @@
     }
 }
 
-/* Reproduction entry row */
 .gx-mut-entry__repro {
     display: flex;
     align-items: center;

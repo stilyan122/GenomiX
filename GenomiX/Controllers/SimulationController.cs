@@ -189,13 +189,11 @@ namespace GenomiX.Controllers
             var user = await _users.GetUserAsync(User);
             if (user == null) return Challenge();
 
-            // Use GetByIdAsync to check global existence, not just user-owned
             var pop = await _sim.GetByIdAsync(id);
             if (pop == null) return NotFound();
 
             bool isReadOnly = pop.UserId != user.Id;
 
-            // Security: If not owner, must be public. If private and not owner, block.
             if (isReadOnly && !pop.IsPublic) return Forbid();
 
             var f = SimFactorsJsonHelper.Read(pop.Factors);
@@ -235,7 +233,6 @@ namespace GenomiX.Controllers
             var user = await _users.GetUserAsync(User);
             if (user == null) return Challenge();
 
-            // Security: Verify ownership before allowing factor updates
             var pop = await _sim.GetForUserAsync(user.Id, id);
             if (pop == null) return Forbid();
 
@@ -260,7 +257,6 @@ namespace GenomiX.Controllers
             var user = await _users.GetUserAsync(User);
             if (user == null) return Challenge();
 
-            // Security: Verify ownership
             var pop = await _sim.GetForUserAsync(user.Id, id);
             if (pop == null) return Forbid();
 
@@ -276,7 +272,6 @@ namespace GenomiX.Controllers
             var user = await _users.GetUserAsync(User);
             if (user == null) return Challenge();
 
-            // Security: Verify ownership
             var pop = await _sim.GetForUserAsync(user.Id, id);
             if (pop == null) return Forbid();
 
@@ -293,7 +288,6 @@ namespace GenomiX.Controllers
             var user = await _users.GetUserAsync(User);
             if (user == null) return Challenge();
 
-            // Security: Verify ownership
             var pop = await _sim.GetForUserAsync(user.Id, id);
             if (pop == null) return Forbid();
 

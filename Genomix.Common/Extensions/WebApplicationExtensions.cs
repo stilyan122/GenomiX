@@ -6,9 +6,6 @@ using Microsoft.Extensions.Options;
 
 namespace GenomiX.Common.Extensions
 {
-    /// <summary>
-    /// Helper to force known dev passwords for seeded users (and other web app extensions).
-    /// </summary>
     public static class WebApplicationExtensions
     {
         public static async Task UseKnownIdentityPasswordsAsync(this WebApplication app)

@@ -1,9 +1,4 @@
-﻿/* ═══════════════════════════════════════════════════════════
-   GenomiX — DNA → Protein Translation Panel
-   ═══════════════════════════════════════════════════════════ */
-
-/* ── Panel shell ─────────────────────────────────────────── */
-.gx-translate-panel {
+﻿.gx-translate-panel {
     margin-top: 16px;
     border-radius: 20px;
     border: 1px solid rgba(255,255,255,.09);
@@ -24,7 +19,6 @@
     }
 }
 
-/* ── Header ──────────────────────────────────────────────── */
 .gx-translate-panel__hd {
     display: flex;
     flex-wrap: wrap;
@@ -62,7 +56,6 @@
     font-size: 13px;
 }
 
-/* ── Stats chips ─────────────────────────────────────────── */
 .gx-translate-stats {
     display: flex;
     gap: 6px;
@@ -97,7 +90,6 @@
     line-height: 1.2;
 }
 
-/* ── Legend ──────────────────────────────────────────────── */
 .gx-translate-legend {
     display: flex;
     gap: 6px;
@@ -142,7 +134,6 @@
     color: rgba(203,213,225,.95);
 }
 
-/* ── Panel body ──────────────────────────────────────────── */
 .gx-translate-panel__body {
     padding: 16px 18px 20px;
     display: flex;
@@ -150,7 +141,6 @@
     gap: 14px;
 }
 
-/* No start codon notice */
 .gx-tr-nostart {
     padding: 16px;
     border-radius: 12px;
@@ -161,7 +151,6 @@
     text-align: center;
 }
 
-/* ── Codon track ─────────────────────────────────────────── */
 .gx-codon-track {
     display: flex;
     align-items: stretch;
@@ -173,7 +162,6 @@
     min-height: 140px;
 }
 
-/* ── Codon blocks ────────────────────────────────────────── */
 .gx-codon {
     display: flex;
     flex-direction: column;
@@ -194,7 +182,6 @@
         z-index: 2;
     }
 
-/* Colour variants */
 .gx-codon--nonpolar {
     border-color: rgba(245,158,11,.22);
     background: rgba(245,158,11,.07);
@@ -247,7 +234,6 @@
         box-shadow: 0 6px 20px rgba(34,197,94,.22), 0 0 0 2px rgba(34,197,94,.15);
     }
 
-/* UTR block */
 .gx-codon--utr {
     opacity: .45;
     min-width: 80px;
@@ -255,7 +241,6 @@
     justify-content: flex-end;
 }
 
-/* Codon content */
 .gx-codon__dna {
     font-size: 13px;
     font-weight: 700;
@@ -344,7 +329,6 @@
     color: rgba(203,213,225,.90);
 }
 
-/* ── Peptide bond connector ──────────────────────────────── */
 .gx-codon-bond {
     width: 20px;
     flex-shrink: 0;
@@ -374,8 +358,6 @@
     .gx-codon-bond::after {
         right: 0;
     }
-
-/* UTR separator */
 .gx-codon-sep {
     width: 24px;
     flex-shrink: 0;
@@ -383,7 +365,6 @@
     border-top: 1px dashed rgba(100,140,255,.20);
 }
 
-/* ── Protein sequence string ─────────────────────────────── */
 .gx-protein-seq {
     display: flex;
     align-items: center;
@@ -420,7 +401,6 @@
     height: auto;
 }
 
-/* ── Responsive ──────────────────────────────────────────── */
 @media (max-width: 760px) {
     .gx-translate-panel__hd {
         flex-direction: column;

@@ -782,7 +782,6 @@ namespace GenomiX.Tests.Services
 
             await sut.DeleteUserSequenceAsync(Guid.NewGuid());
 
-            // no exception and DB remains empty
             Assert.That(await db.DNA_Sequences.CountAsync(), Is.EqualTo(0));
         }
 

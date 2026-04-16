@@ -130,7 +130,6 @@
             </div>
         </section>
 
-        @* ── Translation panel — hidden until Translate button is clicked ── *@
         <section id="gx-translate-panel" class="gx-translate-panel" hidden>
             <div class="gx-translate-panel__hd">
                 <div class="gx-translate-panel__title">
@@ -169,15 +168,12 @@
             </div>
 
             <div class="gx-translate-panel__body">
-                @* No-start-codon notice *@
                 <div class="gx-tr-nostart" id="gx-tr-nostart" hidden>
                     @L["Translate_NoStart"]
                 </div>
 
-                @* Codon scroll track *@
                 <div class="gx-codon-track" id="gx-codon-track"></div>
 
-                @* Protein sequence string *@
                 <div class="gx-protein-seq" id="gx-protein-seq-wrap" hidden>
                     <span class="gx-protein-seq__label">@L["Translate_Protein"]</span>
                     <code class="gx-protein-seq__str" id="gx-protein-seq"></code>

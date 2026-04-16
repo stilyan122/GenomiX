@@ -192,19 +192,19 @@
     letter-spacing: .02em;
 }
 
-    .gx-tab.is-active {
-        background: rgba(126,230,255,0.14);
-        color: rgba(255,255,255,0.95);
-        box-shadow: 0 0 0 1px rgba(126,230,255,0.18) inset;
-    }
+.gx-tab.is-active {
+    background: rgba(126,230,255,0.14);
+    color: rgba(255,255,255,0.95);
+    box-shadow: 0 0 0 1px rgba(126,230,255,0.18) inset;
+}
 
 .gx-modal__pane {
     display: none;
 }
 
-    .gx-modal__pane.is-active {
-        display: block;
-    }
+.gx-modal__pane.is-active {
+    display: block;
+}
 
 .gx-modal__grid.onecol {
     display: block;
@@ -799,12 +799,12 @@
     min-width: 0;
 }
 
-    .gx-compare-panel h3 {
-        margin: 0 0 12px;
-        font-size: 24px;
-        font-weight: 850;
-        color: rgba(255,255,255,.96);
-    }
+.gx-compare-panel h3 {
+    margin: 0 0 12px;
+    font-size: 24px;
+    font-weight: 850;
+    color: rgba(255,255,255,.96);
+}
 
 .gx-compare-3d {
     min-height: 560px;
@@ -891,7 +891,6 @@
         grid-template-columns: 1fr;
     }
 }
-/* ── 3D Chromosome panel ───────────────────────────────────────────────── */
 
 .gx-chromosome-box {
     border-radius: 24px;
@@ -901,13 +900,11 @@
     min-width: 0;
 }
 
-    /* override old SVG styles for 3D */
-    .gx-chromosome-box canvas {
-        display: block;
-        width: 100% !important;
-    }
+.gx-chromosome-box canvas {
+    display: block;
+    width: 100% !important;
+}
 
-/* Label overlay inside the canvas container */
 .gx-chrom3d-label {
     position: absolute;
     top: 14px;
@@ -928,7 +925,6 @@
     backdrop-filter: blur(6px);
 }
 
-/* Legend bottom-left */
 .gx-chrom3d-legend {
     position: absolute;
     bottom: 14px;
@@ -962,7 +958,6 @@
     flex-shrink: 0;
 }
 
-/* Drag hint top-right */
 .gx-chrom3d-hint {
     position: absolute;
     top: 14px;
@@ -974,7 +969,6 @@
     transition: opacity .4s;
 }
 
-/* Sequence badge bottom-right */
 .gx-chrom3d-badge {
     position: absolute;
     bottom: 14px;
@@ -991,8 +985,6 @@
     border-radius: 999px;
     border: 1px solid rgba(255,255,255,.08);
 }
-
-/* ── Mutation info panel ──────────────────────────────────────────────── */
 
 .gx-chromosome-info {
     margin-top: 22px;
@@ -1036,7 +1028,6 @@
     line-height: 1;
 }
 
-/* New badge style replacing the plain value */
 .gx-chrom-type-badge {
     display: inline-flex;
     align-items: center;
@@ -1108,8 +1099,6 @@
     background: rgba(255,50,80,.08);
     border-color: rgba(255,80,100,.18);
 }
-
-/* ── Compare modal layout update ─────────────────────────────────────── */
 
 .gx-chrom-compare-grid {
     display: grid;

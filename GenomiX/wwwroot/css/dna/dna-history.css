@@ -1,9 +1,3 @@
-/* ═══════════════════════════════════════════════════════════════════════════
-   GenomiX — Mutation Timeline Panel
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-/* ── Side-drawer panel ───────────────────────────────────────────────────── */
-
 .gx-tl-panel {
     position: fixed;
     top: 0;
@@ -24,11 +18,9 @@
     will-change: transform;
 }
 
-    .gx-tl-panel.is-open {
-        transform: translateX(0);
-    }
-
-/* ── Header ──────────────────────────────────────────────────────────────── */
+.gx-tl-panel.is-open {
+    transform: translateX(0);
+}
 
 .gx-tl-header {
     display: flex;
@@ -73,12 +65,10 @@
     flex-shrink: 0;
 }
 
-    .gx-tl-header__close:hover {
-        background: rgba(255,255,255,.12);
-        color: #fff;
-    }
-
-/* ── Stats bar ───────────────────────────────────────────────────────────── */
+.gx-tl-header__close:hover {
+    background: rgba(255,255,255,.12);
+    color: #fff;
+}
 
 .gx-tl-stats {
     display: grid;
@@ -115,8 +105,6 @@
     white-space: nowrap;
 }
 
-/* ── Filter tabs ─────────────────────────────────────────────────────────── */
-
 .gx-tl-filters {
     display: flex;
     gap: 6px;
@@ -127,9 +115,9 @@
     scrollbar-width: none;
 }
 
-    .gx-tl-filters::-webkit-scrollbar {
-        display: none;
-    }
+.gx-tl-filters::-webkit-scrollbar {
+    display: none;
+}
 
 .gx-tl-filter {
     flex-shrink: 0;
@@ -145,16 +133,16 @@
     letter-spacing: .04em;
 }
 
-    .gx-tl-filter:hover {
-        background: rgba(255,255,255,.08);
-        color: #fff;
-    }
+.gx-tl-filter:hover {
+    background: rgba(255,255,255,.08);
+    color: #fff;
+}
 
-    .gx-tl-filter.is-active {
-        background: rgba(100,140,255,.20);
-        border-color: rgba(100,140,255,.45);
-        color: rgba(180,200,255,.98);
-    }
+.gx-tl-filter.is-active {
+    background: rgba(100,140,255,.20);
+    border-color: rgba(100,140,255,.45);
+    color: rgba(180,200,255,.98);
+}
 
 .gx-tl-filter--mutate.is-active {
     background: rgba(112,144,255,.18);
@@ -179,8 +167,6 @@
     color: rgba(255,235,140,.95);
 }
 
-/* ── Timeline body (scrollable) ──────────────────────────────────────────── */
-
 .gx-tl-body {
     flex: 1;
     overflow-y: auto;
@@ -193,16 +179,14 @@
     scrollbar-color: rgba(255,255,255,.12) transparent;
 }
 
-    .gx-tl-body::-webkit-scrollbar {
-        width: 4px;
-    }
+.gx-tl-body::-webkit-scrollbar {
+    width: 4px;
+}
 
-    .gx-tl-body::-webkit-scrollbar-thumb {
-        background: rgba(255,255,255,.12);
-        border-radius: 4px;
-    }
-
-/* ── Empty state ─────────────────────────────────────────────────────────── */
+.gx-tl-body::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,.12);
+    border-radius: 4px;
+}
 
 .gx-tl-empty {
     flex: 1;
@@ -226,8 +210,6 @@
     line-height: 1.55;
 }
 
-/* ── Divider: "current state" marker ─────────────────────────────────────── */
-
 .gx-tl-divider {
     display: flex;
     align-items: center;
@@ -240,21 +222,19 @@
     text-transform: uppercase;
 }
 
-    .gx-tl-divider::before {
-        content: "";
-        flex: none;
-        width: 100%;
-        max-width: 32px;
-        height: 2px;
-        background: rgba(100,220,140,.45);
-        border-radius: 1px;
-    }
+.gx-tl-divider::before {
+    content: "";
+    flex: none;
+    width: 100%;
+    max-width: 32px;
+    height: 2px;
+    background: rgba(100,220,140,.45);
+    border-radius: 1px;
+}
 
 .gx-tl-divider__label {
     white-space: nowrap;
 }
-
-/* ── Timeline entry ──────────────────────────────────────────────────────── */
 
 .gx-tl-entry {
     display: flex;
@@ -270,7 +250,6 @@
     opacity: .38;
 }
 
-/* Track column (dot + vertical line) */
 .gx-tl-entry__track {
     display: flex;
     flex-direction: column;
@@ -314,7 +293,6 @@
     min-height: 12px;
 }
 
-/* Card */
 .gx-tl-entry__card {
     flex: 1;
     min-width: 0;
@@ -372,7 +350,6 @@
     margin-bottom: 8px;
 }
 
-/* Base letter chips */
 .gx-tl-base {
     display: inline-block;
     min-width: 20px;
@@ -399,7 +376,6 @@
     vertical-align: middle;
 }
 
-/* Position strip */
 .gx-tl-entry__strip {
     display: flex;
     align-items: center;
@@ -421,7 +397,6 @@
     white-space: nowrap;
 }
 
-/* Action buttons */
 .gx-tl-entry__actions {
     display: flex;
     gap: 7px;
@@ -441,11 +416,11 @@
     white-space: nowrap;
 }
 
-    .gx-tl-act:hover {
-        background: rgba(255,255,255,.10);
-        color: #fff;
-        border-color: rgba(255,255,255,.18);
-    }
+.gx-tl-act:hover {
+    background: rgba(255,255,255,.10);
+    color: #fff;
+    border-color: rgba(255,255,255,.18);
+}
 
 .gx-tl-act--goto:hover {
     background: rgba(112,144,255,.16);
@@ -464,8 +439,6 @@
     border-color: rgba(68,232,135,.30);
     color: rgba(140,255,190,.95);
 }
-
-/* ── Footer ──────────────────────────────────────────────────────────────── */
 
 .gx-tl-footer {
     display: flex;
@@ -489,11 +462,11 @@
     transition: all .14s;
 }
 
-    .gx-tl-footer-btn:hover {
-        background: rgba(255,255,255,.10);
-        border-color: rgba(255,255,255,.18);
-        color: #fff;
-    }
+.gx-tl-footer-btn:hover {
+    background: rgba(255,255,255,.10);
+    border-color: rgba(255,255,255,.18);
+    color: #fff;
+}
 
 .gx-tl-footer-btn--copy:hover {
     background: rgba(112,144,255,.16);
@@ -505,8 +478,6 @@
     color: rgba(160,180,230,.45);
     font-variant-numeric: tabular-nums;
 }
-
-/* ── History button badge ─────────────────────────────────────────────────── */
 
 #history-btn {
     position: relative;
@@ -531,13 +502,10 @@
     font-variant-numeric: tabular-nums;
 }
 
-/* ── Responsive ──────────────────────────────────────────────────────────── */
-
 @media (max-width: 860px) {
     .gx-tl-panel {
         width: 100vw;
     }
-    /* body padding handled by JS; on mobile the panel covers full screen so no shift needed */
 }
 
 @media (max-width: 600px) {

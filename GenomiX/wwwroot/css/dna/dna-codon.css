@@ -1,14 +1,6 @@
-﻿/* ═══════════════════════════════════════════════════════════════════════════
-   GenomiX — Codon Reading Frame Overlay
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-/* ── Push tooltip below codon bar when overlay is active ─────────────────── */
-
-.gx-codon-active .dna-tooltip {
-    top: 72px !important; /* 10px offset + 52px bar + 10px gap */
+﻿.gx-codon-active .dna-tooltip {
+    top: 72px !important;
 }
-
-/* ── Codon bar clears the tooltip area ───────────────────────────────────── */
 
 .gx-codon-bar {
     position: absolute;
@@ -21,11 +13,9 @@
     transition: opacity .2s;
 }
 
-    .gx-codon-bar.is-hidden {
-        display: none;
-    }
-
-/* ── Individual codon block ──────────────────────────────────────────────── */
+.gx-codon-bar.is-hidden {
+    display: none;
+}
 
 .gx-codon-block {
     position: absolute;
@@ -47,45 +37,41 @@
     user-select: none;
 }
 
-    .gx-codon-block:hover {
-        background: color-mix(in srgb, var(--ac, #6688ff) 24%, rgba(8,12,28,.95));
-        border-color: color-mix(in srgb, var(--ac, #6688ff) 75%, transparent);
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px color-mix(in srgb, var(--ac, #6688ff) 30%, transparent);
-        z-index: 5;
-    }
+.gx-codon-block:hover {
+    background: color-mix(in srgb, var(--ac, #6688ff) 24%, rgba(8,12,28,.95));
+    border-color: color-mix(in srgb, var(--ac, #6688ff) 75%, transparent);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px color-mix(in srgb, var(--ac, #6688ff) 30%, transparent);
+    z-index: 5;
+}
 
-/* Stop codon: bold red styling */
 .gx-codon-block--is-stop {
     background: rgba(200, 30, 60, .16);
     border-color: rgba(220, 50, 80, .55);
     border-style: dashed;
 }
 
-    .gx-codon-block--is-stop:hover {
-        background: rgba(220, 40, 70, .28);
-    }
+.gx-codon-block--is-stop:hover {
+    background: rgba(220, 40, 70, .28);
+}
 
-/* Start codon: bright teal */
 .gx-codon-block--is-start {
     background: rgba(0, 200, 140, .15);
     border-color: rgba(0, 220, 150, .55);
     box-shadow: 0 0 10px rgba(0, 220, 150, .18);
 }
 
-    .gx-codon-block--is-start:hover {
-        background: rgba(0, 220, 150, .26);
-        box-shadow: 0 6px 22px rgba(0, 220, 150, .30);
-    }
+.gx-codon-block--is-start:hover {
+    background: rgba(0, 220, 150, .26);
+    box-shadow: 0 6px 22px rgba(0, 220, 150, .30);
+}
 
-/* Partial codon (< 3 bp): faded */
 .gx-codon-block--partial {
     opacity: .38;
     border-style: dotted;
     cursor: default;
 }
 
-/* Leader: unpaired bases before frame starts */
 .gx-codon-block--leader {
     border-style: dotted;
     border-color: rgba(255,255,255,.12);
@@ -93,8 +79,6 @@
     cursor: default;
     pointer-events: none;
 }
-
-/* ── Content inside codon blocks ─────────────────────────────────────────── */
 
 .gx-codon-block__aa {
     font-family: ui-monospace, Menlo, Consolas, monospace;
@@ -128,11 +112,9 @@
     letter-spacing: .06em;
 }
 
-/* ── Frame picker controls ───────────────────────────────────────────────── */
-
 .gx-codon-controls {
     position: absolute;
-    top: 68px; /* below the 52px-tall codon bar (10px offset + 52px + 6px gap) */
+    top: 68px; 
     right: 14px;
     z-index: 30;
     display: flex;
@@ -146,9 +128,9 @@
     pointer-events: auto;
 }
 
-    .gx-codon-controls.is-hidden {
-        display: none;
-    }
+.gx-codon-controls.is-hidden {
+    display: none;
+}
 
 .gx-codon-controls__label {
     font-size: 11px;
@@ -178,19 +160,17 @@
     line-height: 1;
 }
 
-    .gx-codon-frame-btn:hover {
-        background: rgba(255,255,255,.10);
-        color: #fff;
-    }
+.gx-codon-frame-btn:hover {
+    background: rgba(255,255,255,.10);
+    color: #fff;
+}
 
-    .gx-codon-frame-btn.is-active {
-        background: rgba(100,140,255,.22);
-        border-color: rgba(100,140,255,.50);
-        color: rgba(180,205,255,.98);
-        box-shadow: 0 0 8px rgba(100,140,255,.20);
-    }
-
-/* ── Codon hover tooltip ─────────────────────────────────────────────────── */
+.gx-codon-frame-btn.is-active {
+    background: rgba(100,140,255,.22);
+    border-color: rgba(100,140,255,.50);
+    color: rgba(180,205,255,.98);
+    box-shadow: 0 0 8px rgba(100,140,255,.20);
+}
 
 .gx-codon-tip {
     position: fixed;
@@ -270,9 +250,9 @@
     border-bottom: 1px solid rgba(255,255,255,.04);
 }
 
-    .gx-codon-tip__row:last-of-type {
-        border-bottom: none;
-    }
+.gx-codon-tip__row:last-of-type {
+    border-bottom: none;
+}
 
 .gx-codon-tip__k {
     font-size: 11px;
@@ -317,15 +297,11 @@
     color: rgba(255,130,150,.95);
 }
 
-/* ── Codons toggle button: active state ──────────────────────────────────── */
-
 #gx-codon-toggle-btn.is-active {
     background: rgba(100,140,255,.18);
     border-color: rgba(100,140,255,.45);
     color: rgba(180,205,255,.98);
 }
-
-/* ── Responsive ──────────────────────────────────────────────────────────── */
 
 @media (max-width: 720px) {
     .gx-codon-controls {

@@ -99,7 +99,6 @@ namespace GenomiX.Core.Services
 
             var f = SimFactorsJsonHelper.Read(pop.Factors);
 
-            // Collect offspring per tick — inserted via _orgs after the loop
             var offspringPerTick = new List<Organism>();
 
             for (int s = 0; s < Math.Max(1, steps); s++)
@@ -107,11 +106,9 @@ namespace GenomiX.Core.Services
                 f.Tick++;
                 offspringPerTick.Clear();
 
-                // Reset previous reproduction markers
                 foreach (var o in pop.Organisms.Where(x => x.Status == "reproduced"))
                     o.Status = "alive";
 
-                // All unique species currently alive (for hybrid offspring)
                 var aliveSpecies = pop.Organisms
                     .Where(o => o.Status != "dead")
                     .Select(o => o.Type).Distinct().ToList();
@@ -120,24 +117,20 @@ namespace GenomiX.Core.Services
                 {
                     if (o.Status == "dead") continue;
 
-                    // ── Environmental stress ──────────────────────────
                     double tempStress = Math.Pow(Math.Abs(f.Temperature - 22.0) / 40.0, 1.4);
                     double stress = Math.Clamp(
                         tempStress + f.Radiation * 0.85 + f.DiseasePressure * 0.70 - f.Resources * 0.55,
                         0.0, 2.0);
 
-                    // ── Fitness drift (accumulated) ───────────────────
                     double drift = -stress * 0.032 + f.Resources * 0.016
                                  + (Random.Shared.NextDouble() - 0.5) * 0.010;
                     o.Fitness = Math.Clamp(o.Fitness + drift, 0.0, 1.0);
                     o.SurvivalScore = o.Fitness;
 
-                    // ── Position drift ────────────────────────────────
                     double posDrift = 0.004 + stress * 0.006;
                     o.X = Math.Clamp(o.X + (float)((Random.Shared.NextDouble() - 0.5) * posDrift), 0f, 1f);
                     o.Y = Math.Clamp(o.Y + (float)((Random.Shared.NextDouble() - 0.5) * posDrift), 0f, 1f);
 
-                    // ── Death ─────────────────────────────────────────
                     double lowFitnessPenalty = Math.Pow(Math.Max(0, 0.5 - o.Fitness) * 2.0, 2.0) * 0.30;
                     double deathChance = Math.Clamp(stress * 0.048 + lowFitnessPenalty - f.Resources * 0.012, 0.001, 0.60);
                     if (Random.Shared.NextDouble() < deathChance)
@@ -145,13 +138,11 @@ namespace GenomiX.Core.Services
                         o.Status = "dead"; o.Fitness = 0; continue;
                     }
 
-                    // ── Reproduction ──────────────────────────────────
                     if (o.Fitness > 0.82 && f.Resources > 0.50
                         && Random.Shared.NextDouble() < 0.015)
                     {
                         o.Status = "reproduced";
 
-                        // Pick offspring species: 80% same, 20% hybrid from pop
                         string childSpecies = o.Type;
                         if (aliveSpecies.Count > 1 && Random.Shared.NextDouble() < 0.20)
                         {
@@ -179,18 +170,13 @@ namespace GenomiX.Core.Services
                     }
                 }
 
-                // Insert offspring for this step
-                // Using _orgs.AddAsync here is safe: it calls SaveChangesAsync which
-                // also persists all in-flight organism Status/Fitness modifications.
                 foreach (var child in offspringPerTick)
                     await _orgs.AddAsync(child);
             }
 
-            // Update population factors — UpdateAsync also re-persists tracked organisms
             pop.Factors = SimFactorsJsonHelper.Write(f);
             await _pops.UpdateAsync(pop);
 
-            // Reload population so offspring appear in result
             var updatedPop = await _pops.GetAll()
                 .Where(p => p.Id == populationId)
                 .Include(p => p.Organisms)
@@ -308,7 +294,7 @@ namespace GenomiX.Core.Services
                 .Include(p => p.BaseModel)
                 .Include(p => p.User)
                 .ToListAsync()
-                .ContinueWith(t => t.Result.FirstOrDefault(p => p.Id == id));
+                .ContinueWith(t => t.Result.FirstOrDefault(p => p.Id == id)) ?? _pops.GetAll().First();
         }
     }
 }

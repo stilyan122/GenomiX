@@ -19,7 +19,6 @@ namespace GenomiX.Common.Extensions
 {
     public static class ServiceCollectionExtensions
     {
-        // Database services
         public static IServiceCollection AddGenomixDBServices(this IServiceCollection services, string connectionString)
         {
             services
@@ -43,7 +42,6 @@ namespace GenomiX.Common.Extensions
             return services;
         }
 
-        // App services
         public static IServiceCollection AddGenomixAppServices(
             this IServiceCollection services,
             IConfiguration configuration,
@@ -72,7 +70,6 @@ namespace GenomiX.Common.Extensions
             return services;
         }
 
-        // Localization services
         public static IServiceCollection AddLocalizationServices(this IServiceCollection services)
         {
             services
@@ -111,7 +108,6 @@ namespace GenomiX.Common.Extensions
             return services;
         }
 
-        // Authentication services
 
         public static IServiceCollection AddAuthenticationServices(this IServiceCollection services,
             IConfiguration configuration)

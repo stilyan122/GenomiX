@@ -1,4 +1,5 @@
 ﻿using GenomiX.Core.Services;
+using GenomiX.Core.Services;
 using GenomiX.Infrastructure.Models;
 using GenomiX.Tests.TestHelpers;
 using Microsoft.AspNetCore.Identity;
@@ -546,7 +547,7 @@ namespace GenomiX.Tests.Services
             var rows = await sut.GetRoleRequestsForUserAsync(u1.Id);
 
             Assert.That(rows.Count, Is.EqualTo(2));
-            Assert.That(rows[0].Id, Is.EqualTo(2)); // latest first
+            Assert.That(rows[0].Id, Is.EqualTo(2)); 
             Assert.That(rows[1].Id, Is.EqualTo(1));
             Assert.That(rows.All(r => r.UserId == u1.Id), Is.True);
         }
@@ -566,7 +567,7 @@ namespace GenomiX.Tests.Services
                 RequestType = "Add",
                 Status = "Pending",
                 CreatedAt = DateTime.UtcNow,
-                User = null // explicit
+                User = null 
             });
             await db.SaveChangesAsync();
 
