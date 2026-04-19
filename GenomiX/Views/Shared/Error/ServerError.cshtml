@@ -1,0 +1,18 @@
+﻿@inject IViewLocalizer Localizer
+
+<div class="auth-wrap">
+    <div class="auth-card error-card reveal is-in">
+
+        <div class="error-code">500</div>
+
+        <h1 class="auth-title">@Localizer["Title"]</h1>
+
+        <p class="auth-sub">@Localizer["Message"]</p>
+
+        <div class="auth-external">
+            <a href="/" class="btn primary">@Localizer["Home"]</a>
+            <a href="javascript:history.back()" class="btn ghost">@Localizer["Back"]</a>
+        </div>
+
+    </div>
+</div>

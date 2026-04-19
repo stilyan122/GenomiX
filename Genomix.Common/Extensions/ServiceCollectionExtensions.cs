@@ -129,6 +129,23 @@ namespace GenomiX.Common.Extensions
 
             RegisterGitHub(ghId, ghSecret, authBuilder);
 
+            services.ConfigureApplicationCookie(options =>
+            {
+                options.AccessDeniedPath = "/Error/403";
+                options.LoginPath = "/Identity/Account/Login";
+
+                options.Events.OnRedirectToLogin = ctx =>
+                {
+                    ctx.Response.Redirect("/Error/401");
+                    return Task.CompletedTask;
+                };
+
+                options.Events.OnRedirectToAccessDenied = ctx =>
+                {
+                    ctx.Response.Redirect("/Error/403");
+                    return Task.CompletedTask;
+                };
+            });
 
             return services;
         }

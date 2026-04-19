@@ -31,6 +31,11 @@ namespace GenomiX.Controllers
             _userManager = userManager;
         }
 
+        public IActionResult ErrorTest(int code)
+        {
+            return StatusCode(code);
+        }
+
         [Route("/dna/choose")]
         public IActionResult Choose()
         {

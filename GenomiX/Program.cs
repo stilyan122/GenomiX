@@ -34,27 +34,25 @@ namespace GenomiX
             }
             else
             {
-                app.UseExceptionHandler("/Home/Error");
+                app.UseExceptionHandler("/Error/500");
                 app.UseHsts();
             }
 
             app.UseHttpsRedirection();
-            
             app.UseStaticFiles();
-            
+
             app.Localize();
-            
+
             app.UseRouting();
-            
+
             app.UseAuthentication();
             app.UseAuthorization();
+
+            app.UseStatusCodePagesWithReExecute("/Error/{0}");
 
             app.MapStaticAssets();
             app.MapRazorPages();
             app.MapAppRoutes();
-
-            app.MapRazorPages()
-               .WithStaticAssets();
 
             await app.UseKnownIdentityPasswordsAsync();
 
